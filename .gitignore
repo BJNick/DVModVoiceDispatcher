@@ -1,0 +1,9 @@
+
+## Rider and VS
+*.idea/
+*.vscode/
+*.vs/
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user

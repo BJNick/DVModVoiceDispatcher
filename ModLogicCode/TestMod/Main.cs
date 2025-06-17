@@ -32,7 +32,7 @@ namespace TestMod
         }
 
         private static string[] testVoiceLines = new string[]
-            { "YouHave", "JobTypeShuntingUnload", "Move", "3Cars", "ToTrack", "D", "7", "Move", "1Cars", "ToTrack", "B", "1" };
+            { "YouHave", "JobTypeShuntingUnload", "Move", "3Cars", "ToTrackTypeS", "D", "7", "Move", "1Cars", "ToTrackTypeI", "B", "1" };
 
         // Called when the mod is turned to on/off.
         // With this function you control an operation of the mod and inform users whether it is enabled or not.
@@ -139,6 +139,13 @@ namespace TestMod
             return track?.ID != null ? SeparateIntoLetters(track.ID.TrackPartOnly.Substring(0,2)) :
                 new[] { "Unknown", "Track" };
         }
+        
+        private static string GetTrackTypeLetter(Track track) {
+            if (track == null || track.ID == null) {
+                return "M";
+            }
+            return track.ID.FullID.Split('-').Last();
+        }
 
         private static void AddTaskLines(Task task, List<string> lineBuilder) {
             var taskData = task.GetTaskData();
@@ -168,14 +175,14 @@ namespace TestMod
             }
             
             if (start?.ID != null) {
-                lineBuilder.Add("FromTrack");
+                lineBuilder.Add("FromTrackType"+GetTrackTypeLetter(start));
                 lineBuilder.AddRange(VoicedTrackId(start));
             }
             if (end?.ID != null) {
-                if (taskData.warehouseTaskType == null || taskData.warehouseTaskType == WarehouseTaskType.None) {
-                    lineBuilder.Add("ToTrack");
+                if (taskData.warehouseTaskType == WarehouseTaskType.None) {
+                    lineBuilder.Add("ToTrackType"+GetTrackTypeLetter(end));
                 } else {
-                    lineBuilder.Add("AtTrack");
+                    lineBuilder.Add("AtTrackType"+GetTrackTypeLetter(end));
                 }
                 lineBuilder.AddRange(VoicedTrackId(end));
             }

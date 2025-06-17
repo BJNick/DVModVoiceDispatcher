@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using DV.Booklets;
 using DV.Logic.Job;
 using DV.ThingTypes;
 using UnityEngine;
@@ -30,6 +31,8 @@ namespace TestMod
             modEntry.OnToggle = OnToggle;
             return true;
         }
+        
+        private const string SHORT_PAUSE = "ShortSilence";
 
         private static string[] testVoiceLines = new string[]
             { "YouHave", "JobTypeShuntingUnload", "Move", "3Cars", "ToTrackTypeS", "D", "7", "Move", "1Cars", "ToTrackTypeI", "B", "1" };
@@ -132,19 +135,65 @@ namespace TestMod
                     behaviour.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
                 }
             }
+
+            if (Input.GetKeyDown(KeyCode.O)) {
+                var lineBuilder = new List<string>();
+                AddShuntingLoadJobLines(lineBuilder, JobsManager.Instance.currentJobs.First());
+                
+                var line = string.Join(" ", lineBuilder);
+                mod.Logger.Log("Generated voice line: " + line);
+                SetupSource();
+                var behaviour = source.gameObject.GetComponent<CoroutineRunner>();
+                behaviour.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
+            }
         }
 
-        private static string[] VoicedTrackId(Track track) {
+        private static string[] VoicedTrackId(TrackID trackId) {
             // TODO: Some types have two letters, like "SP" for storage passenger track.
-            return track?.ID != null ? SeparateIntoLetters(track.ID.TrackPartOnly.Substring(0,2)) :
+            return trackId != null ? SeparateIntoLetters(trackId.TrackPartOnly.Substring(0,2)) :
                 new[] { "Unknown", "Track" };
         }
         
-        private static string GetTrackTypeLetter(Track track) {
-            if (track == null || track.ID == null) {
+        private static string GetTrackTypeLetter(TrackID trackId) {
+            if (trackId == null) {
                 return "M";
             }
-            return track.ID.FullID.Split('-').Last();
+            return trackId.FullID.Split('-').Last();
+        }
+        
+        private static void AddShuntingLoadJobLines(List<string> lineBuilder, Job job) {
+            if (job == null || job.tasks == null || job.tasks.Count == 0) {
+                mod.Logger.Error("Invalid job or no tasks found.");
+                return;
+            }
+            var jobInfo = JobDataExtractor.ExtractShuntingLoadJobData(new Job_data(job));
+            
+            lineBuilder.Add("YouHave");
+            lineBuilder.Add("JobType" + job.jobType);
+            lineBuilder.Add(SHORT_PAUSE);
+            
+            lineBuilder.Add("Couple");
+            
+            foreach (var carDataPerTrackID in jobInfo.startingTracksData) {
+                var track = carDataPerTrackID.track;
+                var carCount = carDataPerTrackID.cars.Count;
+                lineBuilder.Add(carCount+"Cars");
+                lineBuilder.Add("AtTrack");
+                lineBuilder.AddRange(VoicedTrackId(track));
+                lineBuilder.Add(SHORT_PAUSE);
+            }
+            
+            lineBuilder.Add("ThenMove");
+            lineBuilder.Add(jobInfo.allCarsToLoad.Count+"Cars");
+            lineBuilder.Add("ToTrack");
+            lineBuilder.AddRange(VoicedTrackId(jobInfo.loadMachineTrack));
+            lineBuilder.Add("ForLoading");
+            lineBuilder.Add(SHORT_PAUSE);
+            
+            lineBuilder.Add("ThenUncouple");
+            lineBuilder.Add("AtTrackType" + GetTrackTypeLetter(jobInfo.destinationTrack));
+            lineBuilder.AddRange(VoicedTrackId(jobInfo.destinationTrack));
+            lineBuilder.Add("ForDeparture");
         }
 
         private static void AddTaskLines(Task task, List<string> lineBuilder) {
@@ -175,16 +224,16 @@ namespace TestMod
             }
             
             if (start?.ID != null) {
-                lineBuilder.Add("FromTrackType"+GetTrackTypeLetter(start));
-                lineBuilder.AddRange(VoicedTrackId(start));
+                lineBuilder.Add("FromTrackType"+GetTrackTypeLetter(start.ID));
+                lineBuilder.AddRange(VoicedTrackId(start.ID));
             }
             if (end?.ID != null) {
                 if (taskData.warehouseTaskType == WarehouseTaskType.None) {
-                    lineBuilder.Add("ToTrackType"+GetTrackTypeLetter(end));
+                    lineBuilder.Add("ToTrackType"+GetTrackTypeLetter(end.ID));
                 } else {
-                    lineBuilder.Add("AtTrackType"+GetTrackTypeLetter(end));
+                    lineBuilder.Add("AtTrackType"+GetTrackTypeLetter(end.ID));
                 }
-                lineBuilder.AddRange(VoicedTrackId(end));
+                lineBuilder.AddRange(VoicedTrackId(end.ID));
             }
         }
 

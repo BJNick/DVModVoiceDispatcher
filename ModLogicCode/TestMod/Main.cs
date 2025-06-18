@@ -15,19 +15,20 @@ namespace TestMod
     {
         public static bool enabled;
         public static UnityModManager.ModEntry mod;
-
-        private static GameObject cube;
-        private static AudioClip chime;
-        private static AudioClip welcomeMsg;
         
         private static AudioSource source;
         
+        private static string assetBundlePath;
         private static AssetBundle voicedLines;
         
         private static int currentLineIndex = 0;
+        
+        private static List<string> readJobs = new List<string>();
+        private static bool currentlyReading;
 
         static bool Load(UnityModManager.ModEntry modEntry) {
             mod = modEntry;
+            assetBundlePath = Path.Combine(mod.Path, "voiced_lines");
             modEntry.OnToggle = OnToggle;
             return true;
         }
@@ -41,12 +42,9 @@ namespace TestMod
         // With this function you control an operation of the mod and inform users whether it is enabled or not.
         static bool OnToggle(UnityModManager.ModEntry modEntry, bool value /* to active or deactivate */)
         {
-            if (value)
-            {
+            if (value) {
                 Enable(); // Perform all necessary steps to start mod.
-            }
-            else
-            {
+            } else {
                 Disable(); // Perform all necessary steps to stop mod.
             }
             
@@ -56,23 +54,13 @@ namespace TestMod
 
         static void Enable() {
             mod.OnUpdate = OnUpdate;
+            mod.OnSessionStart = OnSessionStart;
             try {
-                var path = Path.Combine(mod.Path, "testbundle");
-                mod.Logger.Log("Getting asset bundle from: " + path);
-                var assets = AssetBundle.LoadFromFile(path);
-                
-                path = Path.Combine(mod.Path, "voiced_lines");
-                mod.Logger.Log("Loading voiced lines from: " + path);
-                voicedLines = AssetBundle.LoadFromFile(path);
-                
+                mod.Logger.Log("Loading voiced lines from: " + assetBundlePath);
+                voicedLines = AssetBundle.LoadFromFile(assetBundlePath);
                 if (voicedLines == null) {
                     mod.Logger.Error("Failed to load voiced lines asset bundle.");
                 }
-                
-                mod.Logger.Log("Got asset bundle: " + assets);
-                cube = assets.LoadAsset<GameObject>("Cube");
-                chime = assets.LoadAsset<AudioClip>("chime");
-                welcomeMsg = assets.LoadAsset<AudioClip>("welcome-dm3");
             } catch (Exception e) {
                 mod.Logger.Error("Failed to load asset bundle: " + e.Message);
             }
@@ -83,23 +71,17 @@ namespace TestMod
             mod.OnUpdate = null;
             PlayerManager.CarChanged -= OnCarChanged;
         }
+        
+        static void OnCarChanged(TrainCar car) {
+            //ReadJobOverview(JobsManager.Instance.currentJobs.First());
+        }
 
+        static void OnSessionStart(UnityModManager.ModEntry modEntry) {
+            SetupSource();
+        }
+        
         static void OnUpdate(UnityModManager.ModEntry modEntry, float dt) {
-            // on key press, instantiate a cube and play a sound
-            if (Input.GetKeyDown(KeyCode.C)) {
-                // Create a gameobject with an audio source and play the audio clip
-                var obj = GameObject.Instantiate(cube);
-                var pos = Camera.main.transform.position;
-                obj.transform.position = pos;
-
-                var audioSource = obj.AddComponent<AudioSource>();
-                audioSource.clip = chime;
-                audioSource.Play();
-                audioSource.loop = true;
-
-            }
-
-            if (Input.GetKeyDown(KeyCode.F)) {
+            if (Input.GetKeyDown(KeyCode.L)) {
                 SetupSource();
                 var behaviour = source.gameObject.GetComponent<CoroutineRunner>();
                 behaviour.StartCoroutine(PlayVoiceLinesCoroutine(testVoiceLines));
@@ -107,44 +89,54 @@ namespace TestMod
 
             if (Input.GetKeyDown(KeyCode.P)) {
                 var lineBuilder = new List<string>();
-                if (JobsManager.Instance.currentJobs.Count == 0) {
-                    mod.Logger.Log("No current jobs found.");
-                    lineBuilder.Add("YouHaveA");
-                    lineBuilder.Add("0");
-                    lineBuilder.Add("Cars");
-                    lineBuilder.Add("To");
-                    lineBuilder.Add("Move");
-                }
-                
-                foreach (var job in JobsManager.Instance.currentJobs) {
-                    lineBuilder.Add("YouHave");
-
-                    var typeLine = "JobType" + job.jobType;
-                    lineBuilder.Add(typeLine);
-
-                    foreach (var task in job.tasks) {
-                        AddTaskLines(task, lineBuilder);
-                    }
-                }
-
-                if (lineBuilder.Count > 0) {
-                    var line = string.Join(" ", lineBuilder);
-                    mod.Logger.Log("Generated voice line: " + line);
-                    SetupSource();
-                    var behaviour = source.gameObject.GetComponent<CoroutineRunner>();
-                    behaviour.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.O)) {
-                var lineBuilder = new List<string>();
-                AddJobSpecificLines(lineBuilder, JobsManager.Instance.currentJobs.First());
-                
+                AddGenericJobLines(lineBuilder, JobsManager.Instance.currentJobs.First());
                 var line = string.Join(" ", lineBuilder);
                 mod.Logger.Log("Generated voice line: " + line);
                 SetupSource();
                 var behaviour = source.gameObject.GetComponent<CoroutineRunner>();
                 behaviour.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
+            }
+
+            if (Input.GetKeyDown(KeyCode.O)) {
+                ReadJobOverview(JobsManager.Instance.currentJobs.First());
+            }
+            
+            if (JobsManager.Instance != null) {
+                foreach (var job in JobsManager.Instance.currentJobs) {
+                    if (!readJobs.Contains(job.ID) && !currentlyReading) {
+                        readJobs.Add(job.ID);
+                        ReadJobOverview(job);
+                    }
+                }
+            }
+        }
+
+        private static void AddGenericJobLines(List<string> lineBuilder, Job job) {
+            lineBuilder.Add("YouHave");
+
+            var typeLine = "JobType" + job.jobType;
+            lineBuilder.Add(typeLine);
+
+            foreach (var task in job.tasks) {
+                AddTaskLines(task, lineBuilder);
+            }
+        }
+
+        private static void ReadJobOverview(Job job) {
+            if (currentlyReading) {
+                return;
+            }
+            currentlyReading = true;
+            try {
+                var lineBuilder = new List<string>();
+                AddJobSpecificLines(lineBuilder, job);
+                var line = string.Join(" ", lineBuilder);
+                mod.Logger.Log("Generated voice line: " + line);
+                SetupSource();
+                var behaviour = source.gameObject.GetComponent<CoroutineRunner>();
+                behaviour.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
+            } finally {
+                currentlyReading = false;
             }
         }
 
@@ -174,7 +166,7 @@ namespace TestMod
                     AddShuntingUnloadJobLines(lineBuilder, job);
                     break;
                 default:
-                    mod.Logger.Error("Unsupported job type: " + job.jobType);
+                    AddGenericJobLines(lineBuilder, job);
                     break;
             }
         }
@@ -315,6 +307,7 @@ namespace TestMod
                 var waitTime = clip.length - 0.05f;
                 yield return new WaitForSeconds(waitTime);
             }
+            currentlyReading = false;
         }
         
         static AudioClip GetVoicedClip(string name)
@@ -330,14 +323,6 @@ namespace TestMod
             return clip;
         }
         
-        static void OnCarChanged(TrainCar car)
-        {
-            if (car != null && car.carType == TrainCarType.LocoDM3)
-            {
-                PlaySound(welcomeMsg);
-            }
-        }
-        
         static void PlaySound(AudioClip clip)
         {
             SetupSource();
@@ -347,11 +332,17 @@ namespace TestMod
         }
 
         private static void SetupSource() {
+            if (voicedLines == null) {
+                voicedLines = AssetBundle.LoadFromFile(assetBundlePath);
+                mod.Logger.Error("Failed to load voiced lines asset bundle.");
+            }
             if (source == null)
             {
                 source = new GameObject("AudioSource").AddComponent<AudioSource>();
                 source.transform.position = Camera.main.transform.position;//PlayerManager.PlayerTransform.position;
                 source.loop = false;
+            }
+            if (source.gameObject.GetComponent<CoroutineRunner>() == null) {
                 source.gameObject.AddComponent<CoroutineRunner>();
             }
         }

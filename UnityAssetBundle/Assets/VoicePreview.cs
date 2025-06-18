@@ -24,7 +24,7 @@ public class VoicePreview : MonoBehaviour
             play = false;
             
             var lineBuilder = new List<string>();
-            AddShuntingLoadJobLines(lineBuilder);
+            AddShuntingUnloadJobLines(lineBuilder);
 
             var line = string.Join(" ", lineBuilder);
             Debug.Log(line);
@@ -45,9 +45,10 @@ public class VoicePreview : MonoBehaviour
     private static void AddShuntingUnloadJobLines(List<string> lineBuilder) {
         lineBuilder.AddRange(new[] {
             "YouHave", "JobTypeShuntingUnload", SHORT_PAUSE,
-            "PickUp", "3Cars", "AtTrackTypeI", "E", "2", SHORT_PAUSE,
+            "PickUp", "6Cars", "AtTrackTypeI", "E", "2", SHORT_PAUSE,
             "ThenUnloadThoseCars", "AtTrack", "F", "4", SHORT_PAUSE,
             "ThenUncouple", "2Cars", "AtTrack", "G", "1", SHORT_PAUSE,
+            "3Cars", "AtTrack", "H", "3", SHORT_PAUSE,
             "And", "1Cars", "AtTrack", "H", "3", "ToCompleteTheOrder"
         });
     }

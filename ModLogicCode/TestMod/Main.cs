@@ -188,13 +188,13 @@ namespace TestMod
                 var carDataPerTrackID = jobInfo.startingTracksData[index];
                 var track = carDataPerTrackID.track;
                 var carCount = carDataPerTrackID.cars.Count;
+                if (index == jobInfo.startingTracksData.Count - 1) {
+                    lineBuilder.Add("And");
+                }
                 lineBuilder.Add(carCount + "Cars");
                 lineBuilder.Add("AtTrack");
                 lineBuilder.AddRange(VoicedTrackId(track));
                 lineBuilder.Add(SHORT_PAUSE);
-                if (index < jobInfo.startingTracksData.Count - 1) {
-                    lineBuilder.Add("And");
-                }
             }
 
             lineBuilder.Add("ThenMove");
@@ -237,12 +237,14 @@ namespace TestMod
                 var carDataPerTrackID = jobInfo.destinationTracksData[index];
                 var track = carDataPerTrackID.track;
                 var carCount = carDataPerTrackID.cars.Count;
+                if (index == jobInfo.destinationTracksData.Count - 1) {
+                    lineBuilder.Add("And");
+                }
                 lineBuilder.Add(carCount + "Cars");
                 lineBuilder.Add("AtTrack");
                 lineBuilder.AddRange(VoicedTrackId(track));
                 if (index < jobInfo.destinationTracksData.Count - 1) {
                     lineBuilder.Add(SHORT_PAUSE);
-                    lineBuilder.Add("And");
                 }
             }
             lineBuilder.Add("ToCompleteTheOrder");

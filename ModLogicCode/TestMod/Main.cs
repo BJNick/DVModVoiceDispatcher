@@ -138,7 +138,7 @@ namespace TestMod
 
             if (Input.GetKeyDown(KeyCode.O)) {
                 var lineBuilder = new List<string>();
-                AddShuntingLoadJobLines(lineBuilder, JobsManager.Instance.currentJobs.First());
+                AddJobSpecificLines(lineBuilder, JobsManager.Instance.currentJobs.First());
                 
                 var line = string.Join(" ", lineBuilder);
                 mod.Logger.Log("Generated voice line: " + line);
@@ -161,6 +161,24 @@ namespace TestMod
             return trackId.FullID.Split('-').Last();
         }
         
+        private static void AddJobSpecificLines(List<string> lineBuilder, Job job) {
+            if (job == null || job.tasks == null || job.tasks.Count == 0) {
+                mod.Logger.Error("Invalid job or no tasks found.");
+                return;
+            }
+            switch (job.jobType) {
+                case JobType.ShuntingLoad:
+                    AddShuntingLoadJobLines(lineBuilder, job);
+                    break;
+                case JobType.ShuntingUnload:
+                    AddShuntingUnloadJobLines(lineBuilder, job);
+                    break;
+                default:
+                    mod.Logger.Error("Unsupported job type: " + job.jobType);
+                    break;
+            }
+        }
+        
         private static void AddShuntingLoadJobLines(List<string> lineBuilder, Job job) {
             if (job == null || job.tasks == null || job.tasks.Count == 0) {
                 mod.Logger.Error("Invalid job or no tasks found.");
@@ -173,16 +191,20 @@ namespace TestMod
             lineBuilder.Add(SHORT_PAUSE);
             
             lineBuilder.Add("Couple");
-            
-            foreach (var carDataPerTrackID in jobInfo.startingTracksData) {
+
+            for (var index = 0; index < jobInfo.startingTracksData.Count; index++) {
+                var carDataPerTrackID = jobInfo.startingTracksData[index];
                 var track = carDataPerTrackID.track;
                 var carCount = carDataPerTrackID.cars.Count;
-                lineBuilder.Add(carCount+"Cars");
+                lineBuilder.Add(carCount + "Cars");
                 lineBuilder.Add("AtTrack");
                 lineBuilder.AddRange(VoicedTrackId(track));
                 lineBuilder.Add(SHORT_PAUSE);
+                if (index < jobInfo.startingTracksData.Count - 1) {
+                    lineBuilder.Add("And");
+                }
             }
-            
+
             lineBuilder.Add("ThenMove");
             lineBuilder.Add(jobInfo.allCarsToLoad.Count+"Cars");
             lineBuilder.Add("ToTrack");
@@ -194,6 +216,44 @@ namespace TestMod
             lineBuilder.Add("AtTrackType" + GetTrackTypeLetter(jobInfo.destinationTrack));
             lineBuilder.AddRange(VoicedTrackId(jobInfo.destinationTrack));
             lineBuilder.Add("ForDeparture");
+        }
+        
+        private static void AddShuntingUnloadJobLines(List<string> lineBuilder, Job job) {
+            if (job == null || job.tasks == null || job.tasks.Count == 0) {
+                mod.Logger.Error("Invalid job or no tasks found.");
+                return;
+            }
+            var jobInfo = JobDataExtractor.ExtractShuntingUnloadJobData(new Job_data(job));
+            
+            lineBuilder.Add("YouHave");
+            lineBuilder.Add("JobType" + job.jobType);
+            lineBuilder.Add(SHORT_PAUSE);
+            
+            lineBuilder.Add("PickUp");
+            lineBuilder.Add(jobInfo.allCarsToUnload.Count+"Cars");
+            lineBuilder.Add("AtTrackType" + GetTrackTypeLetter(jobInfo.startingTrack));
+            lineBuilder.AddRange(VoicedTrackId(jobInfo.startingTrack));
+            lineBuilder.Add(SHORT_PAUSE);
+            
+            lineBuilder.Add("ThenUnloadThoseCars");
+            lineBuilder.Add("AtTrack");
+            lineBuilder.AddRange(VoicedTrackId(jobInfo.unloadMachineTrack));
+            lineBuilder.Add(SHORT_PAUSE);
+            
+            lineBuilder.Add("ThenUncouple");
+            for (var index = 0; index < jobInfo.destinationTracksData.Count; index++) {
+                var carDataPerTrackID = jobInfo.destinationTracksData[index];
+                var track = carDataPerTrackID.track;
+                var carCount = carDataPerTrackID.cars.Count;
+                lineBuilder.Add(carCount + "Cars");
+                lineBuilder.Add("AtTrack");
+                lineBuilder.AddRange(VoicedTrackId(track));
+                if (index < jobInfo.destinationTracksData.Count - 1) {
+                    lineBuilder.Add(SHORT_PAUSE);
+                    lineBuilder.Add("And");
+                }
+            }
+            lineBuilder.Add("ToCompleteTheOrder");
         }
 
         private static void AddTaskLines(Task task, List<string> lineBuilder) {

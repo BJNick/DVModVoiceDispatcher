@@ -36,9 +36,19 @@ public class VoicePreview : MonoBehaviour
         lineBuilder.AddRange(new[] {
             "YouHave", "JobTypeShuntingLoad", SHORT_PAUSE,
             "Couple", "4Cars", "AtTrack", "D", "1", SHORT_PAUSE,
-            "2Cars", "AtTrack", "A", "5", SHORT_PAUSE,
+            "And", "2Cars", "AtTrack", "A", "5", SHORT_PAUSE,
             "ThenMove", "6Cars", "ToTrack", "C", "3", "ForLoading", SHORT_PAUSE,
             "ThenUncouple", "AtTrackTypeO", "B", "7", "ForDeparture"
+        });
+    }
+    
+    private static void AddShuntingUnloadJobLines(List<string> lineBuilder) {
+        lineBuilder.AddRange(new[] {
+            "YouHave", "JobTypeShuntingUnload", SHORT_PAUSE,
+            "PickUp", "3Cars", "AtTrackTypeI", "E", "2", SHORT_PAUSE,
+            "ThenUnloadThoseCars", "AtTrack", "F", "4", SHORT_PAUSE,
+            "ThenUncouple", "2Cars", "AtTrack", "G", "1", SHORT_PAUSE,
+            "And", "1Cars", "AtTrack", "H", "3", "ToCompleteTheOrder"
         });
     }
     

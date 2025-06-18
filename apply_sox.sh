@@ -38,4 +38,3 @@ else
     rate 8000
 fi
 
-echo "Radio effect applied: $OUTPUT"

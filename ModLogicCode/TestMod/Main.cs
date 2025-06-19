@@ -3,11 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using DV;
 using DV.Booklets;
 using DV.Logic.Job;
 using DV.ThingTypes;
+using DV.Utils;
+using HarmonyLib;
 using UnityEngine;
 using UnityModManagerNet;
+using Object = UnityEngine.Object;
 
 namespace TestMod
 {
@@ -26,7 +31,12 @@ namespace TestMod
         private static List<string> readJobs = new List<string>();
         private static bool currentlyReading;
 
+        private static CommsRadioController commsRadio;
+        
         static bool Load(UnityModManager.ModEntry modEntry) {
+            var harmony = new Harmony(modEntry.Info.Id);
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
+
             mod = modEntry;
             assetBundlePath = Path.Combine(mod.Path, "voiced_lines");
             modEntry.OnToggle = OnToggle;
@@ -78,6 +88,7 @@ namespace TestMod
 
         static void OnSessionStart(UnityModManager.ModEntry modEntry) {
             SetupSource();
+            commsRadio = Object.FindObjectOfType<CommsRadioController>();
         }
         
         static void OnUpdate(UnityModManager.ModEntry modEntry, float dt) {
@@ -304,12 +315,22 @@ namespace TestMod
                 yield break;
             }
             foreach (var clip in clips) {
-                source.PlayOneShot(clip);
+                PlayRadioClip(clip);
                 // Sleep until the next clip is ready to play
                 var waitTime = clip.length - 0.05f;
                 yield return new WaitForSeconds(waitTime);
             }
             currentlyReading = false;
+        }
+
+        static void PlayRadioClip(AudioClip clip) {
+            var radio = CommsRadioNarrator.Instance;
+            if (radio == null) {
+                mod.Logger.Error("CommsRadioNarrator instance not found.");
+                clip.Play(Camera.main.transform.position);
+                return;
+            }
+            clip.Play(radio.transform.position, volume: 1, minDistance: 4, maxDistance: 10f, parent: radio.transform, mixerGroup: SingletonBehaviour<AudioManager>.Instance.cabGroup);
         }
         
         static AudioClip GetVoicedClip(string name)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DV;
 using DV.Customization.Paint;
@@ -55,6 +56,9 @@ namespace TestMod
             return LASER_COLOR;
         }
         public void OverrideSignalOrigin(Transform signalOrigin) => this.signalOrigin = signalOrigin;
+        
+        public static event Action<TrainCar> OnCarClicked;
+        public static event Action OnNothingClicked;
 
         #region Initialization
 
@@ -130,7 +134,7 @@ namespace TestMod
 
         public void SetStartingDisplay()
         {
-            display.SetDisplay("Narrator", "Hello world!", "MyAction");
+            display.SetDisplay("Narrator", "Ongoing order available", "Check");
         }
 
         #endregion
@@ -172,11 +176,15 @@ namespace TestMod
                     PointedCar = car;
                     HighlightCar(PointedCar, selectionMaterial);
                     CommsRadioController.PlayAudioFromRadio(HoverCarSound, transform);
+                    
+                    display.SetContentAndAction("What is this car?", "Ask");
                 }
                 else
                 {
                     PointedCar = null;
                     ClearHighlightedCar();
+                    
+                    display.SetContentAndAction("Ongoing order available", "Check");
                 }
             }
         }
@@ -322,7 +330,7 @@ namespace TestMod
             switch (CurrentState)
             {
                 case State.SelectCar:
-                    if (PointedCar != null)
+                    /*if (PointedCar != null)
                     {
                         SelectedCar = PointedCar;
                         HasInterior = SelectedCar.GetComponents<TrainCarPaint>().Any(tcp => tcp.TargetArea == TrainCarPaint.Target.Interior);
@@ -331,6 +339,11 @@ namespace TestMod
                         HighlightCar(SelectedCar, skinningMaterial);
                         CommsRadioController.PlayAudioFromRadio(SelectedCarSound, transform);
                         SetState(State.SelectSkin);
+                    }*/
+                    if (PointedCar != null) {
+                        OnCarClicked?.Invoke(PointedCar);
+                    } else {
+                        OnNothingClicked?.Invoke();
                     }
                     break;
 

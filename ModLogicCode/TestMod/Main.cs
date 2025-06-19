@@ -75,6 +75,8 @@ namespace TestMod
                 mod.Logger.Error("Failed to load asset bundle: " + e.Message);
             }
             PlayerManager.CarChanged += OnCarChanged;
+            CommsRadioNarrator.OnCarClicked += OnCarClicked;
+            CommsRadioNarrator.OnNothingClicked += ReadFirstJobOverview;
         }
         
         static void Disable() {
@@ -84,6 +86,16 @@ namespace TestMod
         
         static void OnCarChanged(TrainCar car) {
             //ReadJobOverview(JobsManager.Instance.currentJobs.First());
+        }
+
+        static void OnCarClicked(TrainCar car) {
+            var lineBuilder = new List<string>();
+            lineBuilder.Add("ThisIsCar");
+            lineBuilder.AddRange(SeparateIntoLetters(car.ID));
+            
+            SetupSource();
+            var behaviour = source.gameObject.GetComponent<CoroutineRunner>();
+            behaviour.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
         }
 
         static void OnSessionStart(UnityModManager.ModEntry modEntry) {
@@ -130,6 +142,19 @@ namespace TestMod
 
             foreach (var task in job.tasks) {
                 AddTaskLines(task, lineBuilder);
+            }
+        }
+        
+        private static void ReadFirstJobOverview() {
+            if (JobsManager.Instance == null || JobsManager.Instance.currentJobs == null || JobsManager.Instance.currentJobs.Count == 0) {
+                mod.Logger.Error("No jobs available to read.");
+                return;
+            }
+            var firstJob = JobsManager.Instance.currentJobs.FirstOrDefault();
+            if (firstJob != null) {
+                ReadJobOverview(firstJob);
+            } else {
+                mod.Logger.Error("No valid job found to read.");
             }
         }
 
@@ -325,12 +350,14 @@ namespace TestMod
 
         static void PlayRadioClip(AudioClip clip) {
             var radio = CommsRadioNarrator.Instance;
-            if (radio == null) {
-                mod.Logger.Error("CommsRadioNarrator instance not found.");
-                clip.Play(Camera.main.transform.position);
-                return;
+            var playAt = PlayerManager.PlayerTransform;
+            if (radio != null && radio.isActiveAndEnabled) {
+                playAt = radio.transform;
             }
-            clip.Play(radio.transform.position, volume: 1, minDistance: 4, maxDistance: 10f, parent: radio.transform, mixerGroup: SingletonBehaviour<AudioManager>.Instance.cabGroup);
+            if (playAt == null) {
+                playAt = Camera.main.transform;
+            }
+            clip.Play(playAt.position, volume: 1, minDistance: 1, maxDistance: 10f, parent: playAt, mixerGroup: SingletonBehaviour<AudioManager>.Instance.cabGroup);
         }
         
         static AudioClip GetVoicedClip(string name)

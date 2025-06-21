@@ -38,6 +38,8 @@ namespace TestMod
             harmony.PatchAll(Assembly.GetExecutingAssembly());
 
             mod = modEntry;
+            CommsRadioNarrator.mod = mod;
+            
             assetBundlePath = Path.Combine(mod.Path, "voiced_lines");
             modEntry.OnToggle = OnToggle;
             return true;
@@ -340,24 +342,12 @@ namespace TestMod
                 yield break;
             }
             foreach (var clip in clips) {
-                PlayRadioClip(clip);
+                CommsRadioNarrator.PlayRadioClip(clip);
                 // Sleep until the next clip is ready to play
                 var waitTime = clip.length - 0.05f;
                 yield return new WaitForSeconds(waitTime);
             }
             currentlyReading = false;
-        }
-
-        static void PlayRadioClip(AudioClip clip) {
-            var radio = CommsRadioNarrator.Instance;
-            var playAt = PlayerManager.PlayerTransform;
-            if (radio != null && radio.isActiveAndEnabled) {
-                playAt = radio.transform;
-            }
-            if (playAt == null) {
-                playAt = Camera.main.transform;
-            }
-            clip.Play(playAt.position, volume: 1, minDistance: 1, maxDistance: 10f, parent: playAt, mixerGroup: SingletonBehaviour<AudioManager>.Instance.cabGroup);
         }
         
         static AudioClip GetVoicedClip(string name)

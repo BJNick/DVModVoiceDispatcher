@@ -5,8 +5,11 @@ using DV;
 using DV.Customization.Paint;
 using DV.ThingTypes;
 using DV.UserManagement;
+using DV.Utils;
 using HarmonyLib;
 using UnityEngine;
+using UnityEngine.Audio;
+using UnityModManagerNet;
 
 // Thank you Skin Manager for this beautiful code 
 #nullable disable
@@ -14,6 +17,8 @@ namespace TestMod
 {
     public class CommsRadioNarrator : MonoBehaviour, ICommsRadioMode
     {
+        public static UnityModManager.ModEntry mod;
+        
         public static CommsRadioNarrator Instance;
         
         public static CommsRadioController Controller;
@@ -39,6 +44,9 @@ namespace TestMod
         private TrainCar PointedCar = null;
         private bool HasInterior = false;
         private MeshRenderer HighlighterRender;
+        
+        public static AudioSource source;
+        static AudioManager audioManager;
 
         //private PaintArea AreaToPaint = PaintArea.All;
         //private PaintArea AlreadyPainted = PaintArea.None;
@@ -84,6 +92,28 @@ namespace TestMod
             else
             {
                 Debug.LogError("CommsRadioNarrator: couldn't get properties from siblings");
+            }
+
+            SetUpSource();
+        }
+
+        private static void SetUpSource() {
+            if (!source) {
+                var sourceObject = new GameObject("CommsRadioNarratorAudioSource");
+                source = sourceObject.AddComponent<AudioSource>();
+            }
+            source.playOnAwake = false;
+            source.spatialBlend = 1f;
+            source.minDistance = 0.5f;
+            source.maxDistance = 10f;
+            source.rolloffMode = AudioRolloffMode.Logarithmic;
+            source.volume = 1;
+            try {
+                audioManager = SingletonBehaviour<AudioManager>.Instance;
+                var boomboxGroups = audioManager.mix.FindMatchingGroups("Boombox");
+                source.outputAudioMixerGroup = boomboxGroups.Length > 0 ? boomboxGroups.First() : audioManager.cabGroup;
+            } catch (Exception e) {
+                mod.Logger.Error($"CommsRadioNarrator: Failed to set audio mixer group: {e.Message}");
             }
         }
 
@@ -232,6 +262,8 @@ namespace TestMod
 
         public void OnUpdate()
         {
+            MoveSourceIntoPosition();
+            
             TrainCar trainCar;
 
             switch (CurrentState)
@@ -454,6 +486,27 @@ namespace TestMod
             SelectCar,
             SelectSkin,
             SelectAreas,
+        }
+        
+        public static void PlayRadioClip(AudioClip clip) {
+            SetUpSource();
+            MoveSourceIntoPosition();
+            //clip.Play(playAt.position, volume: 1, minDistance: 1, maxDistance: 10f, parent: playAt, mixerGroup: SingletonBehaviour<AudioManager>.Instance.cabGroup);
+            source.clip = clip;
+            source.Play();
+        }
+        
+        public static void MoveSourceIntoPosition() {
+            var radio = Instance;
+            var playAt = PlayerManager.PlayerTransform;
+            if (radio && radio.isActiveAndEnabled) {
+                playAt = radio.transform;
+            }
+            if (!playAt) {
+                playAt = Camera.main.transform;
+            }
+            source.transform.position = playAt.position;
+            source.transform.rotation = playAt.rotation;
         }
     }
     

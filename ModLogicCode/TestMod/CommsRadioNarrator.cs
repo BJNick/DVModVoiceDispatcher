@@ -103,7 +103,6 @@ namespace TestMod
                 source = sourceObject.AddComponent<AudioSource>();
             }
             source.playOnAwake = false;
-            source.spatialBlend = 1f;
             source.minDistance = 0.5f;
             source.maxDistance = 10f;
             source.rolloffMode = AudioRolloffMode.Logarithmic;
@@ -501,9 +500,15 @@ namespace TestMod
             var playAt = PlayerManager.PlayerTransform;
             if (radio && radio.isActiveAndEnabled) {
                 playAt = radio.transform;
-            }
-            if (!playAt) {
-                playAt = Camera.main.transform;
+                var distanceFromListener = Vector3.Distance(playAt.position, Camera.main.transform.transform.position);
+                // Decrease spacial blend to 0 at distance 0.4 and lower, increase to 1 at distance 0.8 and beyond
+                source.volume = 1;
+                source.spatialBlend = Mathf.Clamp01((distanceFromListener - 0.4f) / 0.4f);
+            } else {
+                if (!playAt) playAt = Camera.main.transform;
+                // in inventory
+                source.volume = 0.75f; 
+                source.spatialBlend = 0;
             }
             source.transform.position = playAt.position;
             source.transform.rotation = playAt.rotation;

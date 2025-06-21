@@ -191,6 +191,13 @@ namespace TestMod
             return trackId.FullID.Split('-').Last();
         }
         
+        private static string GetYardName(TrackID trackId) {
+            if (trackId == null) {
+                return "Unknown Yard";
+            }
+            return trackId.yardId;
+        }
+        
         private static void AddJobSpecificLines(List<string> lineBuilder, Job job) {
             if (job == null || job.tasks == null || job.tasks.Count == 0) {
                 mod.Logger.Error("Invalid job or no tasks found.");
@@ -202,6 +209,12 @@ namespace TestMod
                     break;
                 case JobType.ShuntingUnload:
                     AddShuntingUnloadJobLines(lineBuilder, job);
+                    break;
+                case JobType.Transport:
+                    AddTransportJobLines(lineBuilder, job);
+                    break;
+                case JobType.EmptyHaul:
+                    AddEmptyHaulJobLines(lineBuilder, job);
                     break;
                 default:
                     AddGenericJobLines(lineBuilder, job);
@@ -286,6 +299,45 @@ namespace TestMod
                 }
             }
             lineBuilder.Add("ToCompleteTheOrder");
+        }
+        
+        private static void AddTransportJobLines(List<string> lineBuilder, Job job) {
+            if (job == null || job.tasks == null || job.tasks.Count == 0) {
+                mod.Logger.Error("Invalid job or no tasks found.");
+                return;
+            }
+            var jobInfo = JobDataExtractor.ExtractTransportJobData(new Job_data(job));
+            AddBasicTransportJobLines(lineBuilder, job.jobType, jobInfo.transportingCars, jobInfo.startingTrack, jobInfo.destinationTrack);
+        }
+        
+        private static void AddEmptyHaulJobLines(List<string> lineBuilder, Job job) {
+            if (job == null || job.tasks == null || job.tasks.Count == 0) {
+                mod.Logger.Error("Invalid job or no tasks found.");
+                return;
+            }
+            var jobInfo = JobDataExtractor.ExtractEmptyHaulJobData(new Job_data(job));
+            AddBasicTransportJobLines(lineBuilder, job.jobType, jobInfo.transportingCars, jobInfo.startingTrack, jobInfo.destinationTrack);
+        }
+
+        private static void AddBasicTransportJobLines(List<string> lineBuilder, JobType jobType, List<Car_data> transportingCars,
+            TrackID startingTrack, TrackID destinationTrack) {
+            lineBuilder.Add("YouHave");
+            lineBuilder.Add("JobType" + jobType);
+            lineBuilder.Add(SHORT_PAUSE);
+
+            lineBuilder.Add("PickUp");
+            lineBuilder.Add(transportingCars.Count+"Cars");
+            lineBuilder.Add("FromTrack");
+            lineBuilder.AddRange(VoicedTrackId(startingTrack));
+            lineBuilder.Add("InYard");
+            lineBuilder.Add(GetYardName(startingTrack));
+            lineBuilder.Add(SHORT_PAUSE);
+
+            lineBuilder.Add("ThenDropOffThoseCars");
+            lineBuilder.Add("AtTrack");
+            lineBuilder.AddRange(VoicedTrackId(destinationTrack));
+            lineBuilder.Add("InYard");
+            lineBuilder.Add(GetYardName(destinationTrack));
         }
 
         private static void AddTaskLines(Task task, List<string> lineBuilder) {

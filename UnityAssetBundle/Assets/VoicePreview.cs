@@ -24,7 +24,7 @@ public class VoicePreview : MonoBehaviour
             play = false;
             
             var lineBuilder = new List<string>();
-            AddShuntingUnloadJobLines(lineBuilder);
+            AddTransportJobLines(lineBuilder);
 
             var line = string.Join(" ", lineBuilder);
             Debug.Log(line);
@@ -50,6 +50,14 @@ public class VoicePreview : MonoBehaviour
             "ThenUncouple", "2Cars", "AtTrack", "G", "1", SHORT_PAUSE,
             "3Cars", "AtTrack", "H", "3", SHORT_PAUSE,
             "And", "1Cars", "AtTrack", "H", "3", "ToCompleteTheOrder"
+        });
+    }
+    
+    private static void AddTransportJobLines(List<string> lineBuilder) {
+        lineBuilder.AddRange(new[] {
+            "YouHave", "JobTypeTransport", SHORT_PAUSE,
+            "PickUp", "12Cars", "FromTrack", "A", "1", "InYard", "YardGF", SHORT_PAUSE,
+            "ThenDropOffThoseCars", "AtTrack", "B", "2", "InYard", "YardIME"
         });
     }
     

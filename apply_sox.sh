@@ -14,30 +14,32 @@ if [[ "$INPUT" == *IPA/* ]]; then
   sox "$INPUT" "$OUTPUT" -R \
     highpass 300 \
     lowpass 3400 \
-    compand 0.3,1 6:-70,-60,-20 -5 \
+    compand 0.0,0.1 6:-80,-70,-5 \
     overdrive 10 \
     fade t 0.05 \
     rate 8000 \
-    trim 0 -0.05 \
-    vol 2.5
+    norm \
+    vol 2dB
 elif [[ "$INPUT" == *TrackType/* ]]; then
   sox "$INPUT" "$OUTPUT" -R \
     highpass 300 \
     lowpass 3400 \
-    compand 0.3,1 6:-70,-60,-20 -5 \
+    compand 0.0,0.1 6:-80,-70,-5 \
     overdrive 10 \
     fade t 0.05 \
     rate 8000 \
     trim 0 -0.1 \
-    vol 2.5
+    norm \
+    vol 2dB
 else
   sox "$INPUT" "$OUTPUT" -R \
     highpass 300 \
     lowpass 3400 \
-    compand 0.3,1 6:-70,-60,-20 -5 \
+    compand 0.0,0.1 6:-80,-70,-5 \
     overdrive 10 \
     fade t 0.05 \
     rate 8000 \
-    vol 2.5
+    norm \
+    vol 2dB
 fi
 

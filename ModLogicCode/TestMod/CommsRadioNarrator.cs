@@ -13,7 +13,7 @@ using static TestMod.CommsRadioNarrator;
 // Thank you Skin Manager for this beautiful code 
 namespace TestMod {
     public class CommsRadioNarrator : MonoBehaviour, ICommsRadioMode {
-        private const float SIGNAL_RANGE = 100f;
+        private const float SIGNAL_RANGE = 300f;
         public static UnityModManager.ModEntry mod;
 
         public static CommsRadioNarrator Instance;
@@ -88,8 +88,7 @@ namespace TestMod {
                 // Decrease spacial blend to 0 at distance 0.4 and lower, increase to 1 at distance 0.8 and beyond
                 source.volume = 1;
                 source.spatialBlend = Mathf.Clamp01((distanceFromListener - 0.4f) / 0.4f);
-            }
-            else {
+            } else {
                 if (!playAt) playAt = Camera.main.transform;
                 // in inventory
                 source.volume = 0.75f;
@@ -127,8 +126,7 @@ namespace TestMod {
                 SelectedCarSound = deleter.warningSound;
                 ConfirmSound = deleter.confirmSound;
                 CancelSound = deleter.cancelSound;
-            }
-            else {
+            } else {
                 Debug.LogError("CommsRadioNarrator: couldn't get properties from siblings");
             }
 
@@ -150,8 +148,7 @@ namespace TestMod {
                 audioManager = SingletonBehaviour<AudioManager>.Instance;
                 var boomboxGroups = audioManager.mix.FindMatchingGroups("Boombox");
                 source.outputAudioMixerGroup = boomboxGroups.Length > 0 ? boomboxGroups.First() : audioManager.cabGroup;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 mod.Logger.Error($"CommsRadioNarrator: Failed to set audio mixer group: {e.Message}");
             }
         }
@@ -218,26 +215,24 @@ namespace TestMod {
         }
 
         private void PointToCar(TrainCar car) {
-            if (PointedCar != car) {
-                if (car != null) {
-                    PointedCar = car;
-                    HighlightCar(PointedCar, selectionMaterial);
+            if (car != null) {
+                if (PointedCar != car) {
+                    HighlightCar(car, selectionMaterial);
                     CommsRadioController.PlayAudioFromRadio(HoverCarSound, transform);
-
-                    display.SetContentAndAction("What is this car?", "Ask");
                 }
-                else {
-                    PointedCar = null;
-                    ClearHighlightedCar();
+                PointedCar = car;
+                display.SetContentAndAction("What's this car?", "Ask");
+            } else {
+                PointedCar = null;
+                ClearHighlightedCar();
 
-                    var jobCount = JobsManager.Instance.currentJobs.Count;
-                    if (jobCount == 0)
-                        display.SetContentAndAction("No ongoing orders", "Check");
-                    else if (jobCount == 1)
-                        display.SetContentAndAction("1 ongoing order", "Check");
-                    else
-                        display.SetContentAndAction(jobCount + " ongoing orders", "Check");
-                }
+                var jobCount = JobsManager.Instance.currentJobs.Count;
+                if (jobCount == 0)
+                    display.SetContentAndAction("No ongoing orders", "Check");
+                else if (jobCount == 1)
+                    display.SetContentAndAction("1 ongoing order", "Check");
+                else
+                    display.SetContentAndAction(jobCount + " ongoing orders", "Check");
             }
         }
 
@@ -301,11 +296,14 @@ namespace TestMod {
                     if (!Physics.Raycast(signalOrigin.position, signalOrigin.forward, out Hit, SIGNAL_RANGE,
                             TrainCarMask)) {
                         PointToCar(null);
-                    }
-                    else {
+                    } else {
                         // Try to get the traincar we're pointing at
                         trainCar = TrainCar.Resolve(Hit.transform.root);
-                        PointToCar(trainCar);
+                        if (!trainCar.IsLoco) {
+                            PointToCar(trainCar);
+                        } else {
+                            PointToCar(null);
+                        }
                     }
 
                     break;
@@ -398,8 +396,7 @@ namespace TestMod {
                     if (PointedCar != null) {
                         OnCarClicked?.Invoke(PointedCar);
                         PointToCar(null);
-                    }
-                    else {
+                    } else {
                         OnNothingClicked?.Invoke();
                     }
 
@@ -418,8 +415,7 @@ namespace TestMod {
                             ApplySelectedSkin();
                             ResetState();*/
                         CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform);
-                    }
-                    else {
+                    } else {
                         // clicked off the selected car, this means cancel
                         CommsRadioController.PlayAudioFromRadio(CancelSound, transform);
                         ResetState();
@@ -543,8 +539,7 @@ namespace TestMod {
                 currentlyReading = false;
                 PlayRadioClip(GetVoicedClip("NoiseClick"));
                 mod.Logger.Log("Narrator line cut short.");
-            }
-            else {
+            } else {
                 mod.Logger.Warning("No narrator line playing to cut short.");
             }
         }

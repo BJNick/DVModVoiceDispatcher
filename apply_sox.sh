@@ -17,7 +17,7 @@ if [[ "$INPUT" == *IPA/* ]]; then
 elif [[ "$INPUT" == *TrackType/* ]]; then
   sox "$INPUT" "$OUTPUT" -V0 -R $RADIO_FILTERS trim 0 -0.1
 elif [[ "$INPUT" == */NoiseClick.wav ]]; then
-  sox -n "$INPUT" -V0 -R trim 0 0.1 synth 0.1 noise pitch -2000 pad 0 0.1 $RADIO_FILTERS vol -2dB
+  sox -n "$INPUT" -V0 -R trim 0 0.1 synth 0.1 noise pitch -2000 pad 0 0.1 $RADIO_FILTERS vol -6dB
 else
   sox "$INPUT" "$OUTPUT" -V0 -R $RADIO_FILTERS
 fi

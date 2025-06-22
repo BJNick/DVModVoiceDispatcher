@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,11 +7,11 @@ using DV;
 using DV.Booklets;
 using DV.Logic.Job;
 using DV.ThingTypes;
-using DV.Utils;
 using HarmonyLib;
 using UnityEngine;
 using UnityModManagerNet;
 using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 namespace TestMod
 {
@@ -26,7 +25,9 @@ namespace TestMod
         
         private static CommsRadioController commsRadio;
         
-        private static List<string> readJobs = new List<string>();
+        private static string lastClickedCarId = string.Empty;
+        
+        private static List<string> readJobs = new();
         
         static bool Load(UnityModManager.ModEntry modEntry) {
             var harmony = new Harmony(modEntry.Info.Id);
@@ -97,12 +98,59 @@ namespace TestMod
         }
 
         static void OnCarClicked(TrainCar car) {
+            var job = JobsManager.Instance.GetJobOfCar(car.logicCar);
+            if (job != null && lastClickedCarId != car.ID && JobsManager.Instance.currentJobs.Count > 0) {
+                TerseCommentOnCarJob(job);
+                lastClickedCarId = car.ID;
+            } else {
+                DetailedCommentOnCar(car, job);
+                lastClickedCarId = "";
+            }
+        }
+
+        private static void TerseCommentOnCarJob(Job job) {
             var lineBuilder = new List<string>();
-            lineBuilder.Add("ThisIsCar");
-            lineBuilder.AddRange(SeparateIntoLetters(car.ID));
+            var isPartOfYourJob = JobsManager.Instance.currentJobs.Contains(job);
+            if (isPartOfYourJob) {
+                lineBuilder.Add(Randomizer.GetRandomLine("CarInJob", 1, 3));
+            } else {
+                lineBuilder.Add(Randomizer.GetRandomLine("CarNotInJob", 1, 3));
+            }
             CommsRadioNarrator.PlayWithClick(lineBuilder);
         }
-        
+
+        private static void DetailedCommentOnCar(TrainCar car, Job job) {
+            var lineBuilder = new List<string>();
+            lineBuilder.AddRange(VoicedCarNumber(car.ID));
+
+            switch (job?.jobType) {
+                case null:
+                    lineBuilder.Add("NotPartOfAnyOrder");
+                    break;
+                case JobType.ShuntingLoad:
+                    lineBuilder.Add("WaitingForLoading");
+                    break;
+                case JobType.ShuntingUnload:
+                    lineBuilder.Add("WaitingForUnloading");
+                    break;
+                case JobType.Transport:
+                    var transportJobData = JobDataExtractor.ExtractTransportJobData(new Job_data(job));
+                    lineBuilder.Add("BoundFor");
+                    lineBuilder.Add(GetYardName(transportJobData.destinationTrack));
+                    break;
+                case JobType.EmptyHaul:
+                    var haulJobData = JobDataExtractor.ExtractEmptyHaulJobData(new Job_data(job));
+                    lineBuilder.Add("BoundFor");
+                    lineBuilder.Add(GetYardName(haulJobData.destinationTrack));
+                    break;
+                default:
+                    lineBuilder.Add("PartOf");
+                    lineBuilder.Add("JobType" + job.jobType);
+                    break;
+            }
+            CommsRadioNarrator.PlayWithClick(lineBuilder);
+        }
+
         static void OnNothingClicked() {
             ReadAllJobsOverview();
         }
@@ -194,6 +242,13 @@ namespace TestMod
                 new[] { "Unknown", "Track" };
         }
         
+        private static string[] VoicedCarNumber(string carId) {
+            if (carId == null) {
+                return new[] { "Unknown", "Car" };
+            }
+            return SeparateIntoLetters(carId.Substring(carId.Length - 3, 3));
+        }
+        
         private static string GetTrackTypeLetter(TrackID trackId) {
             if (trackId == null) {
                 return "M";
@@ -206,6 +261,10 @@ namespace TestMod
                 return "Unknown Yard";
             }
             return "Yard" + trackId.yardId;
+        }
+
+        public static string[] SeparateIntoLetters(string text) {
+            return text.ToCharArray().Select(c => c.ToString()).ToArray();
         }
         
         private static void AddJobSpecificLines(List<string> lineBuilder, Job job) {
@@ -388,8 +447,20 @@ namespace TestMod
             }
         }
 
-        public static string[] SeparateIntoLetters(string text) {
-            return text.ToCharArray().Select(c => c.ToString()).ToArray();
+        /** Never return the same line for the same id in a row. */
+        static class Randomizer {
+            // Map of id to last selected index
+            private static readonly Dictionary<string, int> LastSelectedIndexMap = new();
+            
+            public static string GetRandomLine(string id, int startIndex, int endIndex) {
+                int lastIndex = LastSelectedIndexMap.ContainsKey(id) ? LastSelectedIndexMap[id] : -1;
+                int generatedIndex = startIndex-1;
+                while (generatedIndex == lastIndex || generatedIndex < startIndex) {
+                    generatedIndex = Random.Range(startIndex, endIndex + 1);
+                }
+                LastSelectedIndexMap[id] = generatedIndex;
+                return $"{id}{generatedIndex}";
+            }
         }
     }
 }

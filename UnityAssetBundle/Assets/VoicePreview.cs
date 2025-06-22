@@ -25,7 +25,7 @@ public class VoicePreview : MonoBehaviour
             
             var lineBuilder = new List<string>();
             lineBuilder.Add("NoiseClick");
-            AddTransportJobLines(lineBuilder);
+            AddCarDetailedDescription(lineBuilder);
             lineBuilder.Add("NoiseClick");
 
             var line = string.Join(" ", lineBuilder);
@@ -60,6 +60,15 @@ public class VoicePreview : MonoBehaviour
             "YouHave", "JobTypeTransport", SHORT_PAUSE,
             "PickUp", "12Cars", "FromTrack", "A", "1", "In", "YardGF", SHORT_PAUSE,
             "ThenDropOffThoseCars", "AtTrack", "B", "2", "In", "YardIME"
+        });
+    }
+    
+    private static void AddCarDetailedDescription(List<string> lineBuilder) {
+        lineBuilder.AddRange(new[] {
+            "0", "8", "2", "BoundFor", "YardOWC", SHORT_PAUSE,
+            "4", "7", "1", "WaitingForUnloading", SHORT_PAUSE,
+            "5", "3", "9", "PartOf", "JobTypeComplexTransport", SHORT_PAUSE,
+            "0", "0", "3", "NotPartOfAnyOrder",
         });
     }
     

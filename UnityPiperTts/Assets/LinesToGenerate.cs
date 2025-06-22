@@ -210,6 +210,23 @@ public class CarDescriptionLines : IListOfLines {
     
     public Line[] lines => new[] {
         Line.of("ThisIsCar", "This is car"),
+        Line.of("ThisCarIsBoundFor", "This car is bound for"),
+        Line.of("ItIsBoundFor", "It is bound for"),
+        Line.of("BoundFor", "Bound for"),
+        Line.of("WaitingForUnloading", "Waiting for unloading"),
+        Line.of("WaitingForLoading", "Waiting for loading"),
+        Line.of("AsPartOf", "as part of"),
+        Line.of("PartOf", "part of"),
+        Line.of("NotPartOfAnyOrder", "not part of any order"),
+        
+        Line.of("CarInJob1", "Take this car."),
+        Line.of("CarInJob2", "You need this car."),
+        Line.of("CarInJob3", "Yes that one too."),
+        
+        Line.of("CarNotInJob1", "Unrelated, move on."),
+        Line.of("CarNotInJob2", "Leave it alone."),
+        Line.of("CarNotInJob3", "Not part of your order."),
+        
     };
 }
 

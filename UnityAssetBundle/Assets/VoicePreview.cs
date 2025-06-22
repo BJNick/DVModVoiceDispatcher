@@ -58,8 +58,8 @@ public class VoicePreview : MonoBehaviour
     private static void AddTransportJobLines(List<string> lineBuilder) {
         lineBuilder.AddRange(new[] {
             "YouHave", "JobTypeTransport", SHORT_PAUSE,
-            "PickUp", "12Cars", "FromTrack", "A", "1", "InYard", "YardGF", SHORT_PAUSE,
-            "ThenDropOffThoseCars", "AtTrack", "B", "2", "InYard", "YardIME"
+            "PickUp", "12Cars", "FromTrack", "A", "1", "In", "YardGF", SHORT_PAUSE,
+            "ThenDropOffThoseCars", "AtTrack", "B", "2", "In", "YardIME"
         });
     }
     

@@ -336,14 +336,14 @@ namespace TestMod
             lineBuilder.Add(transportingCars.Count+"Cars");
             lineBuilder.Add("FromTrack");
             lineBuilder.AddRange(VoicedTrackId(startingTrack));
-            lineBuilder.Add("InYard");
+            lineBuilder.Add("In");
             lineBuilder.Add(GetYardName(startingTrack));
             lineBuilder.Add(SHORT_SILENCE);
 
             lineBuilder.Add("ThenDropOffThoseCars");
             lineBuilder.Add("AtTrack");
             lineBuilder.AddRange(VoicedTrackId(destinationTrack));
-            lineBuilder.Add("InYard");
+            lineBuilder.Add("In");
             lineBuilder.Add(GetYardName(destinationTrack));
         }
 

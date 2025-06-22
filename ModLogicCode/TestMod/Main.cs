@@ -47,9 +47,9 @@ namespace TestMod
         
         private const string SHORT_PAUSE = "ShortSilence";
 
-        private static string[] testVoiceLines = new string[]
-            { "YouHave", "JobTypeShuntingUnload", "Move", "3Cars", "ToTrackTypeS", "D", "7", "Move", "1Cars", "ToTrackTypeI", "B", "1" };
-
+        private static List<string> testVoiceLines = new List<string>
+        { "YouHave", "JobTypeShuntingUnload", "Move", "3Cars", "ToTrackTypeS", "D", "7", "Move", "1Cars", "ToTrackTypeI", "B", "1" };
+        
         // Called when the mod is turned to on/off.
         // With this function you control an operation of the mod and inform users whether it is enabled or not.
         static bool OnToggle(UnityModManager.ModEntry modEntry, bool value /* to active or deactivate */)
@@ -94,10 +94,7 @@ namespace TestMod
             var lineBuilder = new List<string>();
             lineBuilder.Add("ThisIsCar");
             lineBuilder.AddRange(SeparateIntoLetters(car.ID));
-            
-            SetupSource();
-            var behaviour = source.gameObject.GetComponent<CoroutineRunner>();
-            behaviour.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
+            PlayInCoroutineWithClick(lineBuilder);
         }
 
         static void OnSessionStart(UnityModManager.ModEntry modEntry) {
@@ -108,18 +105,13 @@ namespace TestMod
         static void OnUpdate(UnityModManager.ModEntry modEntry, float dt) {
             if (Input.GetKeyDown(KeyCode.L)) {
                 SetupSource();
-                var behaviour = source.gameObject.GetComponent<CoroutineRunner>();
-                behaviour.StartCoroutine(PlayVoiceLinesCoroutine(testVoiceLines));
+                PlayInCoroutineWithClick(testVoiceLines);
             }
 
             if (Input.GetKeyDown(KeyCode.P)) {
                 var lineBuilder = new List<string>();
                 AddGenericJobLines(lineBuilder, JobsManager.Instance.currentJobs.First());
-                var line = string.Join(" ", lineBuilder);
-                mod.Logger.Log("Generated voice line: " + line);
-                SetupSource();
-                var behaviour = source.gameObject.GetComponent<CoroutineRunner>();
-                behaviour.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
+                PlayInCoroutineWithClick(lineBuilder);
             }
 
             if (Input.GetKeyDown(KeyCode.O)) {
@@ -161,21 +153,23 @@ namespace TestMod
         }
 
         private static void ReadJobOverview(Job job) {
+            var lineBuilder = new List<string>();
+            AddJobSpecificLines(lineBuilder, job);
+            PlayInCoroutineWithClick(lineBuilder);
+        }
+        
+        private static void PlayInCoroutineWithClick(List<string> lineBuilder) {
             if (currentlyReading) {
+                mod.Logger.Warning("Already reading a voice line, skipping this one.");
                 return;
             }
             currentlyReading = true;
-            try {
-                var lineBuilder = new List<string>();
-                AddJobSpecificLines(lineBuilder, job);
-                var line = string.Join(" ", lineBuilder);
-                mod.Logger.Log("Generated voice line: " + line);
-                SetupSource();
-                var behaviour = source.gameObject.GetComponent<CoroutineRunner>();
-                behaviour.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
-            } finally {
-                currentlyReading = false;
-            }
+            mod.Logger.Log("Generated voice line: " + string.Join(" ", lineBuilder));
+            lineBuilder.Insert(0, "NoiseClick");
+            lineBuilder.Add("NoiseClick");
+            SetupSource();
+            var behaviour = source.gameObject.GetComponent<CoroutineRunner>();
+            behaviour.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
         }
 
         private static string[] VoicedTrackId(TrackID trackId) {

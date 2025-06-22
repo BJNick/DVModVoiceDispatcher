@@ -24,7 +24,9 @@ public class VoicePreview : MonoBehaviour
             play = false;
             
             var lineBuilder = new List<string>();
+            lineBuilder.Add("NoiseClick");
             AddTransportJobLines(lineBuilder);
+            lineBuilder.Add("NoiseClick");
 
             var line = string.Join(" ", lineBuilder);
             Debug.Log(line);

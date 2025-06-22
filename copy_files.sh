@@ -9,3 +9,5 @@ find "$src_dir" -type f -name '*.wav' | while read -r wav; do
     ./apply_sox.sh "$wav" "$out_path"
     echo "Processed: $wav -> $out_path"
 done
+./apply_sox.sh "$dst_dir/NoiseClick.wav"
+

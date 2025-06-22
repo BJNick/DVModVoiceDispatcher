@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DV;
@@ -10,6 +11,7 @@ using HarmonyLib;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityModManagerNet;
+using static TestMod.CommsRadioNarrator;
 
 // Thank you Skin Manager for this beautiful code 
 #nullable disable
@@ -47,6 +49,12 @@ namespace TestMod
         
         public static AudioSource source;
         static AudioManager audioManager;
+        
+        public static bool currentlyReading;
+        private static CoroutineRunner coroutineRunner;
+        private static Coroutine currentCoroutine;
+        
+        public class CoroutineRunner : MonoBehaviour { }
 
         //private PaintArea AreaToPaint = PaintArea.All;
         //private PaintArea AlreadyPainted = PaintArea.None;
@@ -262,6 +270,11 @@ namespace TestMod
         public void OnUpdate()
         {
             MoveSourceIntoPosition();
+
+            if (currentlyReading) {
+                display.SetContentAndAction("Speaking...\n"+source.clip.name, "Stop");
+                return;
+            }
             
             TrainCar trainCar;
 
@@ -371,8 +384,14 @@ namespace TestMod
                         CommsRadioController.PlayAudioFromRadio(SelectedCarSound, transform);
                         SetState(State.SelectSkin);
                     }*/
+                    if (currentlyReading) {
+                        CutCoroutineShort();
+                        return;
+                    }
+                    
                     if (PointedCar != null) {
                         OnCarClicked?.Invoke(PointedCar);
+                        PointToCar(null);
                     } else {
                         OnNothingClicked?.Invoke();
                     }
@@ -486,6 +505,75 @@ namespace TestMod
             SelectSkin,
             SelectAreas,
         }
+
+        #region Coroutine Management
+
+        public static void PlayWithClick(List<string> lineBuilder) {
+            if (currentlyReading) {
+                mod.Logger.Warning("Already reading a voice line, skipping this one.");
+                return;
+            }
+            currentlyReading = true;
+            mod.Logger.Log("Generated voice line: " + string.Join(" ", lineBuilder));
+            lineBuilder.Insert(0, "NoiseClick");
+            lineBuilder.Add("NoiseClick");
+            SetupCoroutineRunner();
+            currentCoroutine = coroutineRunner.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
+        }
+        
+        static IEnumerator PlayVoiceLinesCoroutine(string[] lines) {
+            AudioClip[] clips = lines.Select(GetVoicedClip).Where(clip => clip != null).ToArray();
+            return PlayClipsInCoroutine(clips);
+        }
+
+        static IEnumerator PlayClipsInCoroutine(AudioClip[] clips) {
+            if (clips.Length == 0) {
+                mod.Logger.Error("No valid voice lines found.");
+                yield break;
+            }
+            clips[0].LoadAudioData();
+            foreach (var clip in clips) {
+                PlayRadioClip(clip);
+                // Sleep until the next clip is ready to play
+                var waitTime = clip.length - 0.05f;
+                yield return new WaitForSeconds(waitTime);
+            }
+            currentlyReading = false;
+        }
+        
+        private static void CutCoroutineShort() {
+            if (currentCoroutine != null) {
+                if (coroutineRunner != null) {
+                    coroutineRunner.StopCoroutine(currentCoroutine);
+                }
+                currentlyReading = false;
+                PlayRadioClip(GetVoicedClip("NoiseClick"));
+                mod.Logger.Log("Narrator line cut short.");
+            } else {
+                mod.Logger.Warning("No narrator line playing to cut short.");
+            }
+        }
+        
+        static AudioClip GetVoicedClip(string name) {
+            var voicedLines = Main.GetVoiceLinesBundle();
+            if (!voicedLines) {
+                mod.Logger.Error("Voiced lines asset bundle is not loaded.");
+                return null;
+            }
+            var clip = voicedLines.LoadAsset<AudioClip>(name);
+            if (!clip) {
+                mod.Logger.Error("Failed to load voice line: " + name);
+            }
+            return clip;
+        }
+        
+        private static void SetupCoroutineRunner() {
+            if (!coroutineRunner) {
+                coroutineRunner = new GameObject("NarratorCoroutineRunner").AddComponent<CoroutineRunner>();
+            }
+        }
+
+        #endregion
         
         public static void PlayRadioClip(AudioClip clip) {
             SetUpSource();
@@ -524,7 +612,7 @@ namespace TestMod
         [HarmonyPostfix]
         private static void AfterAwake(CommsRadioController __instance, List<ICommsRadioMode> ___allModes)
         {
-            CommsRadioNarrator.Controller = __instance;
+            Controller = __instance;
             RadioNarrator = __instance.gameObject.AddComponent<CommsRadioNarrator>();
 
             //int paintModeIndex = ___allModes.IndexOf(__instance.carPaintjobControl);

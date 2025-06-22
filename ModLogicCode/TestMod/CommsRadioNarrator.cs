@@ -3,29 +3,31 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DV;
-using DV.Customization.Paint;
-using DV.ThingTypes;
-using DV.UserManagement;
+using DV.Logic.Job;
 using DV.Utils;
 using HarmonyLib;
 using UnityEngine;
-using UnityEngine.Audio;
 using UnityModManagerNet;
 using static TestMod.CommsRadioNarrator;
 
 // Thank you Skin Manager for this beautiful code 
-#nullable disable
-namespace TestMod
-{
-    public class CommsRadioNarrator : MonoBehaviour, ICommsRadioMode
-    {
+namespace TestMod {
+    public class CommsRadioNarrator : MonoBehaviour, ICommsRadioMode {
+        private const float SIGNAL_RANGE = 100f;
         public static UnityModManager.ModEntry mod;
-        
+
         public static CommsRadioNarrator Instance;
-        
+
         public static CommsRadioController Controller;
-        
-        public ButtonBehaviourType ButtonBehaviour { get; private set; }
+
+        public static AudioSource source;
+        private static AudioManager audioManager;
+
+        public static bool currentlyReading;
+        private static CoroutineRunner coroutineRunner;
+        private static Coroutine currentCoroutine;
+        private static readonly Vector3 HIGHLIGHT_BOUNDS_EXTENSION = new(0.25f, 0.8f, 0f);
+        private static readonly Color LASER_COLOR = new(1f, 0.5f, 0f);
 
         public CommsRadioDisplay display;
         public Transform signalOrigin;
@@ -40,51 +42,80 @@ namespace TestMod
         public AudioClip CancelSound;
 
         private State CurrentState;
-        private LayerMask TrainCarMask;
-        private RaycastHit Hit;
-        private TrainCar SelectedCar = null;
-        private TrainCar PointedCar = null;
-        private bool HasInterior = false;
+
+        //private CustomPaintTheme SelectedSkin = null;
+        private (string exterior, string interior) CurrentThemeName;
+        private readonly bool HasInterior = false;
         private MeshRenderer HighlighterRender;
-        
-        public static AudioSource source;
-        static AudioManager audioManager;
-        
-        public static bool currentlyReading;
-        private static CoroutineRunner coroutineRunner;
-        private static Coroutine currentCoroutine;
-        
-        public class CoroutineRunner : MonoBehaviour { }
+        private RaycastHit Hit;
+        private TrainCar PointedCar;
+        private TrainCar SelectedCar;
 
         //private PaintArea AreaToPaint = PaintArea.All;
         //private PaintArea AlreadyPainted = PaintArea.None;
 
         //private List<CustomPaintTheme> SkinsForCarType = null;
         private int SelectedSkinIdx = 0;
-        //private CustomPaintTheme SelectedSkin = null;
-        private (string exterior, string interior) CurrentThemeName;
+        private LayerMask TrainCarMask;
 
-        private const float SIGNAL_RANGE = 100f;
-        private static readonly Vector3 HIGHLIGHT_BOUNDS_EXTENSION = new Vector3(0.25f, 0.8f, 0f);
-        private static readonly Color LASER_COLOR = new Color(1f, 0.5f, 0f);
-        public Color GetLaserBeamColor()
-        {
+        public ButtonBehaviourType ButtonBehaviour { get; private set; }
+
+        public Color GetLaserBeamColor() {
             return LASER_COLOR;
         }
-        public void OverrideSignalOrigin(Transform signalOrigin) => this.signalOrigin = signalOrigin;
-        
+
+        public void OverrideSignalOrigin(Transform signalOrigin) {
+            this.signalOrigin = signalOrigin;
+        }
+
         public static event Action<TrainCar> OnCarClicked;
         public static event Action OnNothingClicked;
+
+        public static void PlayRadioClip(AudioClip clip) {
+            SetUpSource();
+            MoveSourceIntoPosition();
+            //clip.Play(playAt.position, volume: 1, minDistance: 1, maxDistance: 10f, parent: playAt, mixerGroup: SingletonBehaviour<AudioManager>.Instance.cabGroup);
+            source.clip = clip;
+            source.Play();
+        }
+
+        public static void MoveSourceIntoPosition() {
+            var radio = Instance;
+            var playAt = PlayerManager.PlayerTransform;
+            if (radio && radio.isActiveAndEnabled) {
+                playAt = radio.transform;
+                var distanceFromListener = Vector3.Distance(playAt.position, Camera.main.transform.transform.position);
+                // Decrease spacial blend to 0 at distance 0.4 and lower, increase to 1 at distance 0.8 and beyond
+                source.volume = 1;
+                source.spatialBlend = Mathf.Clamp01((distanceFromListener - 0.4f) / 0.4f);
+            }
+            else {
+                if (!playAt) playAt = Camera.main.transform;
+                // in inventory
+                source.volume = 0.75f;
+                source.spatialBlend = 0;
+            }
+
+            source.transform.position = playAt.position;
+            source.transform.rotation = playAt.rotation;
+        }
+
+        public class CoroutineRunner : MonoBehaviour { }
+
+        protected enum State {
+            SelectCar,
+            SelectSkin,
+            SelectAreas
+        }
 
         #region Initialization
 
         public void Awake() {
             Instance = this;
             // steal components from other radio modes
-            CommsRadioCarDeleter deleter = Controller.deleteControl;
+            var deleter = Controller.deleteControl;
 
-            if (deleter)
-            {
+            if (deleter) {
                 signalOrigin = deleter.signalOrigin;
                 display = deleter.display;
                 selectionMaterial = new Material(deleter.selectionMaterial);
@@ -97,8 +128,7 @@ namespace TestMod
                 ConfirmSound = deleter.confirmSound;
                 CancelSound = deleter.cancelSound;
             }
-            else
-            {
+            else {
                 Debug.LogError("CommsRadioNarrator: couldn't get properties from siblings");
             }
 
@@ -110,6 +140,7 @@ namespace TestMod
                 var sourceObject = new GameObject("CommsRadioNarratorAudioSource");
                 source = sourceObject.AddComponent<AudioSource>();
             }
+
             source.playOnAwake = false;
             source.minDistance = 0.5f;
             source.maxDistance = 10f;
@@ -119,43 +150,30 @@ namespace TestMod
                 audioManager = SingletonBehaviour<AudioManager>.Instance;
                 var boomboxGroups = audioManager.mix.FindMatchingGroups("Boombox");
                 source.outputAudioMixerGroup = boomboxGroups.Length > 0 ? boomboxGroups.First() : audioManager.cabGroup;
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 mod.Logger.Error($"CommsRadioNarrator: Failed to set audio mixer group: {e.Message}");
             }
         }
 
-        public void Start()
-        {
-            if (!signalOrigin)
-            {
+        public void Start() {
+            if (!signalOrigin) {
                 Debug.LogError("CommsRadioNarrator: signalOrigin on isn't set, using this.transform!", this);
                 signalOrigin = transform;
             }
 
-            if (display == null)
-            {
-                Debug.LogError("CommsRadioNarrator: display not set, can't function properly!", this);
-            }
+            if (display == null) Debug.LogError("CommsRadioNarrator: display not set, can't function properly!", this);
 
-            if ((selectionMaterial == null) || (skinningMaterial == null))
-            {
+            if (selectionMaterial == null || skinningMaterial == null)
                 Debug.LogError("CommsRadioNarrator: Selection material(s) not set. Visuals won't be correct.", this);
-            }
 
             if (trainHighlighter == null)
-            {
                 Debug.LogError("CommsRadioNarrator: trainHighlighter not set, can't function properly!!", this);
-            }
 
-            if ((HoverCarSound == null) || (SelectedCarSound == null) || (ConfirmSound == null) || (CancelSound == null))
-            {
+            if (HoverCarSound == null || SelectedCarSound == null || ConfirmSound == null || CancelSound == null)
                 Debug.LogError("Not all audio clips set, some sounds won't be played!", this);
-            }
 
-            TrainCarMask = LayerMask.GetMask(new string[]
-            {
-                "Train_Big_Collider"
-            });
+            TrainCarMask = LayerMask.GetMask("Train_Big_Collider");
 
             HighlighterRender = trainHighlighter.GetComponentInChildren<MeshRenderer>(true);
             trainHighlighter.SetActive(false);
@@ -164,13 +182,11 @@ namespace TestMod
 
         public void Enable() { }
 
-        public void Disable()
-        {
+        public void Disable() {
             ResetState();
         }
 
-        public void SetStartingDisplay()
-        {
+        public void SetStartingDisplay() {
             display.SetDisplay("Narrator", "Ongoing order available", "Check");
         }
 
@@ -178,10 +194,8 @@ namespace TestMod
 
         #region Car Highlighting
 
-        private void HighlightCar(TrainCar car, Material highlightMaterial)
-        {
-            if (car == null)
-            {
+        private void HighlightCar(TrainCar car, Material highlightMaterial) {
+            if (car == null) {
                 Debug.LogError("Highlight car is null. Ignoring request.");
                 return;
             }
@@ -189,39 +203,40 @@ namespace TestMod
             HighlighterRender.material = highlightMaterial;
 
             trainHighlighter.transform.localScale = car.Bounds.size + HIGHLIGHT_BOUNDS_EXTENSION;
-            Vector3 b = car.transform.up * (trainHighlighter.transform.localScale.y / 2f);
-            Vector3 b2 = car.transform.forward * car.Bounds.center.z;
-            Vector3 position = car.transform.position + b + b2;
+            var b = car.transform.up * (trainHighlighter.transform.localScale.y / 2f);
+            var b2 = car.transform.forward * car.Bounds.center.z;
+            var position = car.transform.position + b + b2;
 
             trainHighlighter.transform.SetPositionAndRotation(position, car.transform.rotation);
             trainHighlighter.SetActive(true);
             trainHighlighter.transform.SetParent(car.transform, true);
         }
 
-        private void ClearHighlightedCar()
-        {
+        private void ClearHighlightedCar() {
             trainHighlighter.SetActive(false);
             trainHighlighter.transform.SetParent(null);
         }
 
-        private void PointToCar(TrainCar car)
-        {
-            if (PointedCar != car)
-            {
-                if (car != null)
-                {
+        private void PointToCar(TrainCar car) {
+            if (PointedCar != car) {
+                if (car != null) {
                     PointedCar = car;
                     HighlightCar(PointedCar, selectionMaterial);
                     CommsRadioController.PlayAudioFromRadio(HoverCarSound, transform);
-                    
+
                     display.SetContentAndAction("What is this car?", "Ask");
                 }
-                else
-                {
+                else {
                     PointedCar = null;
                     ClearHighlightedCar();
-                    
-                    display.SetContentAndAction("Ongoing order available", "Check");
+
+                    var jobCount = JobsManager.Instance.currentJobs.Count;
+                    if (jobCount == 0)
+                        display.SetContentAndAction("No ongoing orders", "Check");
+                    else if (jobCount == 1)
+                        display.SetContentAndAction("1 ongoing order", "Check");
+                    else
+                        display.SetContentAndAction(jobCount + " ongoing orders", "Check");
                 }
             }
         }
@@ -230,13 +245,11 @@ namespace TestMod
 
         #region State Machine Actions
 
-        private void SetState(State newState)
-        {
+        private void SetState(State newState) {
             if (newState == CurrentState) return;
 
             CurrentState = newState;
-            switch (CurrentState)
-            {
+            switch (CurrentState) {
                 case State.SelectCar:
                     SetStartingDisplay();
                     ButtonBehaviour = ButtonBehaviourType.Regular;
@@ -251,14 +264,13 @@ namespace TestMod
                     break;
 
                 case State.SelectAreas:
-                   // AreaToPaint = PaintArea.All;
+                    // AreaToPaint = PaintArea.All;
                     ButtonBehaviour = ButtonBehaviourType.Override;
                     break;
             }
         }
 
-        private void ResetState()
-        {
+        private void ResetState() {
             PointedCar = null;
 
             SelectedCar = null;
@@ -267,34 +279,30 @@ namespace TestMod
             SetState(State.SelectCar);
         }
 
-        public void OnUpdate()
-        {
+        public void OnUpdate() {
             MoveSourceIntoPosition();
 
             if (currentlyReading) {
-                display.SetContentAndAction("Speaking...\n"+source.clip.name, "Stop");
+                display.SetContentAndAction("Speaking...\n" + source.clip.name, "Stop");
                 return;
             }
-            
+
             TrainCar trainCar;
 
-            switch (CurrentState)
-            {
+            switch (CurrentState) {
                 case State.SelectCar:
-                    if (!(SelectedCar == null))
-                    {
+                    if (!(SelectedCar == null)) {
                         Debug.LogError("Invalid setup for current state, reseting flags!", this);
                         ResetState();
                         return;
                     }
 
                     // Check if not pointing at anything
-                    if (!Physics.Raycast(signalOrigin.position, signalOrigin.forward, out Hit, SIGNAL_RANGE, TrainCarMask))
-                    {
+                    if (!Physics.Raycast(signalOrigin.position, signalOrigin.forward, out Hit, SIGNAL_RANGE,
+                            TrainCarMask)) {
                         PointToCar(null);
                     }
-                    else
-                    {
+                    else {
                         // Try to get the traincar we're pointing at
                         trainCar = TrainCar.Resolve(Hit.transform.root);
                         PointToCar(trainCar);
@@ -326,28 +334,28 @@ namespace TestMod
                     break;
 
                 case State.SelectAreas:
-                    /*display.SetContent($"{Translations.SelectAreasPrompt}\n{AreaToPaintName}");
+                /*display.SetContent($"{Translations.SelectAreasPrompt}\n{AreaToPaintName}");
 
-                    if (Physics.Raycast(signalOrigin.position, signalOrigin.forward, out Hit, SIGNAL_RANGE, TrainCarMask) &&
-                        (trainCar = TrainCar.Resolve(Hit.transform.root)) && (trainCar == SelectedCar))
+                if (Physics.Raycast(signalOrigin.position, signalOrigin.forward, out Hit, SIGNAL_RANGE, TrainCarMask) &&
+                    (trainCar = TrainCar.Resolve(Hit.transform.root)) && (trainCar == SelectedCar))
+                {
+                    PointToCar(trainCar);
+
+                    if ((AlreadyPainted == AreaToPaint) && !SkinProvider.IsBuiltInTheme(SelectedSkin))
                     {
-                        PointToCar(trainCar);
-
-                        if ((AlreadyPainted == AreaToPaint) && !SkinProvider.IsBuiltInTheme(SelectedSkin))
-                        {
-                            display.SetAction(Translations.ReloadAction);
-                        }
-                        else
-                        {
-                            display.SetAction(Translations.ConfirmAction);
-                        }
+                        display.SetAction(Translations.ReloadAction);
                     }
                     else
                     {
-                        PointToCar(null);
-                        display.SetAction(Translations.CancelAction);
+                        display.SetAction(Translations.ConfirmAction);
                     }
-                    break;*/
+                }
+                else
+                {
+                    PointToCar(null);
+                    display.SetAction(Translations.CancelAction);
+                }
+                break;*/
 
                 default:
                     ResetState();
@@ -369,10 +377,8 @@ namespace TestMod
             }
         }*/
 
-        public void OnUse()
-        {
-            switch (CurrentState)
-            {
+        public void OnUse() {
+            switch (CurrentState) {
                 case State.SelectCar:
                     /*if (PointedCar != null)
                     {
@@ -388,41 +394,37 @@ namespace TestMod
                         CutCoroutineShort();
                         return;
                     }
-                    
+
                     if (PointedCar != null) {
                         OnCarClicked?.Invoke(PointedCar);
                         PointToCar(null);
-                    } else {
+                    }
+                    else {
                         OnNothingClicked?.Invoke();
                     }
+
                     break;
 
                 case State.SelectSkin:
-                    if ((PointedCar != null) && (PointedCar == SelectedCar))
-                    {
-                        if (HasInterior)
-                        {
-                            SetState(State.SelectAreas);
-                        }
-                        else
-                        {
-                            // for regular cars, skip area selection
-                            /*if (!SkinProvider.IsBuiltInTheme(SelectedSkin) && (SelectedSkin.name == CurrentThemeName.exterior))
+                    if (PointedCar != null && PointedCar == SelectedCar) {
+                        if (HasInterior) SetState(State.SelectAreas);
+
+                        // for regular cars, skip area selection
+                        /*if (!SkinProvider.IsBuiltInTheme(SelectedSkin) && (SelectedSkin.name == CurrentThemeName.exterior))
                             {
                                 ReloadAndPrepareApplySelectedSkin();
                             }
 
                             ApplySelectedSkin();
                             ResetState();*/
-                        }
                         CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform);
                     }
-                    else
-                    {
+                    else {
                         // clicked off the selected car, this means cancel
                         CommsRadioController.PlayAudioFromRadio(CancelSound, transform);
                         ResetState();
                     }
+
                     break;
 
                 case State.SelectAreas:
@@ -443,8 +445,7 @@ namespace TestMod
             }
         }
 
-        public bool ButtonACustomAction()
-        {
+        public bool ButtonACustomAction() {
             /*if (CurrentState == State.SelectSkin)
             {
                 if ((SkinsForCarType == null) || (SkinsForCarType.Count == 0)) return false;
@@ -470,8 +471,7 @@ namespace TestMod
             return true;
         }
 
-        public bool ButtonBCustomAction()
-        {
+        public bool ButtonBCustomAction() {
             /*if (CurrentState == State.SelectSkin)
             {
                 if ((SkinsForCarType == null) || (SkinsForCarType.Count == 0)) return false;
@@ -499,13 +499,6 @@ namespace TestMod
 
         #endregion
 
-        protected enum State
-        {
-            SelectCar,
-            SelectSkin,
-            SelectAreas,
-        }
-
         #region Coroutine Management
 
         public static void PlayWithClick(List<string> lineBuilder) {
@@ -513,6 +506,7 @@ namespace TestMod
                 mod.Logger.Warning("Already reading a voice line, skipping this one.");
                 return;
             }
+
             currentlyReading = true;
             mod.Logger.Log("Generated voice line: " + string.Join(" ", lineBuilder));
             lineBuilder.Insert(0, "NoiseClick");
@@ -520,17 +514,18 @@ namespace TestMod
             SetupCoroutineRunner();
             currentCoroutine = coroutineRunner.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
         }
-        
-        static IEnumerator PlayVoiceLinesCoroutine(string[] lines) {
-            AudioClip[] clips = lines.Select(GetVoicedClip).Where(clip => clip != null).ToArray();
+
+        private static IEnumerator PlayVoiceLinesCoroutine(string[] lines) {
+            var clips = lines.Select(GetVoicedClip).Where(clip => clip != null).ToArray();
             return PlayClipsInCoroutine(clips);
         }
 
-        static IEnumerator PlayClipsInCoroutine(AudioClip[] clips) {
+        private static IEnumerator PlayClipsInCoroutine(AudioClip[] clips) {
             if (clips.Length == 0) {
                 mod.Logger.Error("No valid voice lines found.");
                 yield break;
             }
+
             clips[0].LoadAudioData();
             foreach (var clip in clips) {
                 PlayRadioClip(clip);
@@ -538,80 +533,49 @@ namespace TestMod
                 var waitTime = clip.length - 0.05f;
                 yield return new WaitForSeconds(waitTime);
             }
+
             currentlyReading = false;
         }
-        
+
         private static void CutCoroutineShort() {
             if (currentCoroutine != null) {
-                if (coroutineRunner != null) {
-                    coroutineRunner.StopCoroutine(currentCoroutine);
-                }
+                if (coroutineRunner != null) coroutineRunner.StopCoroutine(currentCoroutine);
                 currentlyReading = false;
                 PlayRadioClip(GetVoicedClip("NoiseClick"));
                 mod.Logger.Log("Narrator line cut short.");
-            } else {
+            }
+            else {
                 mod.Logger.Warning("No narrator line playing to cut short.");
             }
         }
-        
-        static AudioClip GetVoicedClip(string name) {
+
+        private static AudioClip GetVoicedClip(string name) {
             var voicedLines = Main.GetVoiceLinesBundle();
             if (!voicedLines) {
                 mod.Logger.Error("Voiced lines asset bundle is not loaded.");
                 return null;
             }
+
             var clip = voicedLines.LoadAsset<AudioClip>(name);
-            if (!clip) {
-                mod.Logger.Error("Failed to load voice line: " + name);
-            }
+            if (!clip) mod.Logger.Error("Failed to load voice line: " + name);
             return clip;
         }
-        
+
         private static void SetupCoroutineRunner() {
-            if (!coroutineRunner) {
+            if (!coroutineRunner)
                 coroutineRunner = new GameObject("NarratorCoroutineRunner").AddComponent<CoroutineRunner>();
-            }
         }
 
         #endregion
-        
-        public static void PlayRadioClip(AudioClip clip) {
-            SetUpSource();
-            MoveSourceIntoPosition();
-            //clip.Play(playAt.position, volume: 1, minDistance: 1, maxDistance: 10f, parent: playAt, mixerGroup: SingletonBehaviour<AudioManager>.Instance.cabGroup);
-            source.clip = clip;
-            source.Play();
-        }
-        
-        public static void MoveSourceIntoPosition() {
-            var radio = Instance;
-            var playAt = PlayerManager.PlayerTransform;
-            if (radio && radio.isActiveAndEnabled) {
-                playAt = radio.transform;
-                var distanceFromListener = Vector3.Distance(playAt.position, Camera.main.transform.transform.position);
-                // Decrease spacial blend to 0 at distance 0.4 and lower, increase to 1 at distance 0.8 and beyond
-                source.volume = 1;
-                source.spatialBlend = Mathf.Clamp01((distanceFromListener - 0.4f) / 0.4f);
-            } else {
-                if (!playAt) playAt = Camera.main.transform;
-                // in inventory
-                source.volume = 0.75f; 
-                source.spatialBlend = 0;
-            }
-            source.transform.position = playAt.position;
-            source.transform.rotation = playAt.rotation;
-        }
     }
-    
+
     [HarmonyPatch(typeof(CommsRadioController))]
-    internal static class CommsRadio_Awake_Patch
-    {
-        public static CommsRadioNarrator RadioNarrator = null;
+    internal static class CommsRadio_Awake_Patch {
+        public static CommsRadioNarrator RadioNarrator;
 
         [HarmonyPatch(nameof(CommsRadioController.Awake))]
         [HarmonyPostfix]
-        private static void AfterAwake(CommsRadioController __instance, List<ICommsRadioMode> ___allModes)
-        {
+        private static void AfterAwake(CommsRadioController __instance, List<ICommsRadioMode> ___allModes) {
             Controller = __instance;
             RadioNarrator = __instance.gameObject.AddComponent<CommsRadioNarrator>();
 
@@ -622,9 +586,8 @@ namespace TestMod
 
         [HarmonyPatch(nameof(CommsRadioController.UpdateModesAvailability))]
         [HarmonyPostfix]
-        private static void AfterUpdateModesAvailability(CommsRadioController __instance)
-        {
-            int radioNarratorIdx = __instance.allModes.IndexOf(RadioNarrator);
+        private static void AfterUpdateModesAvailability(CommsRadioController __instance) {
+            var radioNarratorIdx = __instance.allModes.IndexOf(RadioNarrator);
             __instance.disabledModeIndices.Remove(radioNarratorIdx);
         }
     }

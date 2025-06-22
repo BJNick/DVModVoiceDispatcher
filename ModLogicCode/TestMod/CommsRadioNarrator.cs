@@ -226,6 +226,11 @@ namespace TestMod {
                 PointedCar = null;
                 ClearHighlightedCar();
 
+                if (currentlyReading) {
+                    display.SetContentAndAction("Speaking...\n" + source.clip.name, "Stop");
+                    return;
+                }
+
                 var jobCount = JobsManager.Instance.currentJobs.Count;
                 if (jobCount == 0)
                     display.SetContentAndAction("No ongoing orders", "Check");
@@ -276,11 +281,6 @@ namespace TestMod {
 
         public void OnUpdate() {
             MoveSourceIntoPosition();
-
-            if (currentlyReading) {
-                display.SetContentAndAction("Speaking...\n" + source.clip.name, "Stop");
-                return;
-            }
 
             TrainCar trainCar;
 
@@ -388,15 +388,18 @@ namespace TestMod {
                         CommsRadioController.PlayAudioFromRadio(SelectedCarSound, transform);
                         SetState(State.SelectSkin);
                     }*/
-                    if (currentlyReading) {
-                        CutCoroutineShort();
-                        return;
-                    }
 
                     if (PointedCar != null) {
+                        if (currentlyReading) {
+                            CutCoroutineShort(false);
+                        }
                         OnCarClicked?.Invoke(PointedCar);
                         PointToCar(null);
                     } else {
+                        if (currentlyReading) {
+                            CutCoroutineShort();
+                            return;
+                        }
                         OnNothingClicked?.Invoke();
                     }
 
@@ -533,11 +536,15 @@ namespace TestMod {
             currentlyReading = false;
         }
 
-        private static void CutCoroutineShort() {
+        private static void CutCoroutineShort(bool playClick = true) {
             if (currentCoroutine != null) {
                 if (coroutineRunner != null) coroutineRunner.StopCoroutine(currentCoroutine);
                 currentlyReading = false;
-                PlayRadioClip(GetVoicedClip("NoiseClick"));
+                if (playClick) {
+                    PlayRadioClip(GetVoicedClip("NoiseClick"));
+                } else {
+                    source.Stop();
+                }
                 mod.Logger.Log("Narrator line cut short.");
             } else {
                 mod.Logger.Warning("No narrator line playing to cut short.");

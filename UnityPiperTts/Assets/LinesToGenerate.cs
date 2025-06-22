@@ -31,11 +31,11 @@ public class JobTypeLines : IListOfLines {
     public string directory => "JobType/";
     public Line[] lines => new[] {
         Line.of("JobTypeCustom", "A custom order"),
-        Line.of("JobTypeShuntingLoad", "A shunting load order"),
-        Line.of("JobTypeShuntingUnload", "A shunting unload order"),
-        Line.of("JobTypeTransport", "A freight haul order"),
-        Line.of("JobTypeEmptyHaul", "A logistic haul order"),
-        Line.of("JobTypeComplexTransport", "A complex transport order"),
+        Line.of("JobTypeShuntingLoad", "A loading order"),
+        Line.of("JobTypeShuntingUnload", "An unloading order"),
+        Line.of("JobTypeTransport", "A delivery order"),
+        Line.of("JobTypeEmptyHaul", "A logistical order"),
+        Line.of("JobTypeComplexTransport", "A complex delivery order"),
     };
 }
 
@@ -179,10 +179,10 @@ public class TrackTypeLines : IListOfLines {
 public class YardNames : IListOfLines {
     public string directory => "YardName/";
     // Prefix with "Yard" to match the naming convention
-    public Line[] lines => new[] {
+    public Line[] basicLines => new[] {
         Line.of("YardCME", "Coal Mine East"),
         Line.of("YardCMS", "Coal Mine South"),
-        Line.of("YardCP", "Coal Power Plant"),
+        Line.of("YardCP", "Coal Plant"),
         Line.of("YardCS", "City South"),
         Line.of("YardCW", "City West"),
         Line.of("YardFF", "Food Factory"),
@@ -197,10 +197,12 @@ public class YardNames : IListOfLines {
         Line.of("YardMF", "Machine Factory"),
         Line.of("YardOR", "Oil Refinery"),
         Line.of("YardOWC", "Oil Well Central"),
-        Line.of("YardOWN", "Oil Well North"),
+        Line.of("YardOWN", "Oil Well North."),
         Line.of("YardSM", "Steel Mill"),
-        Line.of("YardSW", "Sawmill")
+        Line.of("YardSW", "Saw Mill")
     };
+    // Replace " " with "; " in all lines
+    public Line[] lines => basicLines.Select(line => Line.of(line.filename, line.text.Replace(" ", "; "))).ToArray();
 }
 
 public class CarDescriptionLines : IListOfLines {

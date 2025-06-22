@@ -21,17 +21,16 @@ namespace TestMod
         public static bool enabled;
         public static UnityModManager.ModEntry mod;
         
-        private static AudioSource source;
-        
         private static string assetBundlePath;
         private static AssetBundle voicedLines;
-        
-        private static int currentLineIndex = 0;
         
         private static List<string> readJobs = new List<string>();
         private static bool currentlyReading;
 
         private static CommsRadioController commsRadio;
+        
+        private static CoroutineRunner coroutineRunner;
+        private static Coroutine currentCoroutine;
         
         static bool Load(UnityModManager.ModEntry modEntry) {
             var harmony = new Harmony(modEntry.Info.Id);
@@ -78,7 +77,7 @@ namespace TestMod
             }
             PlayerManager.CarChanged += OnCarChanged;
             CommsRadioNarrator.OnCarClicked += OnCarClicked;
-            CommsRadioNarrator.OnNothingClicked += ReadAllJobsOverview;
+            CommsRadioNarrator.OnNothingClicked += OnNothingClicked;
         }
         
         static void Disable() {
@@ -91,20 +90,32 @@ namespace TestMod
         }
 
         static void OnCarClicked(TrainCar car) {
+            if (currentlyReading) {
+                CutCoroutineShort();
+                return;
+            }
             var lineBuilder = new List<string>();
             lineBuilder.Add("ThisIsCar");
             lineBuilder.AddRange(SeparateIntoLetters(car.ID));
             PlayInCoroutineWithClick(lineBuilder);
         }
+        
+        static void OnNothingClicked() {
+            if (currentlyReading) {
+                CutCoroutineShort();
+                return;
+            }
+            ReadAllJobsOverview();
+        }
 
         static void OnSessionStart(UnityModManager.ModEntry modEntry) {
-            SetupSource();
+            SetupLinesAndRunner();
             commsRadio = Object.FindObjectOfType<CommsRadioController>();
         }
         
         static void OnUpdate(UnityModManager.ModEntry modEntry, float dt) {
             if (Input.GetKeyDown(KeyCode.L)) {
-                SetupSource();
+                SetupLinesAndRunner();
                 PlayInCoroutineWithClick(testVoiceLines);
             }
 
@@ -189,9 +200,8 @@ namespace TestMod
             mod.Logger.Log("Generated voice line: " + string.Join(" ", lineBuilder));
             lineBuilder.Insert(0, "NoiseClick");
             lineBuilder.Add("NoiseClick");
-            SetupSource();
-            var behaviour = source.gameObject.GetComponent<CoroutineRunner>();
-            behaviour.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
+            SetupLinesAndRunner();
+            currentCoroutine = coroutineRunner.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
         }
 
         private static string[] VoicedTrackId(TrackID trackId) {
@@ -415,6 +425,19 @@ namespace TestMod
             currentlyReading = false;
         }
         
+        private static void CutCoroutineShort() {
+            if (currentCoroutine != null) {
+                if (coroutineRunner != null) {
+                    coroutineRunner.StopCoroutine(currentCoroutine);
+                }
+                currentlyReading = false;
+                CommsRadioNarrator.PlayRadioClip(GetVoicedClip("NoiseClick"));
+                mod.Logger.Log("Narrator line cut short.");
+            } else {
+                mod.Logger.Warning("No narrator line playing to cut short.");
+            }
+        }
+        
         static AudioClip GetVoicedClip(string name)
         {
             if (voicedLines == null) {
@@ -428,43 +451,15 @@ namespace TestMod
             return clip;
         }
         
-        static void PlaySound(AudioClip clip)
-        {
-            SetupSource();
-            //if (source.isPlaying) {return;}
-            source.clip = clip;
-            source.Play();
-        }
-
-        private static void SetupSource() {
+        private static void SetupLinesAndRunner() {
             if (voicedLines == null) {
                 voicedLines = AssetBundle.LoadFromFile(assetBundlePath);
                 mod.Logger.Error("Failed to load voiced lines asset bundle.");
             }
-            if (source == null)
-            {
-                source = new GameObject("AudioSource").AddComponent<AudioSource>();
-                source.transform.position = Camera.main.transform.position;//PlayerManager.PlayerTransform.position;
-                source.loop = false;
+            if (!coroutineRunner) {
+                coroutineRunner = new GameObject("NarratorCoroutineRunner").AddComponent<CoroutineRunner>();
+                Object.DontDestroyOnLoad(coroutineRunner);
             }
-            if (source.gameObject.GetComponent<CoroutineRunner>() == null) {
-                source.gameObject.AddComponent<CoroutineRunner>();
-            }
-        }
-
-        static void PlayVoiceLine(string lineName) {
-            if (voicedLines == null) {
-                mod.Logger.Error("Voiced lines asset bundle is not loaded.");
-                return;
-            }
-
-            var clip = voicedLines.LoadAsset<AudioClip>(lineName);
-            if (clip == null) {
-                mod.Logger.Error("Failed to load voice line: " + lineName);
-                return;
-            }
-
-            PlaySound(clip);
         }
     }
 }

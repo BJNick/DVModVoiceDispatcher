@@ -179,30 +179,28 @@ public class TrackTypeLines : IListOfLines {
 public class YardNames : IListOfLines {
     public string directory => "YardName/";
     // Prefix with "Yard" to match the naming convention
-    public Line[] basicLines => new[] {
-        Line.of("YardCME", "Coal Mine East"),
-        Line.of("YardCMS", "Coal Mine South"),
-        Line.of("YardCP", "Coal Plant"),
-        Line.of("YardCS", "City South"),
-        Line.of("YardCW", "City West"),
-        Line.of("YardFF", "Food Factory"),
-        Line.of("YardFM", "Farm Market"),
-        Line.of("YardFRC", "Forest Central"),
-        Line.of("YardFRS", "Forest South"),
-        Line.of("YardGF", "Goods Factory"),
-        Line.of("YardHB", "Harbor"),
-        Line.of("YardIME", "Iron Mine East"),
-        Line.of("YardIMW", "Iron Mine West"),
-        Line.of("YardMB", "Military Base"),
-        Line.of("YardMF", "Machine Factory"),
-        Line.of("YardOR", "Oil Refinery"),
-        Line.of("YardOWC", "Oil Well Central"),
+    public Line[] lines => new[] {
+        Line.of("YardCME", "Coal Mine East."),
+        Line.of("YardCMS", "Coal Mine South."),
+        Line.of("YardCP", "Coal Plant."),
+        Line.of("YardCS", "City South."),
+        Line.of("YardCW", "City West."),
+        Line.of("YardFF", "Food Factory."),
+        Line.of("YardFM", "Farm Market."),
+        Line.of("YardFRC", "Forest Central."),
+        Line.of("YardFRS", "Forest South."),
+        Line.of("YardGF", "Goods Factory."),
+        Line.of("YardHB", "Harbor."),
+        Line.of("YardIME", "Iron Mine East."),
+        Line.of("YardIMW", "Iron Mine West."),
+        Line.of("YardMB", "Military Base."),
+        Line.of("YardMF", "Machine Factory."),
+        Line.of("YardOR", "Oil Refinery."),
+        Line.of("YardOWC", "Oil Well Central."),
         Line.of("YardOWN", "Oil Well North."),
-        Line.of("YardSM", "Steel Mill"),
-        Line.of("YardSW", "Saw Mill")
+        Line.of("YardSM", "Steel Mill."),
+        Line.of("YardSW", "Sawmill.")
     };
-    // Replace " " with "; " in all lines
-    public Line[] lines => basicLines.Select(line => Line.of(line.filename, line.text.Replace(" ", "; "))).ToArray();
 }
 
 public class CarDescriptionLines : IListOfLines {

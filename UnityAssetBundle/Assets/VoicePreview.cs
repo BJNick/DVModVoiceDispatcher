@@ -26,6 +26,7 @@ public class VoicePreview : MonoBehaviour
             var lineBuilder = new List<string>();
             lineBuilder.Add("NoiseClick");
             AddStationGreetings(lineBuilder);
+            AddTransportJobLines(lineBuilder);
             lineBuilder.Add("NoiseClick");
 
             var line = string.Join(" ", lineBuilder);

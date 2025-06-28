@@ -55,6 +55,24 @@ public class Numbers : IListOfLines {
         Line.of("10", "Ten."),
         Line.of("11", "Eleven."),
         Line.of("12", "Twelve."),
+        Line.of("13", "Thirteen."),
+        Line.of("14", "Fourteen."),
+        Line.of("15", "Fifteen."),
+        Line.of("16", "Sixteen."),
+        Line.of("17", "Seventeen."),
+        Line.of("18", "Eighteen."),
+        Line.of("19", "Nineteen."),
+        Line.of("20", "Twenty."),
+        Line.of("30", "Thirty."),
+        Line.of("40", "Forty."),
+        Line.of("50", "Fifty."),
+        Line.of("60", "Sixty."),
+        Line.of("70", "Seventy."),
+        Line.of("80", "Eighty."),
+        Line.of("90", "Ninety."),
+        Line.of("100", "Hund-rid."),
+        Line.of("1000", "Thousand."),
+        Line.of("1000000", "Million."),
     };
 }
 
@@ -146,6 +164,7 @@ public class JobDescriptionLines : IListOfLines {
         Line.of("ToCompleteTheOrder", "to complete the order."),
         Line.of("And", "and"),
         Line.of("Or", "or"),
+        Line.of("HighestPayingJob", "Highest paying job:"),
     };
 }
 
@@ -254,6 +273,25 @@ public class StationGreetingsLines : IListOfLines {
     };
 }
 
+public class UnitsLines : IListOfLines {
+    public string directory => "Units/";
+    
+    public Line[] lines => new[] {
+        Line.of("Dollars", "dollars"),
+        Line.of("Tons", "tons"),
+        Line.of("Meters", "meters"),
+        Line.of("Minutes", "minutes"),
+        Line.of("Hours", "hours"),
+        Line.of("Tracks", "tracks"),
+        
+        Line.of("Over", "over"),
+        Line.of("Under", "under"),
+        Line.of("Above", "above"),
+        Line.of("Ahead", "ahead"),
+        Line.of("Behind", "Behind"),
+    };
+}
+
 public class AllLines {
     public static IListOfLines[] lists = new IListOfLines[] {
         new JobTypeLines(),
@@ -265,6 +303,7 @@ public class AllLines {
         new CarDescriptionLines(),
         new YardNames(),
         new StationGreetingsLines(),
+        new UnitsLines(),
         // Add more lists here as needed
     };
 }

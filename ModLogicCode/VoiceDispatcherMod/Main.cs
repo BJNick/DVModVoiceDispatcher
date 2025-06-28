@@ -149,6 +149,7 @@ namespace VoiceDispatcherMod {
 
             var lineBuilder = new List<string>();
             StationHelper.AddWelcomeToStationMessage(lineBuilder, station);
+            StationHelper.AddHighestPayingJob(lineBuilder, station);
             CommsRadioNarrator.PlayWithClick(lineBuilder);
         }
 

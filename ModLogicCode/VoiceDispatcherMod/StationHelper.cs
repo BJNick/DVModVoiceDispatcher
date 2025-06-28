@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using DV.ThingTypes;
 using UnityEngine;
+using static VoiceDispatcherMod.VoicingUtils;
 
 namespace VoiceDispatcherMod {
     public class StationHelper {
@@ -42,26 +45,52 @@ namespace VoiceDispatcherMod {
 
         public static void AddWelcomeToYardMessage(List<string> lineBuilder, StationController station) {
             lineBuilder.Add(Randomizer.GetRandomLine("EnteringYard", 1, 5));
-            lineBuilder.Add(VoicingUtils.GetYardName(station.stationInfo));
+            lineBuilder.Add(GetYardName(station.stationInfo));
             lineBuilder.Add("ShortSilence");
         }
 
         public static void AddWelcomeToStationMessage(List<string> lineBuilder, StationController station) {
             lineBuilder.Add(Randomizer.GetRandomLine("EnteringStation", 1, 5));
-            lineBuilder.Add(VoicingUtils.GetYardName(station.stationInfo));
+            lineBuilder.Add(GetYardName(station.stationInfo));
             lineBuilder.Add("ShortSilence");
         }
 
         public static void AddExitingYardMessage(List<string> lineBuilder, StationController station) {
             lineBuilder.Add(Randomizer.GetRandomLine("ExitingYard", 1, 5));
-            lineBuilder.Add(VoicingUtils.GetYardName(station.stationInfo));
+            lineBuilder.Add(GetYardName(station.stationInfo));
             lineBuilder.Add("ShortSilence");
+        }
+
+        public static void AddHighestPayingJob(List<string> lineBuilder, StationController station) {
+            var allJobs = station.logicStation.availableJobs;
+            var job = allJobs.OrderByDescending(it => it.initialWage).FirstOrDefault();
+            if (job == null) {
+                lineBuilder.Add("0");
+                lineBuilder.Add("Orders");
+                return;
+            }
+
+            lineBuilder.Add("HighestPayingJob");
+            lineBuilder.Add("JobType" + job.jobType);
+
+            if (job.jobType is JobType.Transport or JobType.EmptyHaul) {
+                lineBuilder.Add("BoundFor");
+                lineBuilder.Add(GetYardName(JobHelper.ExtractTransportDestinationTrack(job)));
+            }
+
+            lineBuilder.Add("ShortSilence");
+
+            lineBuilder.Add("Over");
+            int wage = Mathf.RoundToInt(job.initialWage);
+            lineBuilder.AddRange(RoundedUp(wage));
+            lineBuilder.Add("Dollars");
         }
 
         public static StationController GetPlayerStation() {
             if (CheckPlayerPositionAgain()) {
                 ForceUpdatePlayerStation();
             }
+
             return playerYard;
         }
 
@@ -79,7 +108,7 @@ namespace VoiceDispatcherMod {
             var newYard = FindYardInRange();
             if (newYard != playerYard) {
                 subYard = FindSubYardInRange();
-                
+
                 if (!newYard) {
                     OnYardExited?.Invoke(playerYard);
                 } else {
@@ -99,7 +128,7 @@ namespace VoiceDispatcherMod {
 
             return null;
         }
-        
+
         public static StationController FindSubYardInRange() {
             foreach (var station in StationController.allStations) {
                 if (IsPlayerInYardRange(station) && IsMilitarySubStation(station)) {
@@ -108,12 +137,13 @@ namespace VoiceDispatcherMod {
             }
 
             return null;
-        } 
-        
+        }
+
         public static bool IsMilitarySubStation(StationController station) {
             if (station == null || station.stationRange == null) {
                 return false;
             }
+
             var yardID = station.stationInfo.YardID;
             return yardID != "MB" && yardID.EndsWith("MB");
         }
@@ -123,14 +153,16 @@ namespace VoiceDispatcherMod {
             if (station == null || station.stationRange == null) {
                 return false;
             }
+
             return (station.stationRange.PlayerSqrDistanceFromStationOffice <= OfficeRadiusSqrDistance);
         }
-        
+
         public static bool IsPlayerInYardRange(StationController station) {
             if (station == null || station.stationRange == null) {
                 return false;
             }
-            return station.stationRange.PlayerSqrDistanceFromStationCenter <= 
+
+            return station.stationRange.PlayerSqrDistanceFromStationCenter <=
                    station.stationRange.generateJobsSqrDistance * YardRadiusRatio * YardRadiusRatio;
         }
     }

@@ -46,14 +46,9 @@ namespace VoiceDispatcherMod {
                     lineBuilder.Add("WaitingForUnloading");
                     break;
                 case JobType.Transport:
-                    var transportJobData = JobDataExtractor.ExtractTransportJobData(new Job_data(job));
-                    lineBuilder.Add("BoundFor");
-                    lineBuilder.Add(GetYardName(transportJobData.destinationTrack));
-                    break;
                 case JobType.EmptyHaul:
-                    var haulJobData = JobDataExtractor.ExtractEmptyHaulJobData(new Job_data(job));
                     lineBuilder.Add("BoundFor");
-                    lineBuilder.Add(GetYardName(haulJobData.destinationTrack));
+                    lineBuilder.Add(GetYardName(JobHelper.ExtractTransportDestinationTrack(job)));
                     break;
                 default:
                     lineBuilder.Add("PartOf");

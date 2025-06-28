@@ -42,7 +42,7 @@ namespace VoiceDispatcherMod {
 
             var lineBuilder = new List<string>();
             lineBuilder.Add("YouHave");
-            lineBuilder.Add(jobs.Count.ToString());
+            lineBuilder.AddRange(Exact(jobs.Count));
             lineBuilder.Add("Orders");
             lineBuilder.Add("ShortSilence");
 
@@ -108,14 +108,14 @@ namespace VoiceDispatcherMod {
                     lineBuilder.Add("And");
                 }
 
-                lineBuilder.Add(carCount + "Cars");
+                lineBuilder.AddRange(SayNumberOfCars(carCount));
                 lineBuilder.Add("AtTrack");
                 lineBuilder.AddRange(VoicedTrackId(track));
                 lineBuilder.Add("ShortSilence");
             }
 
             lineBuilder.Add("ThenMove");
-            lineBuilder.Add(jobInfo.allCarsToLoad.Count + "Cars");
+            lineBuilder.AddRange(SayNumberOfCars(jobInfo.allCarsToLoad));
             lineBuilder.Add("ToTrack");
             lineBuilder.AddRange(VoicedTrackId(jobInfo.loadMachineTrack));
             lineBuilder.Add("ForLoading");
@@ -139,7 +139,7 @@ namespace VoiceDispatcherMod {
             lineBuilder.Add("ShortSilence");
 
             lineBuilder.Add("PickUp");
-            lineBuilder.Add(jobInfo.allCarsToUnload.Count + "Cars");
+            lineBuilder.AddRange(SayNumberOfCars(jobInfo.allCarsToUnload));
             lineBuilder.Add("AtTrackType" + GetTrackTypeLetter(jobInfo.startingTrack));
             lineBuilder.AddRange(VoicedTrackId(jobInfo.startingTrack));
             lineBuilder.Add("ShortSilence");
@@ -158,7 +158,7 @@ namespace VoiceDispatcherMod {
                     lineBuilder.Add("And");
                 }
 
-                lineBuilder.Add(carCount + "Cars");
+                lineBuilder.AddRange(SayNumberOfCars(carCount));
                 lineBuilder.Add("AtTrack");
                 lineBuilder.AddRange(VoicedTrackId(track));
                 if (index < jobInfo.destinationTracksData.Count - 1) {
@@ -198,7 +198,7 @@ namespace VoiceDispatcherMod {
             lineBuilder.Add("ShortSilence");
 
             lineBuilder.Add("PickUp");
-            lineBuilder.Add(transportingCars.Count + "Cars");
+            lineBuilder.AddRange(SayNumberOfCars(transportingCars));
             lineBuilder.Add("FromTrack");
             lineBuilder.AddRange(VoicedTrackId(startingTrack));
             lineBuilder.Add("In");
@@ -236,7 +236,7 @@ namespace VoiceDispatcherMod {
             }
 
             if (carCount != null) {
-                lineBuilder.Add(carCount + "Cars");
+                lineBuilder.AddRange(SayNumberOfCars(carCount.Value));
             } else {
                 lineBuilder.Add("Cars");
             }
@@ -254,6 +254,19 @@ namespace VoiceDispatcherMod {
                 }
 
                 lineBuilder.AddRange(VoicedTrackId(end.ID));
+            }
+        }
+        
+        public static TrackID ExtractTransportDestinationTrack(Job job) {
+            var jobData = new Job_data(job);
+            if (jobData.type == JobType.EmptyHaul) {
+                var haulJobData = JobDataExtractor.ExtractEmptyHaulJobData(jobData);
+                return haulJobData.destinationTrack;
+            } else if (jobData.type == JobType.Transport) {
+                var transportJobData = JobDataExtractor.ExtractTransportJobData(jobData);
+                return transportJobData.destinationTrack;
+            } else {
+                throw new System.Exception("Unexpected job type for extracting destination track: " + jobData.type);
             }
         }
     }

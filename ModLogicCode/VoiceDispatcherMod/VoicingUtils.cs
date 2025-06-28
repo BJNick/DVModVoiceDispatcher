@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using DV.Logic.Job;
 
 namespace VoiceDispatcherMod {
@@ -44,6 +46,103 @@ namespace VoiceDispatcherMod {
 
         public static string[] SeparateIntoLetters(string text) {
             return text.ToCharArray().Select(c => c.ToString()).ToArray();
+        }
+
+        public static string[] SayNumberOfCars<T>(List<T> list) {
+            return SayNumberOfCars(list.Count);
+        }
+
+        public static string[] SayNumberOfCars(int number) {
+            if (number <= 12) {
+                return new[] { number + "Cars" };
+            }
+
+            var numberParts = SayFullNumber(number).ToList();
+            numberParts.Add("Cars");
+            return numberParts.ToArray();
+        }
+
+        public static string[] RoundedUp(int number) {
+            return SayApproximateNumber(number);
+        }
+
+        public static string[] SayApproximateNumber(int number) {
+            var leadingDigit = number.ToString()[0] - '0';
+            var totalDigits = number.ToString().Length;
+            // If the leading digit is 1, say 2 digits, otherwise say 1 digit.
+            if (leadingDigit == 1) {
+                var tenthPower = (int)Math.Pow(10, totalDigits - 2);
+                return SayFullNumber(number / tenthPower * tenthPower);
+            } else {
+                var tenthPower = (int)Math.Pow(10, totalDigits - 1);
+                return SayFullNumber(number / tenthPower * tenthPower);
+            }
+        }
+
+        public static string[] Exact(int number) {
+            return SayFullNumber(number);
+        }
+
+        public static string[] SayFullNumber(int number) {
+            if (number == 0) {
+                return new[] { "0" };
+            }
+
+            var numberParts = new List<string>();
+            if (number >= 1_000_000) {
+                var subMillion = number / 1_000_000 % 1000;
+                if (subMillion == 0) {
+                    subMillion = 999; // Max possible value
+                }
+
+                numberParts.AddRange(SayTripleDigitNumber(subMillion));
+                numberParts.Add("1000000");
+            }
+
+            if (number >= 1000) {
+                var subThousand = number / 1000 % 1000;
+                if (subThousand != 0) {
+                    numberParts.AddRange(SayTripleDigitNumber(subThousand));
+                    numberParts.Add("1000");
+                }
+            }
+
+            if (number % 1000 > 0) {
+                numberParts.AddRange(SayTripleDigitNumber(number % 1000));
+            }
+
+            return numberParts.ToArray();
+        }
+
+        public static string[] SayTripleDigitNumber(int number) {
+            if (number < 100) {
+                return SayDoubleDigitNumber(number);
+            }
+
+            var numberParts = new List<string>();
+            numberParts.Add(NthDigit(number, 3).ToString());
+            numberParts.Add("100");
+            if (number % 100 > 0) {
+                numberParts.AddRange(SayDoubleDigitNumber(number % 100));
+            }
+
+            return numberParts.ToArray();
+        }
+
+        public static string[] SayDoubleDigitNumber(int number) {
+            if (number <= 20) {
+                return new[] { number.ToString() };
+            }
+
+            if (number / 10 * 10 == number) {
+                return new[] { number.ToString() };
+            }
+
+            return new[] { (NthDigit(number, 2) * 10).ToString(), NthDigit(number, 1).ToString() };
+        }
+
+        public static int NthDigit(int number, int n) {
+            return number / (int)Math.Pow(10, n - 1) % 10;
         }
     }
 }

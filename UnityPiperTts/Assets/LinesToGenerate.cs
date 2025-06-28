@@ -230,6 +230,27 @@ public class CarDescriptionLines : IListOfLines {
     };
 }
 
+public class StationGreetingsLines : IListOfLines {
+    public string directory => "StationGreetings/";
+    
+    public Line[] lines => new[] {
+        Line.of("EnteringYard1", "Entering"),
+        Line.of("EnteringYard2", "Clear to enter"),
+        Line.of("EnteringYard3", "Welcome to"),
+        Line.of("EnteringYard4", "Proceed to"),
+        Line.of("EnteringYard5", "Permission granted for"),
+        
+        Line.of("ExitingYard1", "Exit-ing"),
+        Line.of("ExitingYard2", "Leaving"),
+        Line.of("ExitingYard3", "Departing"),
+        Line.of("ExitingYard4", "Safe travels from"),
+        
+        Line.of("EnteringStation1", "Welcome inside"),
+        Line.of("EnteringStation2", "Make yourself at home in"),
+        Line.of("EnteringStation3", "Enjoy your stay at"),
+    };
+}
+
 public class AllLines {
     public static IListOfLines[] lists = new IListOfLines[] {
         new JobTypeLines(),
@@ -240,6 +261,7 @@ public class AllLines {
         new TrackTypeLines(),
         new CarDescriptionLines(),
         new YardNames(),
+        new StationGreetingsLines(),
         // Add more lists here as needed
     };
 }

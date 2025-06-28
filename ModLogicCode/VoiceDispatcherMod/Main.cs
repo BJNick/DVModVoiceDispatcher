@@ -73,6 +73,9 @@ namespace VoiceDispatcherMod {
             PlayerManager.CarChanged += OnCarChanged;
             CommsRadioNarrator.OnCarClicked += OnCarClicked;
             CommsRadioNarrator.OnNothingClicked += OnNothingClicked;
+            StationHelper.OnYardEntered += OnYardEntered;
+            StationHelper.OnYardExited += OnYardExited;
+            StationHelper.OnStationEntered += OnStationEntered;
         }
 
         public static AssetBundle GetVoiceLinesBundle() {
@@ -104,11 +107,55 @@ namespace VoiceDispatcherMod {
             ReadAllJobsOverview();
         }
 
+        static void OnYardEntered(StationController station) {
+            if (station == null) {
+                return;
+            }
+
+            if (RateLimiter.CannotYetPlay("YardWelcome", 10f)) {
+                return;
+            }
+
+            var lineBuilder = new List<string>();
+            StationHelper.AddWelcomeToYardMessage(lineBuilder, station);
+            CommsRadioNarrator.PlayWithClick(lineBuilder);
+        }
+
+        static void OnYardExited(StationController previousStation) {
+            if (previousStation == null) {
+                return;
+            }
+
+            if (RateLimiter.CannotYetPlay("StationLeft", 10f)) {
+                return;
+            }
+
+            var lineBuilder = new List<string>();
+            StationHelper.AddExitingYardMessage(lineBuilder, previousStation);
+            CommsRadioNarrator.PlayWithClick(lineBuilder);
+        }
+
+        static void OnStationEntered(StationController station) {
+            if (station == null) {
+                return;
+            }
+            // TODO: Adjust time limits
+            if (RateLimiter.CannotYetPlay("StationWelcome", 5f)) {
+                return;
+            }
+
+            var lineBuilder = new List<string>();
+            StationHelper.AddWelcomeToStationMessage(lineBuilder, station);
+            CommsRadioNarrator.PlayWithClick(lineBuilder);
+        }
+
         static void OnSessionStart(UnityModManager.ModEntry modEntry) {
             commsRadio = Object.FindObjectOfType<CommsRadioController>();
         }
 
         static void OnUpdate(UnityModManager.ModEntry modEntry, float dt) {
+            StationHelper.OnUpdate();
+
             if (Input.GetKeyDown(KeyCode.L)) {
                 CommsRadioNarrator.PlayWithClick(testVoiceLines);
             }

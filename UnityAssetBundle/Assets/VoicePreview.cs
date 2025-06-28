@@ -25,7 +25,7 @@ public class VoicePreview : MonoBehaviour
             
             var lineBuilder = new List<string>();
             lineBuilder.Add("NoiseClick");
-            AddCarDetailedDescription(lineBuilder);
+            AddStationGreetings(lineBuilder);
             lineBuilder.Add("NoiseClick");
 
             var line = string.Join(" ", lineBuilder);
@@ -69,6 +69,14 @@ public class VoicePreview : MonoBehaviour
             "4", "7", "1", "WaitingForUnloading", SHORT_PAUSE,
             "5", "3", "9", "PartOf", "JobTypeComplexTransport", SHORT_PAUSE,
             "0", "0", "3", "NotPartOfAnyOrder",
+        });
+    }
+    
+    private static void AddStationGreetings(List<string> lineBuilder) {
+        lineBuilder.AddRange(new[] {
+            "EnteringYard5", "YardOWC", SHORT_PAUSE,
+            "EnteringStation2", "YardMF", SHORT_PAUSE,
+            "ExitingYard4", "YardIME", SHORT_PAUSE,
         });
     }
     

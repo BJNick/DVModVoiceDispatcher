@@ -34,6 +34,14 @@ namespace VoiceDispatcherMod {
             return "Yard" + trackId.yardId;
         }
 
+        public static string GetYardName(StationInfo stationInfo) {
+            if (stationInfo?.YardID == null) {
+                return "Unknown Yard";
+            }
+
+            return "Yard" + stationInfo.YardID;
+        }
+
         public static string[] SeparateIntoLetters(string text) {
             return text.ToCharArray().Select(c => c.ToString()).ToArray();
         }

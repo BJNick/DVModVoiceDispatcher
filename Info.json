@@ -1,0 +1,10 @@
+{
+  "Id": "VoiceDispatcherMod",
+  "DisplayName": "Voice Dispatcher Mod",
+  "Author": "BJNick",
+  "Version": "0.0.2",
+  "Requirements": [ ],
+  "LoadAfter": [ ],
+  "AssemblyName": "VoiceDispatcherMod.dll",
+  "EntryMethod": "VoiceDispatcherMod.Main.Load"
+}

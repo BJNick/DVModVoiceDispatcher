@@ -236,9 +236,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CarHelper.cs" />
     <Compile Include="CommsRadioNarrator.cs" />
+    <Compile Include="JobHelper.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Randomizer.cs" />
+    <Compile Include="VoicingUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="SpeechLib">

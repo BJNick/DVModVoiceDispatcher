@@ -112,7 +112,8 @@ namespace VoiceDispatcherMod {
                 return;
             }
 
-            if (RateLimiter.CannotYetPlay("YardWelcome", 10f)) {
+            if (RateLimiter.CannotYetPlay("YardEnterOrExit" + station.stationInfo.YardID,
+                    RateLimiter.Minutes(3))) {
                 return;
             }
 
@@ -126,7 +127,8 @@ namespace VoiceDispatcherMod {
                 return;
             }
 
-            if (RateLimiter.CannotYetPlay("StationLeft", 10f)) {
+            if (RateLimiter.CannotYetPlay("YardEnterOrExit" + previousStation.stationInfo.YardID,
+                    RateLimiter.Minutes(3))) {
                 return;
             }
 
@@ -139,8 +141,9 @@ namespace VoiceDispatcherMod {
             if (station == null) {
                 return;
             }
-            // TODO: Adjust time limits
-            if (RateLimiter.CannotYetPlay("StationWelcome", 5f)) {
+
+            if (RateLimiter.CannotYetPlay("StationWelcome" + station.stationInfo.YardID, 
+                    RateLimiter.Minutes(10))) {
                 return;
             }
 

@@ -191,10 +191,12 @@ public class YardNames : IListOfLines {
         Line.of("YardFRS", "Forest South."),
         Line.of("YardGF", "Goods Factory."),
         Line.of("YardHB", "Harbor."),
+        Line.of("YardHMB", "Harbor Military Base."),
         Line.of("YardIME", "Iron Mine East."),
         Line.of("YardIMW", "Iron Mine West."),
         Line.of("YardMB", "Military Base."),
         Line.of("YardMF", "Machine Factory."),
+        Line.of("YardMFMB", "Machine Factory Military Base."),
         Line.of("YardOR", "Oil Refinery."),
         Line.of("YardOWC", "Oil Well Central."),
         Line.of("YardOWN", "Oil Well North."),
@@ -235,17 +237,20 @@ public class StationGreetingsLines : IListOfLines {
         Line.of("EnteringYard1", "Entering"),
         Line.of("EnteringYard2", "Clear to enter"),
         Line.of("EnteringYard3", "Welcome to"),
-        Line.of("EnteringYard4", "Proceed to"),
+        Line.of("EnteringYard4", "Approaching"),
         Line.of("EnteringYard5", "Permission granted for"),
         
         Line.of("ExitingYard1", "Exit-ing"),
         Line.of("ExitingYard2", "Leaving"),
         Line.of("ExitingYard3", "Departing"),
         Line.of("ExitingYard4", "Safe travels from"),
+        Line.of("ExitingYard5", "See you next time at"),
         
-        Line.of("EnteringStation1", "Welcome inside"),
+        Line.of("EnteringStation1", "Nice to see you at"),
         Line.of("EnteringStation2", "Make yourself at home in"),
         Line.of("EnteringStation3", "Enjoy your stay at"),
+        Line.of("EnteringStation4", "Always work at"),
+        Line.of("EnteringStation5", "Busy day at"),
     };
 }
 

@@ -4,15 +4,15 @@ using UnityEngine;
 
 namespace VoiceDispatcherMod {
     public class StationHelper {
-        public static StationController playerStation;
+        public static StationController playerYard;
+        public static StationController subYard;
         private static Vector3 lastPlayerPosition = Vector3.negativeInfinity;
 
-        // TODO: Adjust distances
-        private const float YardRadiusSqrDistance = 1000f;
-        private const float OfficeRadiusSqrDistance = 25f;
-        private const float RangeCheckSqrDistance = 25f;
+        private const float OfficeRadiusSqrDistance = 100f;
+        private const float RangeCheckSqrDistance = 2500f;
+        private const float YardRadiusRatio = 0.7f; // smaller than job spawn radius to avoid false positives
 
-        private static bool playerEnteredOffice = false;
+        private static StationController playerEnteredOffice;
 
         public static event Action<StationController> OnYardEntered;
         public static event Action<StationController> OnYardExited;
@@ -25,19 +25,18 @@ namespace VoiceDispatcherMod {
 
             // Update station and issue events
             GetPlayerStation();
-            CheckEnteredStation();
+            CheckEnteredOffice(playerYard);
+            CheckEnteredOffice(subYard);
         }
 
-        private static void CheckEnteredStation() {
-            if (playerStation) {
-                if (!playerEnteredOffice && IsPlayerInOfficeRange(playerStation)) {
-                    playerEnteredOffice = true;
-                    OnStationEntered?.Invoke(playerStation);
-                } else if (playerEnteredOffice && !IsPlayerInOfficeRange(playerStation)) {
-                    playerEnteredOffice = false;
+        private static void CheckEnteredOffice(StationController yard) {
+            if (yard) {
+                if (!playerEnteredOffice && IsPlayerInOfficeRange(yard)) {
+                    playerEnteredOffice = yard;
+                    OnStationEntered?.Invoke(yard);
+                } else if (playerEnteredOffice == yard && !IsPlayerInOfficeRange(yard)) {
+                    playerEnteredOffice = null;
                 }
-            } else {
-                playerEnteredOffice = false;
             }
         }
 
@@ -48,28 +47,22 @@ namespace VoiceDispatcherMod {
         }
 
         public static void AddWelcomeToStationMessage(List<string> lineBuilder, StationController station) {
-            lineBuilder.Add(Randomizer.GetRandomLine("EnteringStation", 1, 3));
+            lineBuilder.Add(Randomizer.GetRandomLine("EnteringStation", 1, 5));
             lineBuilder.Add(VoicingUtils.GetYardName(station.stationInfo));
             lineBuilder.Add("ShortSilence");
         }
 
         public static void AddExitingYardMessage(List<string> lineBuilder, StationController station) {
-            lineBuilder.Add(Randomizer.GetRandomLine("ExitingYard", 1, 4));
+            lineBuilder.Add(Randomizer.GetRandomLine("ExitingYard", 1, 5));
             lineBuilder.Add(VoicingUtils.GetYardName(station.stationInfo));
             lineBuilder.Add("ShortSilence");
         }
 
         public static StationController GetPlayerStation() {
             if (CheckPlayerPositionAgain()) {
-                if (playerStation) {
-                    if (!IsPlayerInYardRange(playerStation)) {
-                        ForceUpdatePlayerStation();
-                    }
-                } else {
-                    ForceUpdatePlayerStation();
-                }
+                ForceUpdatePlayerStation();
             }
-            return playerStation;
+            return playerYard;
         }
 
         private static bool CheckPlayerPositionAgain() {
@@ -83,26 +76,46 @@ namespace VoiceDispatcherMod {
         }
 
         public static void ForceUpdatePlayerStation() {
-            var newStation = GetYardInRange();
-            if (newStation != playerStation) {
-                if (!newStation) {
-                    OnYardExited?.Invoke(playerStation);
+            var newYard = FindYardInRange();
+            if (newYard != playerYard) {
+                subYard = FindSubYardInRange();
+                
+                if (!newYard) {
+                    OnYardExited?.Invoke(playerYard);
                 } else {
-                    OnYardEntered?.Invoke(newStation);
+                    OnYardEntered?.Invoke(newYard);
                 }
 
-                playerStation = newStation;
+                playerYard = newYard;
             }
         }
 
-        public static StationController GetYardInRange() {
+        public static StationController FindYardInRange() {
             foreach (var station in StationController.allStations) {
-                if (IsPlayerInYardRange(station)) {
+                if (IsPlayerInYardRange(station) && !IsMilitarySubStation(station)) {
                     return station;
                 }
             }
 
             return null;
+        }
+        
+        public static StationController FindSubYardInRange() {
+            foreach (var station in StationController.allStations) {
+                if (IsPlayerInYardRange(station) && IsMilitarySubStation(station)) {
+                    return station;
+                }
+            }
+
+            return null;
+        } 
+        
+        public static bool IsMilitarySubStation(StationController station) {
+            if (station == null || station.stationRange == null) {
+                return false;
+            }
+            var yardID = station.stationInfo.YardID;
+            return yardID != "MB" && yardID.EndsWith("MB");
         }
 
 
@@ -117,8 +130,8 @@ namespace VoiceDispatcherMod {
             if (station == null || station.stationRange == null) {
                 return false;
             }
-            // TODO station center
-            return (station.stationRange.PlayerSqrDistanceFromStationOffice <= YardRadiusSqrDistance);
+            return station.stationRange.PlayerSqrDistanceFromStationCenter <= 
+                   station.stationRange.generateJobsSqrDistance * YardRadiusRatio * YardRadiusRatio;
         }
     }
 }

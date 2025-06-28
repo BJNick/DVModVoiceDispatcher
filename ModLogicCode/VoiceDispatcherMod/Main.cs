@@ -13,7 +13,7 @@ using UnityModManagerNet;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
-namespace TestMod
+namespace VoiceDispatcherMod
 {
     static class Main
     {

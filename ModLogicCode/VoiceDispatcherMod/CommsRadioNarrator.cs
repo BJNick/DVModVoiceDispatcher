@@ -8,10 +8,10 @@ using DV.Utils;
 using HarmonyLib;
 using UnityEngine;
 using UnityModManagerNet;
-using static TestMod.CommsRadioNarrator;
+using static VoiceDispatcherMod.CommsRadioNarrator;
 
 // Thank you Skin Manager for this beautiful code 
-namespace TestMod {
+namespace VoiceDispatcherMod {
     public class CommsRadioNarrator : MonoBehaviour, ICommsRadioMode {
         private const float SIGNAL_RANGE = 300f;
         public static UnityModManager.ModEntry mod;

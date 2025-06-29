@@ -71,6 +71,9 @@ public class Numbers : IListOfLines {
         Line.of("80", "Eighty."),
         Line.of("90", "Ninety."),
         Line.of("100", "Hund-rid."),
+        Line.of("One100", "One hund-rid."),
+        Line.of("110", "One hund-rid ten."),
+        Line.of("120", "One hund-rid twenty."),
         Line.of("1000", "Thousand."),
         Line.of("1000000", "Million."),
     };
@@ -283,12 +286,37 @@ public class UnitsLines : IListOfLines {
         Line.of("Minutes", "minutes"),
         Line.of("Hours", "hours"),
         Line.of("Tracks", "tracks"),
+        Line.of("Percent", "percent"),
+        Line.of("Point", "point"),
         
         Line.of("Over", "over"),
         Line.of("Under", "under"),
         Line.of("Above", "above"),
         Line.of("Ahead", "ahead"),
         Line.of("Behind", "Behind"),
+    };
+}
+
+public class SignDescriptionLines : IListOfLines {
+    public string directory => "SignDescription/";
+
+    public Line[] lines => new[] {
+        Line.of("SpeedLimit", "Speed limit"),
+        Line.of("GradeBecomes", "Grade becomes"),
+        Line.of("JunctionLeft", "Junction left"),
+        Line.of("JunctionRight", "Junction right"),
+    };
+}
+
+public class LoudWarningLines : IListOfLines {
+    public string directory => "LoudWarning/";
+    
+    public Line[] lines => new[] {
+        Line.of("SpeedingWarning1", "Slow down the train!"),
+        Line.of("SpeedingWarning2", "Watch your speed!"),
+        Line.of("SpeedingWarning3", "You're moving too fast!"),
+        Line.of("SpeedingWarning4", "Going over speed limit!"),
+        Line.of("SpeedingWarning5", "Reduce speed immediately!"),
     };
 }
 
@@ -304,6 +332,8 @@ public class AllLines {
         new YardNames(),
         new StationGreetingsLines(),
         new UnitsLines(),
+        new SignDescriptionLines(),
+        new LoudWarningLines(),
         // Add more lists here as needed
     };
 }

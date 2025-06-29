@@ -184,24 +184,8 @@ namespace VoiceDispatcherMod {
                 }
             }
 
-            CheckSpeedLimits();
+            SignHelper.CheckSpeedLimits();
         }
 
-        static void CheckSpeedLimits() {
-            if (RateLimiter.CannotYetPlay("SpeedLimitCheck", 10)) {
-                return;
-            }
-            var speedLimits = FilterTrackEvents.QueryUpcomingSpeedLimits();
-            Logger.Log("Upcoming speed limits: " + string.Join(", ", speedLimits.Select(it => it.limit)));
-            if (speedLimits.Count > 0) {
-                var lineBuilder = new List<string>();
-                lineBuilder.Add("Ahead");
-                lineBuilder.AddRange(VoicingUtils.Exact(speedLimits.First().limit));
-                lineBuilder.Add("In");
-                lineBuilder.AddRange(VoicingUtils.Exact((int) Math.Round(speedLimits.First().span)));
-                lineBuilder.Add("Meters");
-                CommsRadioNarrator.PlayWithClick(lineBuilder);
-            }
-        }
     }
 }

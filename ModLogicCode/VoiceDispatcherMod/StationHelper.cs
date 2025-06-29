@@ -82,7 +82,7 @@ namespace VoiceDispatcherMod {
 
             lineBuilder.Add("Over");
             int wage = Mathf.RoundToInt(job.initialWage);
-            lineBuilder.AddRange(RoundedUp(wage));
+            lineBuilder.AddRange(RoundedDown(wage));
             lineBuilder.Add("Dollars");
         }
 

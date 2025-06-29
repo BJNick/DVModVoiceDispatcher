@@ -27,7 +27,7 @@ public class VoicePreview : MonoBehaviour
             
             var lineBuilder = new List<string>();
             lineBuilder.Add("NoiseClick");
-            AddHighestPayingJobLines(lineBuilder);
+            AddSpeedLimitWarning(lineBuilder);
             //lineBuilder.AddRange(SayApproximateNumber(523456789));
             lineBuilder.Add("NoiseClick");
 
@@ -99,6 +99,13 @@ public class VoicePreview : MonoBehaviour
         });
     }
 
+    private static void AddSpeedLimitWarning(List<string> lineBuilder) {
+        lineBuilder.AddRange(new[] {
+            "SpeedLimit", "120", "in", "One100", "Meters",
+            "SpeedLimit", "40", "in", "5", "100", "Meters",
+            "SpeedingWarning"+Random.Range(1,6), SHORT_PAUSE,
+        });
+    }
     
     static IEnumerator PlayVoiceLinesCoroutine(string[] lines) {
         AudioClip[] clips = lines.Select(GetVoicedClip).Where(clip => clip != null).ToArray();

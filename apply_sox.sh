@@ -14,6 +14,8 @@ vol 2dB"
 # Apply radio effect using SoX
 if [[ "$INPUT" =~ IPA/|TrackType/|StationGreetings/ ]]; then
   sox "$INPUT" "$OUTPUT" -V0 -R $RADIO_FILTERS trim 0 -0.1
+elif [[ "$INPUT" =~ LoudWarning/ ]]; then
+  sox "$INPUT" "$OUTPUT" -V0 -R speed 1.029 $RADIO_FILTERS overdrive 12 fade t 0.05
 elif [[ "$INPUT" == */NoiseClick.wav ]]; then
   sox -n "$INPUT" -V0 -R trim 0 0.1 synth 0.1 noise pitch -2000 pad 0 0.1 $RADIO_FILTERS vol -6dB
 else

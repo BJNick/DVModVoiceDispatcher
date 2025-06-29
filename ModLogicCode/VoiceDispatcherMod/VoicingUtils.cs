@@ -61,8 +61,24 @@ namespace VoiceDispatcherMod {
             numberParts.Add("Cars");
             return numberParts.ToArray();
         }
+        
+        public static string[] SaySpeedLimit(int speedLimit) {
+            switch (speedLimit) {
+                
+            }
+            
+            
+            if (speedLimit <= 0) {
+                return new[] { "No", "Speed", "Limit" };
+            }
 
-        public static string[] RoundedUp(int number) {
+            var numberParts = SayFullNumber(speedLimit).ToList();
+            numberParts.Add("Speed");
+            numberParts.Add("Limit");
+            return numberParts.ToArray();
+        }
+
+        public static string[] RoundedDown(int number) {
             return SayApproximateNumber(number);
         }
 

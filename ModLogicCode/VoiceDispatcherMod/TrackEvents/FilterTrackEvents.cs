@@ -37,7 +37,7 @@ namespace DvMod.HeadsUpDisplay {
             return eventDescriptions;
         }
 
-        public static List<SpeedLimitEvent> QueryUpcomingSpeedLimits() {
+        public static List<SpeedLimitEvent> QueryUpcomingSpeedLimits(int maxEventCount = 1) {
             if (FollowCurrentTrack(MaxEventSpan, out var currentGrade, out var events)) {
                 return new List<SpeedLimitEvent>();
             }
@@ -47,7 +47,7 @@ namespace DvMod.HeadsUpDisplay {
                 .ResolveJunctionSpeedLimits()
                 .FilterRedundantSpeedLimits()
                 .OfType<SpeedLimitEvent>()
-                .Take(3)
+                .Take(maxEventCount)
                 .ToList();
         }
 

@@ -19,6 +19,8 @@ namespace VoiceDispatcherMod {
         public static CommsRadioNarrator Instance;
 
         public static CommsRadioController Controller;
+        
+        public static Queue<List<string>> NarratorQueue = new();
 
         public static AudioSource source;
         private static AudioManager audioManager;
@@ -502,7 +504,8 @@ namespace VoiceDispatcherMod {
 
         public static void PlayWithClick(List<string> lineBuilder) {
             if (currentlyReading) {
-                mod.Logger.Warning("Already reading a voice line, skipping this one.");
+                mod.Logger.Warning("Already reading a voice line, queuing this one.");
+                NarratorQueue.Enqueue(lineBuilder);
                 return;
             }
 
@@ -532,8 +535,12 @@ namespace VoiceDispatcherMod {
                 var waitTime = clip.length - 0.05f;
                 yield return new WaitForSeconds(waitTime);
             }
-
             currentlyReading = false;
+            if (NarratorQueue.Count > 0) {
+                mod.Logger.Log("Playing next queued voice line.");
+                var nextLine = NarratorQueue.Dequeue();
+                PlayWithClick(nextLine);
+            }
         }
 
         private static void CutCoroutineShort(bool playClick = true) {

@@ -139,7 +139,7 @@ namespace VoiceDispatcherMod {
         }
 
         static void OnStationEntered(StationController station) {
-            if (station == null) {
+            if (station == null || station.logicStation?.availableJobs?.Count < 1) {
                 return;
             }
 

@@ -25,8 +25,8 @@ namespace VoiceDispatcherMod {
             }
 
             var speedLimits = FilterTrackEvents.QueryUpcomingSpeedLimits();
-            Main.Logger.Log("Upcoming speed limits: " + string.Join(", ", speedLimits.Select(it => it.limit)));
             if (speedLimits.Count > 0 && GetCurrentSpeed() > MinimumSpeed && !IsPlayerDerailed()) {
+                Main.Logger.Log("Upcoming speed limits: " + string.Join(", ", speedLimits.Select(it => it.limit)));
                 var nextSpeedLimit = speedLimits.First();
                 PlaySpeedLimitRead(nextSpeedLimit);
 
@@ -55,14 +55,16 @@ namespace VoiceDispatcherMod {
         }
 
         private static float GetCurrentSpeed() {
+            if (PlayerManager.LastLoco == null) {
+                return 0f;
+            }
             var playerSpeed = PlayerManager.LastLoco.GetAbsSpeed() * 3.6f; // Convert m/s to km/h
             Main.Logger.Log("Current speed: " + playerSpeed);
             return playerSpeed;
         }
 
         private static bool IsPlayerDerailed() {
-            var playerLoco = PlayerManager.LastLoco;
-            return playerLoco.derailed;
+            return PlayerManager.LastLoco?.derailed ?? false;
         }
 
         private static void PlaySpeedLimitRead(SpeedLimitEvent speedLimit) {

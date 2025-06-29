@@ -50,13 +50,9 @@ namespace VoiceDispatcherMod {
         private MeshRenderer HighlighterRender;
         private RaycastHit Hit;
         private TrainCar PointedCar;
-        private TrainCar SelectedCar;
 
-        //private PaintArea AreaToPaint = PaintArea.All;
-        //private PaintArea AlreadyPainted = PaintArea.None;
+        private RadioMenuList menuList = new();
 
-        //private List<CustomPaintTheme> SkinsForCarType = null;
-        private int SelectedSkinIdx = 0;
         private LayerMask TrainCarMask;
 
         public ButtonBehaviourType ButtonBehaviour { get; private set; }
@@ -103,9 +99,8 @@ namespace VoiceDispatcherMod {
         public class CoroutineRunner : MonoBehaviour { }
 
         protected enum State {
-            SelectCar,
-            SelectSkin,
-            SelectAreas
+            MainView,
+            SelectActions,
         }
 
         #region Initialization
@@ -150,8 +145,10 @@ namespace VoiceDispatcherMod {
                 if (!audioManager) {
                     return;
                 }
+
                 var boomboxGroups = audioManager.mix?.FindMatchingGroups("Boombox");
-                source.outputAudioMixerGroup = boomboxGroups?.Length > 0 ? boomboxGroups.First() : audioManager.cabGroup;
+                source.outputAudioMixerGroup =
+                    boomboxGroups?.Length > 0 ? boomboxGroups.First() : audioManager.cabGroup;
             } catch (Exception e) {
                 Main.Logger.Error($"CommsRadioNarrator: Failed to set audio mixer group: {e.Message}");
             }
@@ -255,21 +252,13 @@ namespace VoiceDispatcherMod {
 
             CurrentState = newState;
             switch (CurrentState) {
-                case State.SelectCar:
+                case State.MainView:
                     SetStartingDisplay();
                     ButtonBehaviour = ButtonBehaviourType.Regular;
                     break;
 
-                case State.SelectSkin:
-                    //UpdateAvailableSkinsList(SelectedCar.carLivery);
-                    //SetSelectedSkin(SkinsForCarType?.FirstOrDefault());
-                    //CurrentThemeName = SkinManager.GetCurrentCarSkin(SelectedCar, false);
-
-                    ButtonBehaviour = ButtonBehaviourType.Override;
-                    break;
-
-                case State.SelectAreas:
-                    // AreaToPaint = PaintArea.All;
+                case State.SelectActions:
+                    menuList.RenderActions(display);
                     ButtonBehaviour = ButtonBehaviourType.Override;
                     break;
             }
@@ -278,10 +267,9 @@ namespace VoiceDispatcherMod {
         private void ResetState() {
             PointedCar = null;
 
-            SelectedCar = null;
             ClearHighlightedCar();
 
-            SetState(State.SelectCar);
+            SetState(State.MainView);
         }
 
         public void OnUpdate() {
@@ -290,19 +278,13 @@ namespace VoiceDispatcherMod {
             TrainCar trainCar;
 
             switch (CurrentState) {
-                case State.SelectCar:
-                    if (!(SelectedCar == null)) {
-                        Debug.LogError("Invalid setup for current state, reseting flags!", this);
-                        ResetState();
-                        return;
-                    }
-
+                case State.MainView:
                     // Check if not pointing at anything
                     if (!Physics.Raycast(signalOrigin.position, signalOrigin.forward, out Hit, SIGNAL_RANGE,
                             TrainCarMask)) {
                         PointToCar(null);
                     } else {
-                        // Try to get the traincar we're pointing at
+                        // Try to get the train car we're pointing at
                         trainCar = TrainCar.Resolve(Hit.transform.root);
                         if (!trainCar.IsLoco) {
                             PointToCar(trainCar);
@@ -313,52 +295,9 @@ namespace VoiceDispatcherMod {
 
                     break;
 
-                case State.SelectSkin:
-                    /*if (Physics.Raycast(signalOrigin.position, signalOrigin.forward, out Hit, SIGNAL_RANGE, TrainCarMask) &&
-                        (trainCar = TrainCar.Resolve(Hit.transform.root)) && (trainCar == SelectedCar))
-                    {
-                        PointToCar(trainCar);
-
-                        if (!HasInterior && !SkinProvider.IsBuiltInTheme(SelectedSkin) && (SelectedSkin.name == CurrentThemeName.exterior))
-                        {
-                            display.SetAction(Translations.ReloadAction);
-                        }
-                        else
-                        {
-                            display.SetAction(Translations.SelectAction);
-                        }
-                    }
-                    else
-                    {
-                        PointToCar(null);
-                        display.SetAction(Translations.CancelAction);
-                    }*/
+                case State.SelectActions:
 
                     break;
-
-                case State.SelectAreas:
-                /*display.SetContent($"{Translations.SelectAreasPrompt}\n{AreaToPaintName}");
-
-                if (Physics.Raycast(signalOrigin.position, signalOrigin.forward, out Hit, SIGNAL_RANGE, TrainCarMask) &&
-                    (trainCar = TrainCar.Resolve(Hit.transform.root)) && (trainCar == SelectedCar))
-                {
-                    PointToCar(trainCar);
-
-                    if ((AlreadyPainted == AreaToPaint) && !SkinProvider.IsBuiltInTheme(SelectedSkin))
-                    {
-                        display.SetAction(Translations.ReloadAction);
-                    }
-                    else
-                    {
-                        display.SetAction(Translations.ConfirmAction);
-                    }
-                }
-                else
-                {
-                    PointToCar(null);
-                    display.SetAction(Translations.CancelAction);
-                }
-                break;*/
 
                 default:
                     ResetState();
@@ -366,33 +305,9 @@ namespace VoiceDispatcherMod {
             }
         }
 
-        /*private string AreaToPaintName
-        {
-            get
-            {
-                return AreaToPaint switch
-                {
-                    PaintArea.Exterior => CommsRadioLocalization.MODE_PAINTJOB_EXTERIOR,
-                    PaintArea.Interior => CommsRadioLocalization.MODE_PAINTJOB_INTERIOR,
-                    _ => CommsRadioLocalization.MODE_PAINTJOB_ALL,
-                };
-                ;
-            }
-        }*/
-
         public void OnUse() {
             switch (CurrentState) {
-                case State.SelectCar:
-                    /*if (PointedCar != null)
-                    {
-                        SelectedCar = PointedCar;
-                        HasInterior = SelectedCar.GetComponents<TrainCarPaint>().Any(tcp => tcp.TargetArea == TrainCarPaint.Target.Interior);
-                        PointedCar = null;
-
-                        HighlightCar(SelectedCar, skinningMaterial);
-                        CommsRadioController.PlayAudioFromRadio(SelectedCarSound, transform);
-                        SetState(State.SelectSkin);
-                    }*/
+                case State.MainView:
 
                     if (PointedCar != null) {
                         if (currentlyReading) {
@@ -407,99 +322,36 @@ namespace VoiceDispatcherMod {
                             return;
                         }
 
-                        OnNothingClicked?.Invoke();
-                    }
-
-                    break;
-
-                case State.SelectSkin:
-                    if (PointedCar != null && PointedCar == SelectedCar) {
-                        if (HasInterior) SetState(State.SelectAreas);
-
-                        // for regular cars, skip area selection
-                        /*if (!SkinProvider.IsBuiltInTheme(SelectedSkin) && (SelectedSkin.name == CurrentThemeName.exterior))
-                            {
-                                ReloadAndPrepareApplySelectedSkin();
-                            }
-
-                            ApplySelectedSkin();
-                            ResetState();*/
-                        CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform);
-                    } else {
-                        // clicked off the selected car, this means cancel
+                        //OnNothingClicked?.Invoke();
                         CommsRadioController.PlayAudioFromRadio(CancelSound, transform);
-                        ResetState();
+                        SetState(State.SelectActions);
                     }
 
                     break;
 
-                case State.SelectAreas:
-                    /*if ((PointedCar != null) && (PointedCar == SelectedCar))
-                    {
-                        // clicked on the selected car again, this means confirm
-                        if ((AlreadyPainted == AreaToPaint) && !SkinProvider.IsBuiltInTheme(SelectedSkin))
-                        {
-                            ReloadAndPrepareApplySelectedSkin();
-                        }
+                case State.SelectActions:
 
-                        ApplySelectedSkin();
-                        CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform);
-                    }*/
+                    // TODO: Activate action
+                    menuList.RenderActions(display);
+                    //CommsRadioController.PlayAudioFromRadio(CancelSound, transform);
 
-                    ResetState();
                     break;
             }
         }
 
         public bool ButtonACustomAction() {
-            /*if (CurrentState == State.SelectSkin)
-            {
-                if ((SkinsForCarType == null) || (SkinsForCarType.Count == 0)) return false;
-
-                SelectedSkinIdx -= 1;
-                if (SelectedSkinIdx < 0) SelectedSkinIdx = SkinsForCarType.Count - 1;
-
-                var selectedSkin = SkinsForCarType[SelectedSkinIdx];
-                SetSelectedSkin(selectedSkin);
-                return true;
+            if (CurrentState == State.SelectActions) {
+                return menuList.ButtonACustomAction(display);
             }
-            else if (CurrentState == State.SelectAreas)
-            {
-                AreaToPaint -= 1;
-                if (AreaToPaint == 0) AreaToPaint = PaintArea.All;
-                return true;
-            }
-            else
-            {
-                Debug.LogError(string.Format("Unexpected state {0}!", CurrentState), this);
-                return false;
-            }*/
-            return true;
+
+            return false;
         }
 
         public bool ButtonBCustomAction() {
-            /*if (CurrentState == State.SelectSkin)
-            {
-                if ((SkinsForCarType == null) || (SkinsForCarType.Count == 0)) return false;
-
-                SelectedSkinIdx += 1;
-                if (SelectedSkinIdx >= SkinsForCarType.Count) SelectedSkinIdx = 0;
-
-                var selectedSkin = SkinsForCarType[SelectedSkinIdx];
-                SetSelectedSkin(selectedSkin);
-                return true;
+            if (CurrentState == State.SelectActions) {
+                return menuList.ButtonBCustomAction(display);
             }
-            else if (CurrentState == State.SelectAreas)
-            {
-                AreaToPaint += 1;
-                if (AreaToPaint > PaintArea.All) AreaToPaint = PaintArea.Exterior;
-                return true;
-            }
-            else
-            {
-                Debug.LogError(string.Format("Unexpected state {0}!", CurrentState), this);
-                return false;
-            }*/
+
             return true;
         }
 
@@ -595,19 +447,21 @@ namespace VoiceDispatcherMod {
                 // Awake should have worked by now
                 return;
             }
+
             // Otherwise patch manually
             Controller = __instance ?? FindObjectOfType<CommsRadioController>();
             if (!Controller) {
                 Main.Logger.Error("CommsRadioNarrator: Could not find CommsRadioController in the scene.");
                 return;
             }
+
             Instance = Controller.gameObject.AddComponent<CommsRadioNarrator>();
             Controller.allModes.Add(Instance);
             var radioNarratorIdx = Controller.allModes.IndexOf(Instance);
             Controller.disabledModeIndices.Remove(radioNarratorIdx);
             Main.Logger.Log("CommsRadioNarrator: Successfully patched after Awake.");
         }
-        
+
         public static void UnpatchRadio() {
             var radioNarrator = Instance;
             if (Controller && radioNarrator) {
@@ -632,6 +486,7 @@ namespace VoiceDispatcherMod {
                 Main.Logger.Error("CommsRadioNarrator: Controller or Instance is null on mod enable.");
                 return;
             }
+
             var index = Controller.allModes.IndexOf(Instance);
             if (index >= 0) {
                 Controller.disabledModeIndices.Remove(index);
@@ -639,15 +494,16 @@ namespace VoiceDispatcherMod {
                 Main.Logger.Error("CommsRadioNarrator: Could not find itself in the radio modes list on enable.");
             }
         }
-        
+
         public static void OnDisableMod() {
             if (Controller && Instance) {
                 var index = Controller.allModes.IndexOf(Instance);
                 if (index >= 0) {
                     Controller.disabledModeIndices.Add(index);
                 }
+
                 Controller.SetMode(Controller.allModes[0]);
-                
+
                 currentlyReading = false;
                 currentCoroutine = null;
                 NarratorQueue.Clear();
@@ -661,7 +517,7 @@ namespace VoiceDispatcherMod {
         [HarmonyPostfix]
         private static void AfterAwake(CommsRadioController __instance, List<ICommsRadioMode> ___allModes) {
             if (!Main.enabled) return;
-            
+
             Controller = __instance;
             Instance = __instance.gameObject.AddComponent<CommsRadioNarrator>();
 
@@ -679,7 +535,7 @@ namespace VoiceDispatcherMod {
             var radioNarratorIdx = __instance.allModes.IndexOf(Instance);
             __instance.disabledModeIndices.Remove(radioNarratorIdx);
         }
-        
+
         // Patch on enabled to ensure the radio is ready
         [HarmonyPatch(nameof(CommsRadioController.Update))]
         [HarmonyPostfix]

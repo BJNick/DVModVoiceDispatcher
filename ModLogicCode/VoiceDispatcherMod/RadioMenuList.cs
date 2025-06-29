@@ -27,28 +27,45 @@ namespace VoiceDispatcherMod {
         
         private int _selectedActionIndex = 0;
         private int _selectedActionScroll = 0;
-        private const int MaxActionsPerPage = 4;
+        private const int MaxActionsPerPage = 6;
 
         private List<ActionItem> _availableActions = new();
+
+        private CommsRadioDisplay display;
+        
+        public bool IsOpen;
+        
+        public RadioMenuList(CommsRadioDisplay display) {
+            this.display = display;
+        }
         
         public void SetAvailableActions(List<ActionItem> actions) {
             _availableActions = actions;
             _selectedActionIndex = 0;
             _selectedActionScroll = 0;
             ScrollToSeeSelectedAction();
+            RenderActions();
+            IsOpen = true;
         }
         
-        public void RenderActions(CommsRadioDisplay display) {
+        public void ClearActions() {
+            _availableActions = new List<ActionItem>();
+            _selectedActionIndex = 0;
+            _selectedActionScroll = 0;
+            IsOpen = false;
+        }
+        
+        public void RenderActions() {
             if (_availableActions.Count == 0) {
                 display.SetContent("Error: No actions available");
                 display.SetAction("");
                 return;
             }
             var message = "";
-            var maxActions = _availableActions.Count > MaxActionsPerPage ? MaxActionsPerPage : _availableActions.Count;
+            var maxActions = _availableActions.Count > MaxActionsPerPage ? MaxActionsPerPage-2 : _availableActions.Count;
             if (_selectedActionScroll > 0) {
                 message += "   ...\n";
-            } else {
+            } else if (_availableActions.Count > MaxActionsPerPage) {
                 message += "\n";
             }
             for (int i = _selectedActionScroll; i < maxActions + _selectedActionScroll; i++) {
@@ -79,7 +96,7 @@ namespace VoiceDispatcherMod {
             }
         }
         
-        public bool ButtonACustomAction(CommsRadioDisplay display) {
+        public bool ButtonACustomAction() {
             _selectedActionIndex -= 1;
             if (_selectedActionIndex < 0) {
                 _selectedActionIndex = 0;
@@ -87,11 +104,11 @@ namespace VoiceDispatcherMod {
             }
             ScrollToSeeSelectedAction();
 
-            RenderActions(display);
+            RenderActions();
             return true;
         }
 
-        public bool ButtonBCustomAction(CommsRadioDisplay display) {
+        public bool ButtonBCustomAction() {
             _selectedActionIndex += 1;
             if (_selectedActionIndex >= _availableActions.Count) {
                 _selectedActionIndex = _availableActions.Count-1;
@@ -99,7 +116,7 @@ namespace VoiceDispatcherMod {
             }
             ScrollToSeeSelectedAction();
             
-            RenderActions(display);
+            RenderActions();
             return true;
         }
 

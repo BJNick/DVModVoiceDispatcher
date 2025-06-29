@@ -51,8 +51,9 @@ namespace VoiceDispatcherMod {
         private RaycastHit Hit;
         private TrainCar PointedCar;
 
-        private RadioMenuList menuList = new();
+        private RadioMenuList menuList;
         private List<ActionItem> mainMenuActions;
+        private List<ActionItem> settingsActions;
 
         private LayerMask TrainCarMask;
 
@@ -69,39 +70,12 @@ namespace VoiceDispatcherMod {
         public static event Action<TrainCar> OnCarClicked;
         public static event Action OnNothingClicked;
 
-        public static void PlayRadioClip(AudioClip clip) {
-            SetUpSource();
-            MoveSourceIntoPosition();
-            //clip.Play(playAt.position, volume: 1, minDistance: 1, maxDistance: 10f, parent: playAt, mixerGroup: SingletonBehaviour<AudioManager>.Instance.cabGroup);
-            source.clip = clip;
-            source.Play();
-        }
-
-        public static void MoveSourceIntoPosition() {
-            var radio = Instance;
-            var playAt = PlayerManager.PlayerTransform;
-            if (radio && radio.isActiveAndEnabled) {
-                playAt = radio.transform;
-                var distanceFromListener = Vector3.Distance(playAt.position, Camera.main.transform.transform.position);
-                // Decrease spacial blend to 0 at distance 0.4 and lower, increase to 1 at distance 0.8 and beyond
-                source.volume = 1 * (Main.settings.Volume / 10f);
-                source.spatialBlend = Mathf.Clamp01((distanceFromListener - 0.4f) / 0.4f);
-            } else {
-                if (!playAt) playAt = Camera.main.transform;
-                // in inventory
-                source.volume = 0.75f * (Main.settings.Volume / 10f);
-                source.spatialBlend = 0;
-            }
-
-            source.transform.position = playAt.position;
-            source.transform.rotation = playAt.rotation;
-        }
-
         public class CoroutineRunner : MonoBehaviour { }
 
         protected enum State {
             MainView,
             SelectActions,
+            ChangeSettings,
         }
 
         #region Initialization
@@ -178,14 +152,8 @@ namespace VoiceDispatcherMod {
             trainHighlighter.SetActive(false);
             trainHighlighter.transform.SetParent(null);
 
-            void SetVolume(int newVolume) {
-                CutCoroutineShort();
-                Main.settings.Volume = Mathf.Clamp(newVolume, 1, 10);
-                Main.settings.Save(Main.mod);
-                Play(new List<string> { Main.settings.Volume.ToString() });
-                menuList.RenderActions(display);
-            }
-
+            menuList = new RadioMenuList(display);
+            
             mainMenuActions = new() {
                 new ActionItem("Cancel", () => {
                     CommsRadioController.PlayAudioFromRadio(CancelSound, transform);
@@ -202,12 +170,29 @@ namespace VoiceDispatcherMod {
                     SetState(State.MainView);
                 }),
                 new ActionItem("Station Overview", () => { PlayWithClick(new List<string> { "C" }); }),
+                new ActionItem("Edit Settings", () => {
+                    CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform);
+                    SetState(State.ChangeSettings);
+                }),
+            };
+
+            void SetVolume(int newVolume) {
+                CutCoroutineShort();
+                Main.settings.Volume = Mathf.Clamp(newVolume, 1, 10);
+                Main.settings.Save(Main.mod);
+                Play(new List<string> { Main.settings.Volume.ToString() });
+                menuList.RenderActions();
+            }
+            settingsActions = new() {
+                new ActionItem("Cancel", () => {
+                    CommsRadioController.PlayAudioFromRadio(CancelSound, transform);
+                    SetState(State.SelectActions);
+                }),
                 new ActionItem("Increase volume", () => { SetVolume(Main.settings.Volume + 1); },
                     () => $"Increase vol {Main.settings.Volume}"),
                 new ActionItem("Decrease volume", () => { SetVolume(Main.settings.Volume - 1); },
                     () => $"Decrease vol {Main.settings.Volume}"),
             };
-            menuList.SetAvailableActions(mainMenuActions);
         }
 
         public void Enable() { }
@@ -283,14 +268,20 @@ namespace VoiceDispatcherMod {
             if (newState == CurrentState) return;
 
             CurrentState = newState;
-            switch (CurrentState) {
+            switch (newState) {
                 case State.MainView:
+                    menuList.ClearActions();
                     SetStartingDisplay();
                     ButtonBehaviour = ButtonBehaviourType.Regular;
                     break;
 
                 case State.SelectActions:
-                    menuList.RenderActions(display);
+                    menuList.SetAvailableActions(mainMenuActions);
+                    ButtonBehaviour = ButtonBehaviourType.Override;
+                    break;
+                
+                case State.ChangeSettings:
+                    menuList.SetAvailableActions(settingsActions);
                     ButtonBehaviour = ButtonBehaviourType.Override;
                     break;
             }
@@ -326,18 +317,15 @@ namespace VoiceDispatcherMod {
                     }
 
                     break;
-
-                case State.SelectActions:
-
-                    break;
-
-                default:
-                    ResetState();
-                    break;
             }
         }
 
         public void OnUse() {
+            if (menuList.IsOpen) {
+                menuList.OnUse();
+                return;
+            }
+            
             switch (CurrentState) {
                 case State.MainView:
 
@@ -359,24 +347,20 @@ namespace VoiceDispatcherMod {
                     }
 
                     break;
-
-                case State.SelectActions:
-                    menuList.OnUse();
-                    break;
             }
         }
 
         public bool ButtonACustomAction() {
-            if (CurrentState == State.SelectActions) {
-                return menuList.ButtonACustomAction(display);
+            if (menuList.IsOpen) {
+                return menuList.ButtonACustomAction();
             }
 
             return false;
         }
 
         public bool ButtonBCustomAction() {
-            if (CurrentState == State.SelectActions) {
-                return menuList.ButtonBCustomAction(display);
+            if (menuList.IsOpen) {
+                return menuList.ButtonBCustomAction();
             }
 
             return true;
@@ -457,6 +441,14 @@ namespace VoiceDispatcherMod {
             }
         }
 
+        public static void PlayRadioClip(AudioClip clip) {
+            SetUpSource();
+            MoveSourceIntoPosition();
+            //clip.Play(playAt.position, volume: 1, minDistance: 1, maxDistance: 10f, parent: playAt, mixerGroup: SingletonBehaviour<AudioManager>.Instance.cabGroup);
+            source.clip = clip;
+            source.Play();
+        }
+
         private static AudioClip GetVoicedClip(string name) {
             var voicedLines = Main.GetVoiceLinesBundle();
             if (!voicedLines) {
@@ -475,6 +467,26 @@ namespace VoiceDispatcherMod {
         }
 
         #endregion
+        
+        public static void MoveSourceIntoPosition() {
+            var radio = Instance;
+            var playAt = PlayerManager.PlayerTransform;
+            if (radio && radio.isActiveAndEnabled) {
+                playAt = radio.transform;
+                var distanceFromListener = Vector3.Distance(playAt.position, Camera.main.transform.transform.position);
+                // Decrease spacial blend to 0 at distance 0.4 and lower, increase to 1 at distance 0.8 and beyond
+                source.volume = 1 * (Main.settings.Volume / 10f);
+                source.spatialBlend = Mathf.Clamp01((distanceFromListener - 0.4f) / 0.4f);
+            } else {
+                if (!playAt) playAt = Camera.main.transform;
+                // in inventory
+                source.volume = 0.75f * (Main.settings.Volume / 10f);
+                source.spatialBlend = 0;
+            }
+
+            source.transform.position = playAt.position;
+            source.transform.rotation = playAt.rotation;
+        }
 
         public static void PatchRadioAfterAwake(CommsRadioController __instance = null) {
             if (Time.time < 2f || Controller) {

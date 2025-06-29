@@ -52,6 +52,7 @@ namespace VoiceDispatcherMod {
         private TrainCar PointedCar;
 
         private RadioMenuList menuList = new();
+        private List<ActionItem> mainMenuActions;
 
         private LayerMask TrainCarMask;
 
@@ -176,6 +177,27 @@ namespace VoiceDispatcherMod {
             HighlighterRender = trainHighlighter.GetComponentInChildren<MeshRenderer>(true);
             trainHighlighter.SetActive(false);
             trainHighlighter.transform.SetParent(null);
+            
+            mainMenuActions = new() {
+                new ActionItem("Cancel", () => {
+                    CommsRadioController.PlayAudioFromRadio(CancelSound, transform); 
+                    SetState(State.MainView);
+                }),
+                new ActionItem("Check Orders", () => {
+                    CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform); 
+                    OnNothingClicked?.Invoke();
+                    SetState(State.MainView);
+                }),
+                new ActionItem("Weather Forecast", () => {
+                    CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform); 
+                    PlayWithClick(new List<string>{"B"});
+                    SetState(State.MainView);
+                }),
+                new ActionItem("Station Overview", () => {PlayWithClick(new List<string>{"C"});}),
+                new ActionItem("Increase volume", () => {PlayWithClick(new List<string>{"D"});}),
+                new ActionItem("Decrease volume", () => {PlayWithClick(new List<string>{"E"});}),
+            };
+            menuList.SetAvailableActions(mainMenuActions);
         }
 
         public void Enable() { }
@@ -322,19 +344,14 @@ namespace VoiceDispatcherMod {
                             return;
                         }
 
-                        //OnNothingClicked?.Invoke();
-                        CommsRadioController.PlayAudioFromRadio(CancelSound, transform);
+                        CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform);
                         SetState(State.SelectActions);
                     }
 
                     break;
 
                 case State.SelectActions:
-
-                    // TODO: Activate action
-                    menuList.RenderActions(display);
-                    //CommsRadioController.PlayAudioFromRadio(CancelSound, transform);
-
+                    menuList.OnUse();
                     break;
             }
         }

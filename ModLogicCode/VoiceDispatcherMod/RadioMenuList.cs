@@ -1,55 +1,86 @@
-﻿using DV;
+﻿using System;
+using System.Collections.Generic;
+using DV;
 
 namespace VoiceDispatcherMod {
+    public class ActionItem {
+        public string Name;
+        public Action Run;
+        
+        public ActionItem(string name, Action run) {
+            Name = name;
+            Run = run;
+        }
+        
+        public void OnUse() {
+            Run?.Invoke();
+        }
+
+        public override string ToString() {
+            return Name;
+        }
+    }
+    
     public class RadioMenuList {
         
-        private int SelectedActionIndex = 0;
-        private int SelectedActionScroll = 0;
+        private int _selectedActionIndex = 0;
+        private int _selectedActionScroll = 0;
         private const int MaxActionsPerPage = 4;
 
-        private string[] AvailableActions = new[] {
-            "Action Alfa",
-            "Action Bravo",
-            "Action Charlie",
-            "Action Delta",
-            "Action Echo",
-            "Action Foxtrot",
-            "Action Golf",
-            "Action Hotel",
-            "Action India",
-        };
+        private List<ActionItem> _availableActions = new();
+        
+        public void SetAvailableActions(List<ActionItem> actions) {
+            _availableActions = actions;
+            _selectedActionIndex = 0;
+            _selectedActionScroll = 0;
+            ScrollToSeeSelectedAction();
+        }
         
         public void RenderActions(CommsRadioDisplay display) {
+            if (_availableActions.Count == 0) {
+                display.SetContent("Error: No actions available");
+                display.SetAction("");
+                return;
+            }
             var message = "";
-            var maxActions = AvailableActions.Length > MaxActionsPerPage ? MaxActionsPerPage : AvailableActions.Length;
-            if (SelectedActionScroll > 0) {
+            var maxActions = _availableActions.Count > MaxActionsPerPage ? MaxActionsPerPage : _availableActions.Count;
+            if (_selectedActionScroll > 0) {
                 message += "   ...\n";
             } else {
                 message += "\n";
             }
-            for (int i = SelectedActionScroll; i < maxActions + SelectedActionScroll; i++) {
-                if (i < 0 || i >= AvailableActions.Length) {
+            for (int i = _selectedActionScroll; i < maxActions + _selectedActionScroll; i++) {
+                if (i < 0 || i >= _availableActions.Count) {
                     message += "\n";
-                } else if (i == SelectedActionIndex) {
-                    message += $"> {AvailableActions[i]}\n";
+                } else if (i == _selectedActionIndex) {
+                    message += $"> {_availableActions[i]}\n";
                 } else {
-                    message += $"   {AvailableActions[i]}\n";
+                    message += $"   {_availableActions[i]}\n";
                 }
             }
-            if (SelectedActionScroll + maxActions < AvailableActions.Length) {
+            if (_selectedActionScroll + maxActions < _availableActions.Count) {
                 message += "   ...\n";
             }
             display.SetContent(message);
+            display.SetAction(_availableActions[_selectedActionIndex].Name);
         }
         
         public void ScrollToSeeSelectedAction() {
-            SelectedActionScroll = SelectedActionIndex;
+            if (_availableActions.Count <= MaxActionsPerPage) {
+                _selectedActionScroll = 0;
+                return;
+            }
+            if (_selectedActionScroll > _selectedActionIndex) {
+                _selectedActionScroll = _selectedActionIndex;
+            } else if (_selectedActionScroll + MaxActionsPerPage <= _selectedActionIndex) {
+                _selectedActionScroll = _selectedActionIndex - MaxActionsPerPage + 1;
+            }
         }
         
         public bool ButtonACustomAction(CommsRadioDisplay display) {
-            SelectedActionIndex -= 1;
-            if (SelectedActionIndex < 0) {
-                SelectedActionIndex = 0;
+            _selectedActionIndex -= 1;
+            if (_selectedActionIndex < 0) {
+                _selectedActionIndex = 0;
                 return false;
             }
             ScrollToSeeSelectedAction();
@@ -59,15 +90,22 @@ namespace VoiceDispatcherMod {
         }
 
         public bool ButtonBCustomAction(CommsRadioDisplay display) {
-            SelectedActionIndex += 1;
-            if (SelectedActionIndex >= AvailableActions.Length) {
-                SelectedActionIndex = AvailableActions.Length-1;
+            _selectedActionIndex += 1;
+            if (_selectedActionIndex >= _availableActions.Count) {
+                _selectedActionIndex = _availableActions.Count-1;
                 return false;
             }
             ScrollToSeeSelectedAction();
             
             RenderActions(display);
             return true;
+        }
+
+        public void OnUse() {
+            if (_selectedActionIndex < 0 || _selectedActionIndex >= _availableActions.Count) {
+                return; // No action available
+            }
+            _availableActions[_selectedActionIndex].OnUse();
         }
         
     }

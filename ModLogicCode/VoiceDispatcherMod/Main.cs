@@ -78,7 +78,6 @@ namespace VoiceDispatcherMod {
 
             PlayerManager.CarChanged += OnCarChanged;
             CommsRadioNarrator.OnCarClicked += OnCarClicked;
-            CommsRadioNarrator.OnNothingClicked += OnNothingClicked;
             StationHelper.OnYardEntered += OnYardEntered;
             StationHelper.OnYardExited += OnYardExited;
             StationHelper.OnStationEntered += OnStationEntered;
@@ -127,10 +126,6 @@ namespace VoiceDispatcherMod {
 
         static void OnCarClicked(TrainCar car) {
             CarHelper.OnCarClicked(car);
-        }
-
-        static void OnNothingClicked() {
-            ReadAllJobsOverview();
         }
 
         static void OnYardEntered(StationController station) {

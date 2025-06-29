@@ -160,17 +160,22 @@ namespace VoiceDispatcherMod {
                     CommsRadioController.PlayAudioFromRadio(CancelSound, transform);
                     SetState(State.MainView);
                 }),
-                new ActionItem("Check Orders", () => {
-                    CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform);
-                    OnNothingClicked?.Invoke();
+                new ActionItem("What's my order?", () => {
+                    CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform); 
+                    JobHelper.ReadAllJobsOverview();
                     SetState(State.MainView);
                 }),
-                new ActionItem("Weather Forecast", () => {
+                new ActionItem("Highest job here?", () => {
+                    if (StationHelper.playerYard == null) {
+                        CommsRadioController.PlayAudioFromRadio(CancelSound, transform);
+                        return;
+                    }
                     CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform);
-                    PlayWithClick(new List<string> { "B" });
+                    var lineBuilder = new List<string>();
+                    StationHelper.AddHighestPayingJob(lineBuilder, StationHelper.playerYard);
+                    PlayWithClick(lineBuilder);
                     SetState(State.MainView);
                 }),
-                new ActionItem("Station Overview", () => { PlayWithClick(new List<string> { "C" }); }),
                 new ActionItem("Edit Settings", () => {
                     CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform);
                     SetState(State.ChangeSettings);
@@ -253,7 +258,7 @@ namespace VoiceDispatcherMod {
                     return;
                 }
 
-                display.SetContentAndAction("Open menu options?");
+                display.SetContentAndAction("Open menu?");
             }
         }
 

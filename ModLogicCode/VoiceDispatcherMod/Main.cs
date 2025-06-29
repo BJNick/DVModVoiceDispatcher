@@ -20,28 +20,35 @@ namespace VoiceDispatcherMod {
         private static string _assetBundlePath;
 
         private static AssetBundle voicedLines;
-
+        public static Settings settings;
+        public static UnityModManager.ModEntry mod;
 
         private static List<string> readJobs = new();
 
         static bool Load(UnityModManager.ModEntry modEntry) {
+            mod = modEntry;
+            settings = UnityModManager.ModSettings.Load<Settings>(modEntry);
+            
             var harmony = new Harmony(modEntry.Info.Id);
             harmony.PatchAll(Assembly.GetExecutingAssembly());
 
             _assetBundlePath = Path.Combine(modEntry.Path, AssetBundleName);
             Logger = modEntry.Logger;
-            
+
             modEntry.OnToggle = OnToggle;
             modEntry.OnUnload = Unload;
+            modEntry.OnGUI = OnGUI;
+            modEntry.OnSaveGUI = OnSaveGUI;
             return true;
         }
-        
+
         static bool Unload(UnityModManager.ModEntry modEntry) {
             var harmony = new Harmony(modEntry.Info.Id);
             harmony.UnpatchAll(modEntry.Info.Id);
             if (enabled) {
                 Disable(modEntry);
             }
+
             CommsRadioNarrator.UnpatchRadio();
             return true; // If true, the mod will be unloaded. If not, the mod will not be unloaded.
         }
@@ -84,6 +91,14 @@ namespace VoiceDispatcherMod {
             PlayerManager.CarChanged -= OnCarChanged;
             voicedLines.Unload(true);
             CommsRadioNarrator.OnDisableMod();
+        }
+
+        static void OnGUI(UnityModManager.ModEntry modEntry) {
+            settings.Draw(modEntry);
+        }
+
+        static void OnSaveGUI(UnityModManager.ModEntry modEntry) {
+            settings.Save(modEntry);
         }
 
         private static bool TryLoadAssetBundle() {
@@ -164,9 +179,7 @@ namespace VoiceDispatcherMod {
             CommsRadioNarrator.PlayWithClick(lineBuilder);
         }
 
-        static void OnSessionStart(UnityModManager.ModEntry modEntry) {
-            
-        }
+        static void OnSessionStart(UnityModManager.ModEntry modEntry) { }
 
         static void OnUpdate(UnityModManager.ModEntry modEntry, float dt) {
             StationHelper.OnUpdate();

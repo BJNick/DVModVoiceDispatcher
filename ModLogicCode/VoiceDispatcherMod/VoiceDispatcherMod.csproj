@@ -251,6 +251,7 @@
     <Compile Include="RadioMenuList.cs" />
     <Compile Include="Randomizer.cs" />
     <Compile Include="RateLimiter.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="SignHelper.cs" />
     <Compile Include="StationHelper.cs" />
     <Compile Include="VoicingUtils.cs" />

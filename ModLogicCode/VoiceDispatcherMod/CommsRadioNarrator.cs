@@ -20,7 +20,6 @@ namespace VoiceDispatcherMod {
 
         public static NarratorLineQueue NarratorQueue = new();
         public const float delayBetweenLinesInQueue = 1f;
-        public static int UserSetVolume = 10;
 
         public static AudioSource source;
         private static AudioManager audioManager;
@@ -85,12 +84,12 @@ namespace VoiceDispatcherMod {
                 playAt = radio.transform;
                 var distanceFromListener = Vector3.Distance(playAt.position, Camera.main.transform.transform.position);
                 // Decrease spacial blend to 0 at distance 0.4 and lower, increase to 1 at distance 0.8 and beyond
-                source.volume = 1 * (UserSetVolume / 10f);
+                source.volume = 1 * (Main.settings.Volume / 10f);
                 source.spatialBlend = Mathf.Clamp01((distanceFromListener - 0.4f) / 0.4f);
             } else {
                 if (!playAt) playAt = Camera.main.transform;
                 // in inventory
-                source.volume = 0.75f * (UserSetVolume / 10f);
+                source.volume = 0.75f * (Main.settings.Volume / 10f);
                 source.spatialBlend = 0;
             }
 
@@ -178,35 +177,35 @@ namespace VoiceDispatcherMod {
             HighlighterRender = trainHighlighter.GetComponentInChildren<MeshRenderer>(true);
             trainHighlighter.SetActive(false);
             trainHighlighter.transform.SetParent(null);
-            
+
+            void SetVolume(int newVolume) {
+                CutCoroutineShort();
+                Main.settings.Volume = Mathf.Clamp(newVolume, 1, 10);
+                Main.settings.Save(Main.mod);
+                Play(new List<string> { Main.settings.Volume.ToString() });
+                menuList.RenderActions(display);
+            }
+
             mainMenuActions = new() {
                 new ActionItem("Cancel", () => {
-                    CommsRadioController.PlayAudioFromRadio(CancelSound, transform); 
+                    CommsRadioController.PlayAudioFromRadio(CancelSound, transform);
                     SetState(State.MainView);
                 }),
                 new ActionItem("Check Orders", () => {
-                    CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform); 
+                    CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform);
                     OnNothingClicked?.Invoke();
                     SetState(State.MainView);
                 }),
                 new ActionItem("Weather Forecast", () => {
-                    CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform); 
-                    PlayWithClick(new List<string>{"B"});
+                    CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform);
+                    PlayWithClick(new List<string> { "B" });
                     SetState(State.MainView);
                 }),
-                new ActionItem("Station Overview", () => {PlayWithClick(new List<string>{"C"});}),
-                new ActionItem("Increase volume", () => {
-                    CutCoroutineShort();
-                    UserSetVolume = Mathf.Clamp(UserSetVolume + 1, 1, 10);
-                    Play(new List<string>{UserSetVolume.ToString()});
-                    menuList.RenderActions(display);
-                }, () => $"Increase vol {UserSetVolume}"),
-                new ActionItem("Decrease volume", () => {
-                    CutCoroutineShort();
-                    UserSetVolume = Mathf.Clamp(UserSetVolume - 1, 1, 10);
-                    Play(new List<string>{UserSetVolume.ToString()});
-                    menuList.RenderActions(display);
-                }, () => $"Decrease vol {UserSetVolume}"),
+                new ActionItem("Station Overview", () => { PlayWithClick(new List<string> { "C" }); }),
+                new ActionItem("Increase volume", () => { SetVolume(Main.settings.Volume + 1); },
+                    () => $"Increase vol {Main.settings.Volume}"),
+                new ActionItem("Decrease volume", () => { SetVolume(Main.settings.Volume - 1); },
+                    () => $"Decrease vol {Main.settings.Volume}"),
             };
             menuList.SetAvailableActions(mainMenuActions);
         }
@@ -390,7 +389,7 @@ namespace VoiceDispatcherMod {
         public static void PlayWithClick(List<string> lineBuilder) {
             Play(lineBuilder, true);
         }
-        
+
         public static void Play(List<string> lineBuilder, bool withClick = false) {
             if (currentlyReading) {
                 Main.Logger.Warning("Already reading a voice line, queuing this one.");
@@ -408,6 +407,7 @@ namespace VoiceDispatcherMod {
                 lineBuilder.Insert(0, "NoiseClick");
                 lineBuilder.Add("NoiseClick");
             }
+
             SetupCoroutineRunner();
             currentCoroutine = coroutineRunner.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
         }

@@ -18,7 +18,8 @@ namespace VoiceDispatcherMod {
 
         public static CommsRadioController Controller;
 
-        public static Queue<List<string>> NarratorQueue = new();
+        public static NarratorLineQueue NarratorQueue = new();
+        public const float delayBetweenLinesInQueue = 1f;
 
         public static AudioSource source;
         private static AudioManager audioManager;
@@ -544,11 +545,13 @@ namespace VoiceDispatcherMod {
                 yield return new WaitForSeconds(waitTime);
             }
 
-            currentlyReading = false;
-            if (NarratorQueue.Count > 0) {
-                Main.Logger.Log("Playing next queued voice line.");
-                var nextLine = NarratorQueue.Dequeue();
-                PlayWithClick(nextLine);
+            if (!NarratorQueue.HasLines()) {
+                currentlyReading = false;
+            } else {
+                Main.Logger.Log("Waiting to play next queued voice line.");
+                yield return new WaitForSeconds(delayBetweenLinesInQueue);
+                currentlyReading = false;
+                PlayWithClick(NarratorQueue.Dequeue());
             }
         }
 
@@ -564,7 +567,7 @@ namespace VoiceDispatcherMod {
 
                 Main.Logger.Log("Narrator line cut short.");
             } else {
-                Main.Logger.Warning("No narrator line playing to cut short.");
+                currentlyReading = false;
             }
         }
 
@@ -643,6 +646,11 @@ namespace VoiceDispatcherMod {
                 if (index >= 0) {
                     Controller.disabledModeIndices.Add(index);
                 }
+                Controller.SetMode(Controller.allModes[0]);
+                
+                currentlyReading = false;
+                currentCoroutine = null;
+                NarratorQueue.Clear();
             }
         }
     }

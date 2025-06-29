@@ -5,11 +5,13 @@ using DV;
 namespace VoiceDispatcherMod {
     public class ActionItem {
         public string Name;
-        public Action Run;
+        private Action Run;
+        public Func<string> ActionName;
         
-        public ActionItem(string name, Action run) {
+        public ActionItem(string name, Action run, Func<string> actionName = null) {
             Name = name;
             Run = run;
+            ActionName = actionName ?? (() => name);
         }
         
         public void OnUse() {
@@ -62,7 +64,7 @@ namespace VoiceDispatcherMod {
                 message += "   ...\n";
             }
             display.SetContent(message);
-            display.SetAction(_availableActions[_selectedActionIndex].Name);
+            display.SetAction(_availableActions[_selectedActionIndex].ActionName());
         }
         
         public void ScrollToSeeSelectedAction() {

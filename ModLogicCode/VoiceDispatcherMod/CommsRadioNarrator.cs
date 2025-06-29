@@ -20,6 +20,7 @@ namespace VoiceDispatcherMod {
 
         public static NarratorLineQueue NarratorQueue = new();
         public const float delayBetweenLinesInQueue = 1f;
+        public static int UserSetVolume = 10;
 
         public static AudioSource source;
         private static AudioManager audioManager;
@@ -84,12 +85,12 @@ namespace VoiceDispatcherMod {
                 playAt = radio.transform;
                 var distanceFromListener = Vector3.Distance(playAt.position, Camera.main.transform.transform.position);
                 // Decrease spacial blend to 0 at distance 0.4 and lower, increase to 1 at distance 0.8 and beyond
-                source.volume = 1;
+                source.volume = 1 * (UserSetVolume / 10f);
                 source.spatialBlend = Mathf.Clamp01((distanceFromListener - 0.4f) / 0.4f);
             } else {
                 if (!playAt) playAt = Camera.main.transform;
                 // in inventory
-                source.volume = 0.75f;
+                source.volume = 0.75f * (UserSetVolume / 10f);
                 source.spatialBlend = 0;
             }
 
@@ -194,8 +195,18 @@ namespace VoiceDispatcherMod {
                     SetState(State.MainView);
                 }),
                 new ActionItem("Station Overview", () => {PlayWithClick(new List<string>{"C"});}),
-                new ActionItem("Increase volume", () => {PlayWithClick(new List<string>{"D"});}),
-                new ActionItem("Decrease volume", () => {PlayWithClick(new List<string>{"E"});}),
+                new ActionItem("Increase volume", () => {
+                    CutCoroutineShort();
+                    UserSetVolume = Mathf.Clamp(UserSetVolume + 1, 1, 10);
+                    Play(new List<string>{UserSetVolume.ToString()});
+                    menuList.RenderActions(display);
+                }, () => $"Increase vol {UserSetVolume}"),
+                new ActionItem("Decrease volume", () => {
+                    CutCoroutineShort();
+                    UserSetVolume = Mathf.Clamp(UserSetVolume - 1, 1, 10);
+                    Play(new List<string>{UserSetVolume.ToString()});
+                    menuList.RenderActions(display);
+                }, () => $"Decrease vol {UserSetVolume}"),
             };
             menuList.SetAvailableActions(mainMenuActions);
         }
@@ -377,6 +388,10 @@ namespace VoiceDispatcherMod {
         #region Coroutine Management
 
         public static void PlayWithClick(List<string> lineBuilder) {
+            Play(lineBuilder, true);
+        }
+        
+        public static void Play(List<string> lineBuilder, bool withClick = false) {
             if (currentlyReading) {
                 Main.Logger.Warning("Already reading a voice line, queuing this one.");
                 NarratorQueue.Enqueue(lineBuilder);
@@ -389,8 +404,10 @@ namespace VoiceDispatcherMod {
 
             currentlyReading = true;
             Main.Logger.Log("Generated voice line: " + string.Join(" ", lineBuilder));
-            lineBuilder.Insert(0, "NoiseClick");
-            lineBuilder.Add("NoiseClick");
+            if (withClick) {
+                lineBuilder.Insert(0, "NoiseClick");
+                lineBuilder.Add("NoiseClick");
+            }
             SetupCoroutineRunner();
             currentCoroutine = coroutineRunner.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
         }

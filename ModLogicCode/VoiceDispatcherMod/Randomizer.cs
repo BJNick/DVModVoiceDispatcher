@@ -21,5 +21,20 @@ namespace VoiceDispatcherMod {
             LastSelectedIndexMap[id] = generatedIndex;
             return $"{id}{generatedIndex}";
         }
+        
+        public static string GetConsecutiveLine(string id, int startIndex, int endIndex) {
+            if (startIndex == endIndex) {
+                return $"{id}{startIndex}";
+            }
+
+            int lastIndex = LastSelectedIndexMap.ContainsKey(id) ? LastSelectedIndexMap[id] : startIndex - 1;
+            int generatedIndex = lastIndex + 1;
+            if (generatedIndex > endIndex) {
+                generatedIndex = startIndex;
+            }
+
+            LastSelectedIndexMap[id] = generatedIndex;
+            return $"{id}{generatedIndex}";
+        }
     }
 }

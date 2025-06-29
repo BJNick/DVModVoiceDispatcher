@@ -320,6 +320,18 @@ public class LoudWarningLines : IListOfLines {
     };
 }
 
+public class DerailmentLines : IListOfLines {
+    public string directory => "Derailment/";
+    
+    public Line[] lines => new[] {
+        Line.of("Derailment1", "Well, would you look at that, physics won this round again."),
+        Line.of("Derailment2", "You've really outdone yourself this time. Hope you weren't too attached to that train."),
+        Line.of("Derailment3", "I did say, slow down! But hey, what do I know, I'm just the dispatcher."),
+        Line.of("Derailment4", "I'll start the paperwork again. You better buy me a drink after this."),
+        Line.of("Derailment5", "Congratulations! You've successfully demonstrated how NOT to drive a train."),
+    };
+}
+
 public class AllLines {
     public static IListOfLines[] lists = new IListOfLines[] {
         new JobTypeLines(),
@@ -334,6 +346,7 @@ public class AllLines {
         new UnitsLines(),
         new SignDescriptionLines(),
         new LoudWarningLines(),
+        new DerailmentLines(),
         // Add more lists here as needed
     };
 }

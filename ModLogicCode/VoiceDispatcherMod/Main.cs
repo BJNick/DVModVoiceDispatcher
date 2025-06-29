@@ -3,26 +3,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using DV;
 using DV.Logic.Job;
-using DvMod.HeadsUpDisplay;
 using HarmonyLib;
 using UnityEngine;
 using UnityModManagerNet;
 using static VoiceDispatcherMod.JobHelper;
-using Object = UnityEngine.Object;
 
 namespace VoiceDispatcherMod {
+    [EnableReloading]
     static class Main {
         public static bool enabled;
-        public static UnityModManager.ModEntry mod;
 
         public static UnityModManager.ModEntry.ModLogger Logger;
 
-        private static string assetBundlePath;
-        private static AssetBundle voicedLines;
+        private const string AssetBundleName = "voiced_lines";
+        private static string _assetBundlePath;
 
-        private static CommsRadioController commsRadio;
+        private static AssetBundle voicedLines;
 
 
         private static List<string> readJobs = new();
@@ -31,13 +28,22 @@ namespace VoiceDispatcherMod {
             var harmony = new Harmony(modEntry.Info.Id);
             harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-            mod = modEntry;
+            _assetBundlePath = Path.Combine(modEntry.Path, AssetBundleName);
             Logger = modEntry.Logger;
-            CommsRadioNarrator.mod = mod;
-
-            assetBundlePath = Path.Combine(mod.Path, "voiced_lines");
+            
             modEntry.OnToggle = OnToggle;
+            modEntry.OnUnload = Unload;
             return true;
+        }
+        
+        static bool Unload(UnityModManager.ModEntry modEntry) {
+            var harmony = new Harmony(modEntry.Info.Id);
+            harmony.UnpatchAll(modEntry.Info.Id);
+            if (enabled) {
+                Disable(modEntry);
+            }
+            CommsRadioNarrator.UnpatchRadio();
+            return true; // If true, the mod will be unloaded. If not, the mod will not be unloaded.
         }
 
         private static List<string> testVoiceLines = new() {
@@ -49,27 +55,19 @@ namespace VoiceDispatcherMod {
         // With this function you control an operation of the mod and inform users whether it is enabled or not.
         static bool OnToggle(UnityModManager.ModEntry modEntry, bool value /* to active or deactivate */) {
             if (value) {
-                Enable(); // Perform all necessary steps to start mod.
+                Enable(modEntry); // Perform all necessary steps to start mod.
             } else {
-                Disable(); // Perform all necessary steps to stop mod.
+                Disable(modEntry); // Perform all necessary steps to stop mod.
             }
 
             enabled = value;
             return true; // If true, the mod will switch the state. If not, the state will not change.
         }
 
-        static void Enable() {
-            mod.OnUpdate = OnUpdate;
-            mod.OnSessionStart = OnSessionStart;
-            try {
-                mod.Logger.Log("Loading voiced lines from: " + assetBundlePath);
-                voicedLines = AssetBundle.LoadFromFile(assetBundlePath);
-                if (voicedLines == null) {
-                    mod.Logger.Error("Failed to load voiced lines asset bundle.");
-                }
-            } catch (Exception e) {
-                mod.Logger.Error("Failed to load asset bundle: " + e.Message);
-            }
+        static void Enable(UnityModManager.ModEntry modEntry) {
+            modEntry.OnUpdate = OnUpdate;
+            modEntry.OnSessionStart = OnSessionStart;
+            TryLoadAssetBundle();
 
             PlayerManager.CarChanged += OnCarChanged;
             CommsRadioNarrator.OnCarClicked += OnCarClicked;
@@ -77,23 +75,35 @@ namespace VoiceDispatcherMod {
             StationHelper.OnYardEntered += OnYardEntered;
             StationHelper.OnYardExited += OnYardExited;
             StationHelper.OnStationEntered += OnStationEntered;
+            CommsRadioNarrator.OnEnableMod();
+        }
+
+        static void Disable(UnityModManager.ModEntry modEntry) {
+            modEntry.OnUpdate = null;
+            modEntry.OnSessionStart = null;
+            PlayerManager.CarChanged -= OnCarChanged;
+            voicedLines.Unload(true);
+            CommsRadioNarrator.OnDisableMod();
+        }
+
+        private static bool TryLoadAssetBundle() {
+            try {
+                Logger.Log("Loading voiced lines from: " + _assetBundlePath);
+                voicedLines = AssetBundle.LoadFromFile(_assetBundlePath);
+                if (voicedLines) return true;
+                Logger.Warning("Failed to load voiced lines asset bundle. Attempting to load existing bundle.");
+                voicedLines = AssetBundle.GetAllLoadedAssetBundles().First(it => it.name == AssetBundleName);
+                if (voicedLines) return true;
+                Logger.Error("No existing asset bundle found with name: " + AssetBundleName);
+            } catch (Exception e) {
+                Logger.Error("Failed to load asset bundle: " + e.Message);
+            }
+
+            return false;
         }
 
         public static AssetBundle GetVoiceLinesBundle() {
-            if (!voicedLines) {
-                voicedLines = AssetBundle.LoadFromFile(assetBundlePath);
-                if (!voicedLines) {
-                    mod.Logger.Error("Failed to load voiced lines asset bundle from: " + assetBundlePath);
-                    return null;
-                }
-            }
-
             return voicedLines;
-        }
-
-        static void Disable() {
-            mod.OnUpdate = null;
-            PlayerManager.CarChanged -= OnCarChanged;
         }
 
         static void OnCarChanged(TrainCar car) {
@@ -143,7 +153,7 @@ namespace VoiceDispatcherMod {
                 return;
             }
 
-            if (RateLimiter.CannotYetPlay("StationWelcome" + station.stationInfo.YardID, 
+            if (RateLimiter.CannotYetPlay("StationWelcome" + station.stationInfo.YardID,
                     RateLimiter.Minutes(10))) {
                 return;
             }
@@ -155,7 +165,7 @@ namespace VoiceDispatcherMod {
         }
 
         static void OnSessionStart(UnityModManager.ModEntry modEntry) {
-            commsRadio = Object.FindObjectOfType<CommsRadioController>();
+            
         }
 
         static void OnUpdate(UnityModManager.ModEntry modEntry, float dt) {
@@ -186,6 +196,5 @@ namespace VoiceDispatcherMod {
 
             SignHelper.CheckSpeedLimits();
         }
-
     }
 }

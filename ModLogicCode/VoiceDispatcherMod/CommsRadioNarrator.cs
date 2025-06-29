@@ -7,19 +7,17 @@ using DV.Logic.Job;
 using DV.Utils;
 using HarmonyLib;
 using UnityEngine;
-using UnityModManagerNet;
 using static VoiceDispatcherMod.CommsRadioNarrator;
 
 // Thank you Skin Manager for this beautiful code 
 namespace VoiceDispatcherMod {
     public class CommsRadioNarrator : MonoBehaviour, ICommsRadioMode {
         private const float SIGNAL_RANGE = 300f;
-        public static UnityModManager.ModEntry mod;
 
         public static CommsRadioNarrator Instance;
 
         public static CommsRadioController Controller;
-        
+
         public static Queue<List<string>> NarratorQueue = new();
 
         public static AudioSource source;
@@ -148,10 +146,13 @@ namespace VoiceDispatcherMod {
             source.volume = 1;
             try {
                 audioManager = SingletonBehaviour<AudioManager>.Instance;
-                var boomboxGroups = audioManager.mix.FindMatchingGroups("Boombox");
-                source.outputAudioMixerGroup = boomboxGroups.Length > 0 ? boomboxGroups.First() : audioManager.cabGroup;
+                if (!audioManager) {
+                    return;
+                }
+                var boomboxGroups = audioManager.mix?.FindMatchingGroups("Boombox");
+                source.outputAudioMixerGroup = boomboxGroups?.Length > 0 ? boomboxGroups.First() : audioManager.cabGroup;
             } catch (Exception e) {
-                mod.Logger.Error($"CommsRadioNarrator: Failed to set audio mixer group: {e.Message}");
+                Main.Logger.Error($"CommsRadioNarrator: Failed to set audio mixer group: {e.Message}");
             }
         }
 
@@ -222,6 +223,7 @@ namespace VoiceDispatcherMod {
                     HighlightCar(car, selectionMaterial);
                     CommsRadioController.PlayAudioFromRadio(HoverCarSound, transform);
                 }
+
                 PointedCar = car;
                 display.SetContentAndAction("What's this car?", "Ask");
             } else {
@@ -395,6 +397,7 @@ namespace VoiceDispatcherMod {
                         if (currentlyReading) {
                             CutCoroutineShort(false);
                         }
+
                         OnCarClicked?.Invoke(PointedCar);
                         PointToCar(null);
                     } else {
@@ -402,6 +405,7 @@ namespace VoiceDispatcherMod {
                             CutCoroutineShort();
                             return;
                         }
+
                         OnNothingClicked?.Invoke();
                     }
 
@@ -504,13 +508,17 @@ namespace VoiceDispatcherMod {
 
         public static void PlayWithClick(List<string> lineBuilder) {
             if (currentlyReading) {
-                mod.Logger.Warning("Already reading a voice line, queuing this one.");
+                Main.Logger.Warning("Already reading a voice line, queuing this one.");
                 NarratorQueue.Enqueue(lineBuilder);
                 return;
             }
 
+            if (!Instance) {
+                Main.Logger.Warning("No CommsRadioNarrator instance found.");
+            }
+
             currentlyReading = true;
-            mod.Logger.Log("Generated voice line: " + string.Join(" ", lineBuilder));
+            Main.Logger.Log("Generated voice line: " + string.Join(" ", lineBuilder));
             lineBuilder.Insert(0, "NoiseClick");
             lineBuilder.Add("NoiseClick");
             SetupCoroutineRunner();
@@ -524,7 +532,7 @@ namespace VoiceDispatcherMod {
 
         private static IEnumerator PlayClipsInCoroutine(AudioClip[] clips) {
             if (clips.Length == 0) {
-                mod.Logger.Error("No valid voice lines found.");
+                Main.Logger.Error("No valid voice lines found.");
                 yield break;
             }
 
@@ -535,9 +543,10 @@ namespace VoiceDispatcherMod {
                 var waitTime = clip.length - 0.05f;
                 yield return new WaitForSeconds(waitTime);
             }
+
             currentlyReading = false;
             if (NarratorQueue.Count > 0) {
-                mod.Logger.Log("Playing next queued voice line.");
+                Main.Logger.Log("Playing next queued voice line.");
                 var nextLine = NarratorQueue.Dequeue();
                 PlayWithClick(nextLine);
             }
@@ -552,21 +561,22 @@ namespace VoiceDispatcherMod {
                 } else {
                     source.Stop();
                 }
-                mod.Logger.Log("Narrator line cut short.");
+
+                Main.Logger.Log("Narrator line cut short.");
             } else {
-                mod.Logger.Warning("No narrator line playing to cut short.");
+                Main.Logger.Warning("No narrator line playing to cut short.");
             }
         }
 
         private static AudioClip GetVoicedClip(string name) {
             var voicedLines = Main.GetVoiceLinesBundle();
             if (!voicedLines) {
-                mod.Logger.Error("Voiced lines asset bundle is not loaded.");
+                Main.Logger.Error("Voiced lines asset bundle is not loaded.");
                 return null;
             }
 
             var clip = voicedLines.LoadAsset<AudioClip>(name);
-            if (!clip) mod.Logger.Error("Failed to load voice line: " + name);
+            if (!clip) Main.Logger.Error("Failed to load voice line: " + name);
             return clip;
         }
 
@@ -576,28 +586,100 @@ namespace VoiceDispatcherMod {
         }
 
         #endregion
+
+        public static void PatchRadioAfterAwake(CommsRadioController __instance = null) {
+            if (Time.time < 2f || Controller) {
+                // Awake should have worked by now
+                return;
+            }
+            // Otherwise patch manually
+            Controller = __instance ?? FindObjectOfType<CommsRadioController>();
+            if (!Controller) {
+                Main.Logger.Error("CommsRadioNarrator: Could not find CommsRadioController in the scene.");
+                return;
+            }
+            Instance = Controller.gameObject.AddComponent<CommsRadioNarrator>();
+            Controller.allModes.Add(Instance);
+            var radioNarratorIdx = Controller.allModes.IndexOf(Instance);
+            Controller.disabledModeIndices.Remove(radioNarratorIdx);
+            Main.Logger.Log("CommsRadioNarrator: Successfully patched after Awake.");
+        }
+        
+        public static void UnpatchRadio() {
+            var radioNarrator = Instance;
+            if (Controller && radioNarrator) {
+                var index = Controller.allModes.IndexOf(radioNarrator);
+                if (index >= 0) {
+                    Controller.disabledModeIndices.Remove(index);
+                    Controller.allModes.Remove(radioNarrator);
+                } else {
+                    Main.Logger.Error("CommsRadioNarrator: Could not find itself in the radio modes list.");
+                }
+            }
+
+            if (radioNarrator) {
+                Destroy(radioNarrator);
+            }
+
+            Instance = null;
+        }
+
+        public static void OnEnableMod() {
+            if (!Controller || !Instance) {
+                Main.Logger.Error("CommsRadioNarrator: Controller or Instance is null on mod enable.");
+                return;
+            }
+            var index = Controller.allModes.IndexOf(Instance);
+            if (index >= 0) {
+                Controller.disabledModeIndices.Remove(index);
+            } else {
+                Main.Logger.Error("CommsRadioNarrator: Could not find itself in the radio modes list on enable.");
+            }
+        }
+        
+        public static void OnDisableMod() {
+            if (Controller && Instance) {
+                var index = Controller.allModes.IndexOf(Instance);
+                if (index >= 0) {
+                    Controller.disabledModeIndices.Add(index);
+                }
+            }
+        }
     }
 
     [HarmonyPatch(typeof(CommsRadioController))]
     internal static class CommsRadio_Awake_Patch {
-        public static CommsRadioNarrator RadioNarrator;
-
         [HarmonyPatch(nameof(CommsRadioController.Awake))]
         [HarmonyPostfix]
         private static void AfterAwake(CommsRadioController __instance, List<ICommsRadioMode> ___allModes) {
+            if (!Main.enabled) return;
+            
             Controller = __instance;
-            RadioNarrator = __instance.gameObject.AddComponent<CommsRadioNarrator>();
+            Instance = __instance.gameObject.AddComponent<CommsRadioNarrator>();
 
             //int paintModeIndex = ___allModes.IndexOf(__instance.carPaintjobControl);
             //___allModes[paintModeIndex] = RadioNarrator;
-            ___allModes.Add(RadioNarrator);
+            ___allModes.Add(Instance);
+            Main.Logger.Log("CommsRadioNarrator: Successfully patched during Awake.");
         }
 
         [HarmonyPatch(nameof(CommsRadioController.UpdateModesAvailability))]
         [HarmonyPostfix]
         private static void AfterUpdateModesAvailability(CommsRadioController __instance) {
-            var radioNarratorIdx = __instance.allModes.IndexOf(RadioNarrator);
+            if (!Main.enabled) return;
+            if (!Instance) return;
+            var radioNarratorIdx = __instance.allModes.IndexOf(Instance);
             __instance.disabledModeIndices.Remove(radioNarratorIdx);
+        }
+        
+        // Patch on enabled to ensure the radio is ready
+        [HarmonyPatch(nameof(CommsRadioController.Update))]
+        [HarmonyPostfix]
+        private static void AfterUpdate(CommsRadioController __instance) {
+            if (!Main.enabled) return;
+            if (!Instance) {
+                PatchRadioAfterAwake(__instance);
+            }
         }
     }
 }

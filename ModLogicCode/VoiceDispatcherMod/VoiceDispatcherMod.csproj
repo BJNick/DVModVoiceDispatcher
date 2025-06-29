@@ -177,6 +177,9 @@
     <Reference Include="DV.WorldTools.Runtime.Common">
       <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Derail Valley\DerailValley_Data\Managed\DV.WorldTools.Runtime.Common.dll</HintPath>
     </Reference>
+    <Reference Include="net.smkd.vector3d">
+      <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Derail Valley\DerailValley_Data\Managed\net.smkd.vector3d.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Speech" />
@@ -234,6 +237,9 @@
     <Reference Include="UnityModManager">
       <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Derail Valley\DerailValley_Data\Managed\UnityModManager\UnityModManager.dll</HintPath>
     </Reference>
+    <Reference Include="WorldStreamer">
+      <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Derail Valley\DerailValley_Data\Managed\WorldStreamer.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CarHelper.cs" />
@@ -245,6 +251,7 @@
     <Compile Include="RateLimiter.cs" />
     <Compile Include="StationHelper.cs" />
     <Compile Include="VoicingUtils.cs" />
+    <Compile Include="TrackEvents\*" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="SpeechLib">

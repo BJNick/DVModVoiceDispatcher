@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using DV;
 using DV.Logic.Job;
 using DV.Utils;
@@ -184,7 +185,7 @@ namespace VoiceDispatcherMod {
                 menuList.RenderActions();
             }
             settingsActions = new() {
-                new ActionItem("Cancel", () => {
+                new ActionItem("Back", () => {
                     CommsRadioController.PlayAudioFromRadio(CancelSound, transform);
                     SetState(State.SelectActions);
                 }),
@@ -246,17 +247,13 @@ namespace VoiceDispatcherMod {
                 ClearHighlightedCar();
 
                 if (currentlyReading) {
-                    display.SetContentAndAction("Speaking...\n" + source.clip.name, "Stop");
+                    // Split camelcase with spaces
+                    string subtitle = Regex.Replace(source.clip.name, "(?<=[a-z])([A-Z])", " $1").Trim();
+                    display.SetContentAndAction("Speaking...\n" + subtitle, "Interrupt");
                     return;
                 }
 
-                var jobCount = JobsManager.Instance.currentJobs.Count;
-                if (jobCount == 0)
-                    display.SetContentAndAction("No ongoing orders", "Check");
-                else if (jobCount == 1)
-                    display.SetContentAndAction("1 ongoing order", "Check");
-                else
-                    display.SetContentAndAction(jobCount + " ongoing orders", "Check");
+                display.SetContentAndAction("Open menu options?");
             }
         }
 

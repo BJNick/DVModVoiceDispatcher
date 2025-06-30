@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -47,24 +48,13 @@ namespace PiperSharp {
             await process.WaitForExitAsync(token);
             ms.Seek(0, SeekOrigin.Begin);
 
-            //using var fs = new RawSourceWaveStream(ms, new WaveFormat((int)(Configuration.Model.Audio?.SampleRate ?? 16000), 1));
-            //return await ConvertToArray(fs, outputType, token);
-            ms.Seek(0, SeekOrigin.Begin);
-            byte[] pcmData = ms.ToArray();
-            int sampleRate = (int)(Configuration.Model.Audio?.SampleRate ?? 16000);
-            int sampleCount = pcmData.Length / 2; // 16-bit PCM
-            float[] samples = new float[sampleCount];
-
-            for (int i = 0; i < sampleCount; i++) {
-                short sample = (short)(pcmData[i * 2] | (pcmData[i * 2 + 1] << 8));
-                samples[i] = sample / 32768f;
-            }
+            var sampleRate = (int)(Configuration.Model.Audio?.SampleRate ?? 16000);
+            ToSamples(ms, out var sampleCount, out var samples);
 
             AudioClip clip = AudioClip.Create("PiperClip", sampleCount, 1, sampleRate, false);
             clip.SetData(samples, 0);
             return clip;
         }
-
 
         public async Task<AudioClip> InferAsyncWithSox(string text, AudioOutputType outputType = AudioOutputType.Wav,
             CancellationToken token = default(CancellationToken)) {
@@ -100,20 +90,28 @@ namespace PiperSharp {
             
             await Task.WhenAll(pipeTask, readTask, soxErrorTask, piperProcess.WaitForExitAsync(token), soxProcess.WaitForExitAsync(token));
             
-            ms.Seek(0, SeekOrigin.Begin);
-            byte[] pcmData = ms.ToArray();
             int soxSampleRate = 8000;
-            int sampleCount = pcmData.Length / 2; // 16-bit PCM
-            float[] samples = new float[sampleCount];
-
-            for (int i = 0; i < sampleCount; i++) {
-                short sample = (short)(pcmData[i * 2] | (pcmData[i * 2 + 1] << 8));
-                samples[i] = sample / 32768f;
-            }
+            ToSamples(ms, out var sampleCount, out var samples);
 
             AudioClip clip = AudioClip.Create("PiperClip", sampleCount, 1, soxSampleRate, false);
             clip.SetData(samples, 0);
             return clip;
+        }
+
+        private void ToSamples(MemoryStream ms, out int sampleCount, out float[] samples) {
+            ms.Seek(0, SeekOrigin.Begin);
+            var floats = new List<float>();
+            var buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = ms.Read(buffer, 0, buffer.Length)) > 0) {
+                for (int i = 0; i < bytesRead; i += 2) {
+                    if (i + 1 >= bytesRead) break;
+                    short sample = (short)(buffer[i] | (buffer[i + 1] << 8));
+                    floats.Add(sample / 32768f);
+                }
+            }
+            sampleCount = floats.Count;
+            samples = floats.ToArray();
         }
     }
 }

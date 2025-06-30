@@ -98,11 +98,8 @@ namespace PiperSharp {
             
             Main.Logger.Log("Started all processes, waiting for output...");
             
-            await Task.WhenAll(pipeTask, readTask, piperProcess.WaitForExitAsync(token), soxProcess.WaitForExitAsync(token));
-            ms.Seek(0, SeekOrigin.Begin);
-
-            //using var fs = new RawSourceWaveStream(ms, new WaveFormat((int)(Configuration.Model.Audio?.SampleRate ?? 16000), 1));
-            //return await ConvertToArray(fs, outputType, token);
+            await Task.WhenAll(pipeTask, readTask, soxErrorTask, piperProcess.WaitForExitAsync(token), soxProcess.WaitForExitAsync(token));
+            
             ms.Seek(0, SeekOrigin.Begin);
             byte[] pcmData = ms.ToArray();
             int soxSampleRate = 8000;

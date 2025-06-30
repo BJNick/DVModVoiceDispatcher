@@ -29,8 +29,10 @@ namespace PiperSharp.Tests.Tests
             {
                 //await TestDownloadPiper();
                 //await TestDownloadModel();
+                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
                 await TestTTSInference();
-                Main.Logger.Error("All tests passed successfully.");
+                stopwatch.Stop();
+                Main.Logger.Log($"All tests passed successfully. TTS inference duration: {stopwatch.Elapsed.TotalSeconds:0.00} seconds.");
             }
             catch (Exception ex)
             {

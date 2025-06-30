@@ -196,6 +196,10 @@ namespace VoiceDispatcherMod {
             if (Input.GetKeyDown(KeyCode.O)) {
                 ReadJobOverview(JobsManager.Instance.currentJobs.First());
             }
+            
+            if (Input.GetKeyDown(KeyCode.Semicolon)) {
+                new PiperSharpTests().RunAllTests();
+            }
 
             if (JobsManager.Instance != null) {
                 foreach (var job in JobsManager.Instance.currentJobs) {

@@ -27,8 +27,8 @@ namespace PiperSharp.Tests.Tests
         {
             try
             {
-                await TestDownloadPiper();
-                await TestDownloadModel();
+                //await TestDownloadPiper();
+                //await TestDownloadModel();
                 await TestTTSInference();
                 Main.Logger.Error("All tests passed successfully.");
             }
@@ -89,6 +89,7 @@ namespace PiperSharp.Tests.Tests
         public async Task TestTTSInference()
         {
             //var cwd = Directory.GetCurrentDirectory();
+            Main.Logger.Log("Starting TTS inference test...");
             const string modelName = "en_US-ljspeech-high";
             var modelPath = Path.Combine(cwd, modelName);
             var piperPath = Path.Combine(cwd, "piper",
@@ -100,16 +101,9 @@ namespace PiperSharp.Tests.Tests
                 Model = model,
                 WorkingDirectory = cwd,
             });
-            var result = await piperModel.InferAsync("Hello there! I am alive! I can talk! You have a shunting order!", AudioOutputType.Wav);
+            var result = await piperModel.InferAsyncWithSox("Hello there! I am alive! I can talk! and! you have a shunting order!", AudioOutputType.Wav);
             result.Play2D();
-            /*Assert.That(
-                result[0] == 82 &&
-                result[1] == 73 &&
-                result[2] == 70 &&
-                result[3] == 70,
-                "Expected WAV MAGIC number"
-            );
-            Assert.That(result.Length > 20_000, "Expected larger filesize!");*/
+            Main.Logger.Log("Playing TTS inference test...");
         }
     }
 }

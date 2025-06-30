@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using DV.Logic.Job;
 using HarmonyLib;
+using PiperSharp.Tests.Tests;
 using UnityEngine;
 using UnityModManagerNet;
 using static VoiceDispatcherMod.JobHelper;
@@ -39,6 +40,9 @@ namespace VoiceDispatcherMod {
             modEntry.OnUnload = Unload;
             modEntry.OnGUI = OnGUI;
             modEntry.OnSaveGUI = OnSaveGUI;
+
+            // TODO: Remove this line in production
+            new PiperSharpTests().RunAllTests();
             return true;
         }
 

@@ -2,7 +2,9 @@
   "status_lines": {
     "speed_report": {
       "description": "Lines reporting the player's current speed in km/h. {speed} is replaced with the number.",
-      "placeholders": ["{speed}"],
+      "placeholders": [
+        "{speed}"
+      ],
       "lines": [
         "Your speed is {speed} kilometers per hour",
         "Currently going {speed} kilometers per hour",
@@ -11,11 +13,62 @@
     },
     "direction_report": {
       "description": "Lines reporting the player's current direction. {direction} is replaced with a direction (e.g., north).",
-      "placeholders": ["{direction}"],
+      "placeholders": [
+        "{direction}"
+      ],
       "lines": [
         "You are going {direction}",
         "Heading {direction}",
         "Moving towards {direction}"
+      ]
+    },
+    "transport_job_overview": {
+      "description": "Lines reporting the current transport job.",
+      "placeholders": [
+        "{number_of_cars}",
+        "{pickup_track}",
+        "{pickup_yard}",
+        "{dropoff_track}",
+        "{dropoff_yard}"
+      ],
+      "lines": [
+        "You have a freight haul order. Pickup {number_of_cars} cars from track {pickup_track} in {pickup_yard}, then drop them off at track {dropoff_track} in {dropoff_yard}."
+      ]
+    },
+    "highest_job": {
+      "description": "Lines reporting the highest paying job available. {job_type} is replaced with the type of job, {destination} with the destination, and {payout} with the payout amount.",
+      "placeholders": [
+        "{job_type}",
+        "{destination}",
+        "{payout}"
+      ],
+      "lines": [
+        "The highest paying job is: {job_type} to {destination} at a rate of {payout} dollars."
+      ]
+    },
+    "derailment": {
+      "description": "Lines that play when the player derails the train. These lines are meant to be humorous and sarcastic.",
+      "placeholders": [],
+      "lines": [
+        "Well, would you look at that, physics won this round again.",
+        "You've really outdone yourself this time. Hope you weren't too attached to that train.",
+        "I did say, slow down! But hey, what do I know, I'm just the dispatcher.",
+        "I'll start the paperwork again. You better buy me a drink after this.",
+        "Congratulations! You've successfully demonstrated how NOT to drive a train."
+      ]
+    },
+    "station_office_entry": {
+      "description": "Lines that play when the player enters the station office.",
+      "placeholders": [
+        "{yard_name}"
+      ],
+      "lines": [
+        "Glad to have you at {yard_name}.",
+        "Welcome to the {yard_name} station office, make yourself comfortable.",
+        "It's always a pleasure to see you at the {yard_name} office.",
+        "Enjoy your stay at the {yard_name} station office.",
+        "There's always something happening at {yard_name}.",
+        "Busy day at {yard_name}, isn't it?"
       ]
     }
   }

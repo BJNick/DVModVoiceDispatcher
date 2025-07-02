@@ -27,6 +27,10 @@ namespace VoiceDispatcherMod {
                 
                 var groupName = string.IsNullOrEmpty(lineGroupName) ? lastGroupName : lineGroupName;
                 var group = JsonLinesLoader.GetLineGroup(groupName);
+                if (group == null) {
+                    Console.WriteLine($"Line group '{groupName}' not found. Please try again.");
+                    continue;
+                }
                 lastGroupName = groupName;
                 var toReplace = group.placeholders;
                 

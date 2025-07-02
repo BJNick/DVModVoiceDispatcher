@@ -1,0 +1,70 @@
+## Build Folders
+bin/
+obj/
+
+## Rider and VS Code
+.idea/
+.vscode/
+
+## Visual Studio
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.VC.db
+
+## ASP.NET temp files
+**/App_Data/
+**/App_Start/TemporaryGeneratedFiles/
+
+## Package directories
+# NuGet
+packages/
+# project.lock.json or project.assets.json
+project.lock.json
+project.assets.json
+
+## .NET Core
+*.dbmdl
+*.dbproj.schemaview
+*.pdb
+*.cache
+*.log
+
+## Publish and build artifacts
+*.exe
+*.dll
+*.app
+*.out
+*.vspscc
+*.vssscc
+
+## Others
+*.nupkg
+*.snupkg
+*.vs/
+*.DS_Store
+Thumbs.db
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# Test results
+TestResults/
+*.coverage
+*.coveragexml
+
+# Logs
+*.log
+
+# OS files
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# Backup and temporary files
+*.bak
+*.tmp
+*.swp
+*.sln.ide

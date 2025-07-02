@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.36203.30 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoiceDispatcherMod", "VoiceDispatcherMod\VoiceDispatcherMod.csproj", "{F70D4B99-03CD-4ADA-99A6-19A874C017D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTestRunner", "ConsoleTestRunner\ConsoleTestRunner.csproj", "{ECA5AB8B-9B66-47A8-865D-800ECAFE183A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{F70D4B99-03CD-4ADA-99A6-19A874C017D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F70D4B99-03CD-4ADA-99A6-19A874C017D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F70D4B99-03CD-4ADA-99A6-19A874C017D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECA5AB8B-9B66-47A8-865D-800ECAFE183A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECA5AB8B-9B66-47A8-865D-800ECAFE183A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECA5AB8B-9B66-47A8-865D-800ECAFE183A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECA5AB8B-9B66-47A8-865D-800ECAFE183A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

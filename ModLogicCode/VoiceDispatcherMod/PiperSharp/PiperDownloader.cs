@@ -20,7 +20,8 @@ namespace PiperSharp
         private const string MODEL_DOWNLOAD_URL =
             "https://huggingface.co/rhasspy/piper-voices/resolve/main/MODEL_FILE_URL?download=true";
 
-        public static string DefaultLocation => Path.Combine(Main.mod.Path, "Piper");
+        public static string DefaultLocation =>
+            "D:\\SteamLibrary\\steamapps\\common\\Derail Valley\\Mods\\VoiceDispatcherMod\\Piper";//Path.Combine(Main.mod.Path, "Piper");
         public static string DefaultModelLocation => Path.Combine(DefaultLocation, "models");
         public static string DefaultPiperLocation => Path.Combine(DefaultLocation, "piper");
         public static string DefaultPiperExecutableLocation => Path.Combine(DefaultPiperLocation, PiperExecutable);

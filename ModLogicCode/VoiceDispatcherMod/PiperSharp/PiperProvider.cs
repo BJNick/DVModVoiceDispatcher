@@ -90,16 +90,7 @@ namespace PiperSharp {
 
             var readTask = soxProcess.StandardOutput.BaseStream.CopyToAsync(ms, 81920, token);
             
-            var soxErrorTask = Task.Run(async () => {
-                string? line;
-                while ((line = await soxProcess.StandardError.ReadLineAsync()) != null) {
-                    Main.Logger.Warning($"SoX STDERR: {line}");
-                }
-            });
-            
-            Main.Logger.Log("Started all processes, waiting for output...");
-            
-            await Task.WhenAll(pipeTask, readTask, soxErrorTask, piperProcess.WaitForExitAsync(token), soxProcess.WaitForExitAsync(token));
+            await Task.WhenAll(pipeTask, readTask, piperProcess.WaitForExitAsync(token), soxProcess.WaitForExitAsync(token));
             
             int soxSampleRate = 8000;
             ToSamples(ms, out var sampleCount, out var samples);

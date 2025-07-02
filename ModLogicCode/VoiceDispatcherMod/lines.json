@@ -1,0 +1,22 @@
+﻿{
+  "status_lines": {
+    "speed_report": {
+      "description": "Lines reporting the player's current speed in km/h. {speed} is replaced with the number.",
+      "placeholders": ["{speed}"],
+      "lines": [
+        "Your speed is {speed} kilometers per hour",
+        "Currently going {speed} kilometers per hour",
+        "Speed: {speed} kilometers per hour"
+      ]
+    },
+    "direction_report": {
+      "description": "Lines reporting the player's current direction. {direction} is replaced with a direction (e.g., north).",
+      "placeholders": ["{direction}"],
+      "lines": [
+        "You are going {direction}",
+        "Heading {direction}",
+        "Moving towards {direction}"
+      ]
+    }
+  }
+}

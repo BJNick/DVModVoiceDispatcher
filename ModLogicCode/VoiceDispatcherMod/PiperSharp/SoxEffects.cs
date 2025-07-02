@@ -14,7 +14,6 @@ namespace VoiceDispatcherMod.PiperSharp {
                     Arguments = soxArgs,
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
-                    RedirectStandardError = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
                 }

@@ -266,6 +266,7 @@
     <Compile Include="CarHelper.cs" />
     <Compile Include="CommsRadioNarrator.cs" />
     <Compile Include="JobHelper.cs" />
+    <Compile Include="JsonLinesLoader.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="NarratorLineQueue.cs" />
     <Compile Include="PiperSharp\Extensions.cs" />
@@ -317,5 +318,8 @@
   <Import Project="..\packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.targets" Condition="Exists('..\packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.targets')" />
   <ItemGroup>
     <Publicize Include="Assembly-CSharp" IncludeCompilerGeneratedMembers="false" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="lines.json" />
   </ItemGroup>
 </Project>

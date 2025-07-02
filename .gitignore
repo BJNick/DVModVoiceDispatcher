@@ -7,3 +7,5 @@
 # Resharper
 _ReSharper*/
 *.DotSettings.user
+
+output.wav

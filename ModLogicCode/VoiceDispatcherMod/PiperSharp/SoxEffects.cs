@@ -6,7 +6,7 @@ using PiperSharp;
 namespace VoiceDispatcherMod.PiperSharp {
     public class SoxEffects {
         
-        public static Process ConfigureSoxProcess(int sampleRate = 16000) {
+        public static Process CreateSoxProcess(int sampleRate = 16000) {
             var soxArgs = BuildSoxArguments(sampleRate);
             return new Process {
                 StartInfo = new ProcessStartInfo {

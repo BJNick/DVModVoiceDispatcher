@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using VoiceDispatcherMod;
 
 namespace PiperSharp.Models
 {
@@ -13,15 +14,26 @@ namespace PiperSharp.Models
         /// </summary>
         public float SpeakingRate { get; set; } = 1f;
         public bool UseCuda { get; set; }
+        
+        public bool OutputRaw { get; set; } = false;
+        public string OutputFilePath { get; set; } = null;
 
         public string BuildArguments()
         {
             var args = new List<string>()
             {
                 "--quiet",
-                "--output-raw",
                 $"--model {Model.GetModelLocation()}"
             };
+            if (OutputRaw) {
+                args.Add($"--output-raw");
+            } else {
+                if (string.IsNullOrEmpty(OutputFilePath)) {
+                    Main.Logger.Error("PiperConfiguration: Output file path is empty");
+                } else {
+                    args.Add($"--output-file {OutputFilePath.AddPathQuotesIfRequired()}");
+                }
+            }
             if (SpeakerId > 0) args.Add($"--speaker {SpeakerId}");
             if (SpeakingRate != 1f) {
                 var lengthScaleStr = SpeakingRate.ToString("0.00").Replace(',', '.');

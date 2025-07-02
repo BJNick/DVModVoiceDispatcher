@@ -97,14 +97,17 @@ namespace PiperSharp.Tests.Tests
             var piperPath = Path.Combine(cwd, "piper",
                 Environment.OSVersion.Platform == PlatformID.Win32NT ? "piper.exe" : "piper");
             var model = await VoiceModel.LoadModel(modelPath);
-            var piperModel = new PiperProvider(new PiperConfiguration()
+            var piperModelConfig = new PiperConfiguration()
             {
                 ExecutableLocation = piperPath,
                 Model = model,
                 WorkingDirectory = cwd,
-            });
-            var result = await piperModel.InferAsyncWithSox("Hello there! I am alive! I can talk! and! you have a shunting order!", AudioOutputType.Wav);
-            result.Play2D();
+                OutputFilePath = "D:\\Projects\\Mods\\DVVoiceAssistant\\output.wav",
+                UseCuda = true,
+            };
+            var result = await PiperProvider.InferAsync("Hello there! I am alive! I can talk! and! you have a shunting order!", piperModelConfig);
+            var clip = await PiperProvider.LoadAudioClipFromFileAsync(result);
+            clip.Play2D();
             Main.Logger.Log("Playing TTS inference test...");
         }
     }

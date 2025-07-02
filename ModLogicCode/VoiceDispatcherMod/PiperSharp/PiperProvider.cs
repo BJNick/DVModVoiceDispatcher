@@ -7,18 +7,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using PiperSharp.Models;
 using UnityEngine;
+using UnityEngine.Networking;
 using VoiceDispatcherMod;
 using VoiceDispatcherMod.PiperSharp;
 
 namespace PiperSharp {
-    public class PiperProvider {
-        public PiperConfiguration Configuration { get; set; }
-
-        public PiperProvider(PiperConfiguration configuration) {
-            Configuration = configuration;
-        }
-
-        public static Process ConfigureProcess(PiperConfiguration configuration) {
+    public static class PiperProvider {
+        public static Process CreatePiperProcess(PiperConfiguration configuration) {
             if (configuration.Model is null)
                 throw new ArgumentNullException(nameof(PiperConfiguration.Model), "VoiceModel not configured!");
 
@@ -27,43 +22,59 @@ namespace PiperSharp {
                     FileName = configuration.ExecutableLocation.AddPathQuotesIfRequired(),
                     Arguments = configuration.BuildArguments(),
                     RedirectStandardInput = true,
-                    RedirectStandardOutput = true,
+                    RedirectStandardOutput = configuration.OutputRaw,
                     UseShellExecute = false,
                     CreateNoWindow = true,
                     WorkingDirectory = configuration.WorkingDirectory,
-                    StandardOutputEncoding = Encoding.UTF8,
+                    StandardOutputEncoding = configuration.OutputRaw ? Encoding.UTF8 : null,
                 },
             };
         }
         
-        public async Task<AudioClip> InferAsync(string text, AudioOutputType outputType = AudioOutputType.Wav,
-            CancellationToken token = default(CancellationToken)) {
-            var process = ConfigureProcess(Configuration);
+        public static async Task<string> InferAsync(string text, PiperConfiguration configuration,
+            CancellationToken token = default) {
+            var process = CreatePiperProcess(configuration);
             process.Start();
             await process.StandardInput.WriteLineAsync(text.ToUtf8());
             await process.StandardInput.FlushAsync();
             process.StandardInput.Close();
-            using var ms = new MemoryStream();
-            await process.StandardOutput.BaseStream.CopyToAsync(ms, 81920, token);
+            
+            /*using var ms = new MemoryStream();
+            await process.StandardOutput.BaseStream.CopyToAsync(ms, 81920, token);*/
             await process.WaitForExitAsync(token);
-            ms.Seek(0, SeekOrigin.Begin);
+            /*ms.Seek(0, SeekOrigin.Begin);
 
-            var sampleRate = (int)(Configuration.Model.Audio?.SampleRate ?? 16000);
+            var sampleRate = (int)(configuration.Model.Audio?.SampleRate ?? 16000);
             ToSamples(ms, out var sampleCount, out var samples);
 
-            AudioClip clip = AudioClip.Create("PiperClip", sampleCount, 1, sampleRate, false);
-            clip.SetData(samples, 0);
-            return clip;
+            AudioClip clip = AudioClip.Create("PiperClip", sampleCount, 1, sampleRate, false);*/
+            
+            // Read clip data from file
+            return configuration.OutputFilePath;
+        }
+        
+        public static async Task<AudioClip> LoadAudioClipFromFileAsync(string filePath, AudioType audioType = AudioType.WAV) {
+            string uri = "file://" + filePath;
+            using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, audioType)) {
+                var request = www.SendWebRequest();
+                while (!request.isDone)
+                    await Task.Yield();
+
+                if (www.responseCode != 200)
+                    throw new IOException($"Failed to load audio: {www.error}");
+
+                return DownloadHandlerAudioClip.GetContent(www);
+            }
         }
 
-        public async Task<AudioClip> InferAsyncWithSox(string text, AudioOutputType outputType = AudioOutputType.Wav,
-            CancellationToken token = default(CancellationToken)) {
-            var piperProcess = ConfigureProcess(Configuration);
+        public static async Task<AudioClip> InferAsyncWithSox(string text, PiperConfiguration configuration,
+            CancellationToken token = default) {
+            var piperProcess = CreatePiperProcess(configuration);
             piperProcess.Start();
             
-            int sampleRate = (int)(Configuration.Model.Audio?.SampleRate ?? 16000);
+            int sampleRate = (int)(configuration.Model.Audio?.SampleRate ?? 16000);
             
-            var soxProcess = SoxEffects.ConfigureSoxProcess(sampleRate);
+            var soxProcess = SoxEffects.CreateSoxProcess(sampleRate);
             soxProcess.Start();
             
             await piperProcess.StandardInput.WriteLineAsync(text.ToUtf8());
@@ -98,7 +109,7 @@ namespace PiperSharp {
             return clip;
         }
 
-        private void ToSamples(MemoryStream ms, out int sampleCount, out float[] samples) {
+        private static void ToSamples(MemoryStream ms, out int sampleCount, out float[] samples) {
             ms.Seek(0, SeekOrigin.Begin);
             var floats = new List<float>();
             var buffer = new byte[4096];

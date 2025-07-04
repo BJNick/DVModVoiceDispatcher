@@ -34,6 +34,9 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+        <Reference Include="I2.Localization">
+          <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Derail Valley\DerailValley_Data\Managed\I2.Localization.dll</HintPath>
+        </Reference>
         <Reference Include="System"/>
         <Reference Include="System.Core"/>
         <Reference Include="System.Data"/>

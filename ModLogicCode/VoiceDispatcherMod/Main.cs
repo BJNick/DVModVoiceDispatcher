@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using DV.Localization;
 using DV.Logic.Job;
 using HarmonyLib;
 using PiperSharp.Tests.Tests;

@@ -43,7 +43,19 @@
         "{payout}"
       ],
       "lines": [
-        "The highest paying job is: {job_type} to {destination} at a rate of {payout} dollars."
+        "The highest paying job is: a {job_type} to {destination} at a rate of {payout} dollars.",
+        "If you want a good payout, consider taking the {job_type} to {destination} for {payout} dollars.",
+        "Attention! {payout} dollars are on the table for a {job_type} to {destination}.",
+        "Looking to go to {destination}? The {job_type} on the way there pays {payout} dollars.",
+
+        "Jackpot! {payout} dollars await for a {job_type} heading to {destination}.",
+        "Big money move: Take the {job_type} to {destination} and earn {payout} dollars.",
+        "Feeling ambitious? The {job_type} to {destination} pays a cool {payout} dollars.",
+        "All aboard for riches! {job_type} to {destination} nets you {payout} dollars.",
+        "Highest stakes: {job_type} bound for {destination}, payout is {payout} dollars.",
+        "Chasing profits? {job_type} to {destination} is your ticket to {payout} dollars.",
+        "Ready for a windfall? {job_type} to {destination} pays out {payout} dollars.",
+        "Top of the board: {job_type} to {destination} with a reward of {payout} dollars."
       ]
     },
     "derailment": {

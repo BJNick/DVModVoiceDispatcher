@@ -43,6 +43,7 @@ namespace VoiceDispatcherMod {
             
             VoiceGenerator.Init();
             JsonLinesLoader.Init( "D:\\Projects\\Mods\\DVVoiceAssistant\\ModLogicCode\\VoiceDispatcherMod\\lines.json");
+            JsonLinesLoader.LogError = Logger.Error;
 
             return true;
         }
@@ -168,15 +169,17 @@ namespace VoiceDispatcherMod {
                 return;
             }
 
-            if (RateLimiter.CannotYetPlay("StationWelcome" + station.stationInfo.YardID,
-                    RateLimiter.Minutes(10))) {
+            // TODO: Increase interval back to 10 minutes after testing
+            if (RateLimiter.CannotYetPlay("StationWelcome" + station.stationInfo.YardID, 5)) {
                 return;
             }
 
-            var lineBuilder = new List<string>();
-            StationHelper.AddWelcomeToStationMessage(lineBuilder, station);
-            StationHelper.AddHighestPayingJob(lineBuilder, station);
-            CommsRadioNarrator.PlayWithClick(lineBuilder);
+            var fullYardName = JsonLinesLoader.MapType("yard_id", station.stationInfo.YardID);
+
+            var line = JsonLinesLoader.GetRandomAndReplace("station_office_entry", new Dictionary<string, string> {
+                { "{yard_name}", fullYardName }
+            });
+            CommsRadioNarrator.GenerateAndPlay(line);
         }
 
         static void OnSessionStart(UnityModManager.ModEntry modEntry) { }

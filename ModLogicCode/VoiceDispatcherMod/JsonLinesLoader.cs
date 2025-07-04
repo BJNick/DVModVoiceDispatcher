@@ -6,6 +6,7 @@ namespace VoiceDispatcherMod {
     [Serializable]
     public class DialogueData {
         public Dictionary<string, LineGroup> status_lines;
+        public Dictionary<string, TypeMap> type_maps;
     }
 
     [Serializable]
@@ -13,6 +14,12 @@ namespace VoiceDispatcherMod {
         public string description;
         public List<string> placeholders;
         public List<string> lines;
+    }
+
+    [Serializable]
+    public class TypeMap {
+        public string description;
+        public Dictionary<string, string> map;
     }
 
     public static class JsonLinesLoader {
@@ -65,5 +72,15 @@ namespace VoiceDispatcherMod {
             var line = Randomizer.GetRandomLine(group);
             return Replace(line, replacements);
         }
+        
+        public static string MapType(string type, string key) {
+            if (DialogueData.type_maps.TryGetValue(type, out var typeMap)) {
+                if (typeMap.map.TryGetValue(key, out var mappedValue)) {
+                    return mappedValue;
+                }
+            }
+            LogError($"Mapping for type '{type}' and key '{key}' not found.");
+            return key; // Return the original key if no mapping is found
     }
+        }
 }

@@ -47,7 +47,6 @@
         "If you want a good payout, consider taking the {job_type} to {destination} for {payout} dollars.",
         "Attention! {payout} dollars are on the table for a {job_type} to {destination}.",
         "Looking to go to {destination}? The {job_type} on the way there pays {payout} dollars.",
-
         "Jackpot! {payout} dollars await for a {job_type} heading to {destination}.",
         "Big money move: Take the {job_type} to {destination} and earn {payout} dollars.",
         "Feeling ambitious? The {job_type} to {destination} pays a cool {payout} dollars.",
@@ -82,6 +81,35 @@
         "There's always something happening at {yard_name}.",
         "Busy day at {yard_name}, isn't it?"
       ]
+    }
+  },
+  "type_maps": {
+    "yard_id": {
+      "description": "Takes the yard ID and returns the full name of the yard.",
+      "map": {
+        "CME": "Coal Mine East",
+        "CMS": "Coal Mine South",
+        "CP": "Coal Plant",
+        "CS": "City South",
+        "CW": "City West",
+        "FF": "Food Factory",
+        "FM": "Farm Market",
+        "FRC": "Forest Central",
+        "FRS": "Forest South",
+        "GF": "Goods Factory",
+        "HB": "Harbor",
+        "HMB": "Harbor Base",
+        "IME": "Iron Mine East",
+        "IMW": "Iron Mine West",
+        "MB": "Military Base",
+        "MF": "Machine Factory",
+        "MFMB": "Machine Factory Base",
+        "OR": "Oil Refinery",
+        "OWC": "Oil Well Central",
+        "OWN": "Oil Well North",
+        "SM": "Steel Mill",
+        "SW": "Sawmill"
+      }
     }
   }
 }

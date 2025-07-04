@@ -11,7 +11,7 @@ namespace VoiceDispatcherMod {
         public static StationController subYard;
         private static Vector3 lastPlayerPosition = Vector3.negativeInfinity;
 
-        private const float OfficeRadiusSqrDistance = 100f;
+        private const float OfficeRadiusSqrDistance = 25f;
         private const float RangeCheckSqrDistance = 2500f;
         private const float YardRadiusRatio = 0.7f; // smaller than job spawn radius to avoid false positives
 

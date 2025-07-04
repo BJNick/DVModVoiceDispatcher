@@ -279,7 +279,7 @@
     <Compile Include="PiperSharp\PiperDownloader.cs" />
     <Compile Include="PiperSharp\PiperProvider.cs" />
     <Compile Include="PiperSharp\PiperSharpTests.cs" />
-    <Compile Include="PiperSharp\SoxEffects.cs" />
+    <Compile Include="PiperSharp\SoxConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RadioMenuList.cs" />
     <Compile Include="Randomizer.cs" />

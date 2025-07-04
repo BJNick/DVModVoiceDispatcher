@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using PiperSharp;
 using PiperSharp.Models;
+using VoiceDispatcherMod.PiperSharp;
 
 namespace VoiceDispatcherMod {
     public class TestRunner {
@@ -61,7 +62,7 @@ namespace VoiceDispatcherMod {
                     selectedLine = selectedLine.Replace(placeholder.Key, placeholder.Value);
                 }
                 Console.WriteLine($"Generating line: {selectedLine}");
-                Generate(selectedLine).GetAwaiter().GetResult();
+                GenerateWithSox(selectedLine).GetAwaiter().GetResult();
                 Play();
                 Console.WriteLine();
 
@@ -86,9 +87,31 @@ namespace VoiceDispatcherMod {
                 Model = model,
                 WorkingDirectory = cwd,
                 OutputFilePath = "D:\\Projects\\Mods\\DVVoiceAssistant\\output.wav",
-                UseCuda = true,
             };
             var result = await PiperProvider.InferAsync(text, piperModelConfig);
+        }
+
+        public static async Task GenerateWithSox(string text) {
+            const string modelName = "en_US-ljspeech-high";
+            var modelPath = Path.Combine(cwd, modelName);
+            var piperPath = Path.Combine(cwd, "piper",
+                Environment.OSVersion.Platform == PlatformID.Win32NT ? "piper.exe" : "piper");
+            var model = await VoiceModel.LoadModel(modelPath);
+            var piperModelConfig = new PiperConfiguration()
+            {
+                ExecutableLocation = piperPath,
+                Model = model,
+                WorkingDirectory = cwd,
+                OutputRaw = true,
+            };
+            int sampleRate = (int)(model.Audio?.SampleRate ?? 16000);
+            var soxConfiguration = new SoxConfiguration {
+                InputSampleRate = sampleRate,
+                OutputSampleRate = 16000,
+                OutputRaw = false,
+                OutputFilePath = "D:\\Projects\\Mods\\DVVoiceAssistant\\output.wav",
+            };
+            var result = await PiperProvider.InferAsyncWithSox(text, piperModelConfig, soxConfiguration);
         }
 
         public static void Play() {

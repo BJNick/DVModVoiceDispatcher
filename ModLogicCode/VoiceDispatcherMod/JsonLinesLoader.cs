@@ -16,14 +16,14 @@ namespace VoiceDispatcherMod {
     }
 
     public static class JsonLinesLoader {
-        private const string Path =
-            "D:\\Projects\\Mods\\DVVoiceAssistant\\ModLogicCode\\VoiceDispatcherMod\\lines.json";
+        private static string Path;
 
         public static DialogueData DialogueData;
         
         public static Action<string> LogError = Console.WriteLine;
 
-        public static void Init() {
+        public static void Init(string path) {
+            Path = path;
             DialogueData = LoadDialogueData();
             if (DialogueData == null) {
                 LogError("Failed to load dialogue data.");
@@ -48,6 +48,19 @@ namespace VoiceDispatcherMod {
             }
             LogError($"Line group '{groupName}' not found.");
             return null;
+        }
+        
+        public static string Replace(string text, Dictionary<string, string> replacements) {
+            foreach (var kvp in replacements) {
+                text = text.Replace(kvp.Key, kvp.Value);
+            }
+            return text;
+        }
+        
+        public static string GetRandomAndReplace(string groupName, Dictionary<string, string> replacements) {
+            var group = GetLineGroup(groupName);
+            var line = Randomizer.GetRandomLine(group);
+            return Replace(line, replacements);
         }
     }
 }

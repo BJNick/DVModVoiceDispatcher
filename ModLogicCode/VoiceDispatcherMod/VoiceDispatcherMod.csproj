@@ -287,6 +287,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="SignHelper.cs" />
     <Compile Include="StationHelper.cs" />
+    <Compile Include="VoiceGenerator.cs" />
     <Compile Include="VoicingUtils.cs" />
     <Compile Include="TrackEvents\*" />
   </ItemGroup>

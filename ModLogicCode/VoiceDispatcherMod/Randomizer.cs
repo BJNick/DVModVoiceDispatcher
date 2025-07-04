@@ -12,7 +12,7 @@ namespace VoiceDispatcherMod {
                 return $"{id}{startIndex}";
             }
 
-            int lastIndex = LastSelectedIndexMap.ContainsKey(id) ? LastSelectedIndexMap[id] : -1;
+            int lastIndex = LastSelectedIndexMap.TryGetValue(id, out var value) ? value : -1;
             int generatedIndex = startIndex - 1;
             while (generatedIndex == lastIndex || generatedIndex < startIndex) {
                 generatedIndex = Random.Range(startIndex, endIndex + 1);
@@ -27,7 +27,7 @@ namespace VoiceDispatcherMod {
                 return $"{id}{startIndex}";
             }
 
-            int lastIndex = LastSelectedIndexMap.ContainsKey(id) ? LastSelectedIndexMap[id] : startIndex - 1;
+            int lastIndex = LastSelectedIndexMap.TryGetValue(id, out var value) ? value : startIndex - 1;
             int generatedIndex = lastIndex + 1;
             if (generatedIndex > endIndex) {
                 generatedIndex = startIndex;
@@ -35,6 +35,21 @@ namespace VoiceDispatcherMod {
 
             LastSelectedIndexMap[id] = generatedIndex;
             return $"{id}{generatedIndex}";
+        }
+        
+        public static string GetRandomLine(LineGroup lineGroup) {
+            if (lineGroup == null || lineGroup.lines.Count == 0) {
+                return string.Empty;
+            }
+
+            int lastIndex = LastSelectedIndexMap.TryGetValue(lineGroup.description, out var value) ? value : -1;
+            int generatedIndex = -1;
+            while (generatedIndex == lastIndex || generatedIndex < 0) {
+                generatedIndex = Random.Range(0, lineGroup.lines.Count);
+            }
+
+            LastSelectedIndexMap[lineGroup.description] = generatedIndex;
+            return lineGroup.lines[generatedIndex];
         }
     }
 }

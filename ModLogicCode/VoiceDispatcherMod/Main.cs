@@ -40,9 +40,10 @@ namespace VoiceDispatcherMod {
             modEntry.OnUnload = Unload;
             modEntry.OnGUI = OnGUI;
             modEntry.OnSaveGUI = OnSaveGUI;
+            
+            VoiceGenerator.Init();
+            JsonLinesLoader.Init( "D:\\Projects\\Mods\\DVVoiceAssistant\\ModLogicCode\\VoiceDispatcherMod\\lines.json");
 
-            // TODO: Remove this line in production
-            new PiperSharpTests().RunAllTests();
             return true;
         }
 
@@ -198,7 +199,7 @@ namespace VoiceDispatcherMod {
             }
             
             if (Input.GetKeyDown(KeyCode.Semicolon)) {
-                new PiperSharpTests().RunAllTests();
+                // TODO
             }
 
             if (JobsManager.Instance != null) {

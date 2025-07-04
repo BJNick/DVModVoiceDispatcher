@@ -11,8 +11,10 @@ namespace VoiceDispatcherMod {
         
         const string cwd = "D:\\SteamLibrary\\steamapps\\common\\Derail Valley\\Mods\\VoiceDispatcherMod\\Piper";
         
+        const string lines = "D:\\Projects\\Mods\\DVVoiceAssistant\\ModLogicCode\\VoiceDispatcherMod\\lines.json";
+        
         public static void Main(string[] args) {
-            JsonLinesLoader.Init();
+            JsonLinesLoader.Init(lines);
             string lastGroupName = "speed_report";
             Dictionary<string, string> replacements = new Dictionary<string, string>();
 
@@ -24,7 +26,7 @@ namespace VoiceDispatcherMod {
                     break;
                 }
                 
-                JsonLinesLoader.Init();
+                JsonLinesLoader.Init(lines);
                 
                 var groupName = string.IsNullOrEmpty(lineGroupName) ? lastGroupName : lineGroupName;
                 var group = JsonLinesLoader.GetLineGroup(groupName);
@@ -106,6 +108,7 @@ namespace VoiceDispatcherMod {
             };
             int sampleRate = (int)(model.Audio?.SampleRate ?? 16000);
             var soxConfiguration = new SoxConfiguration {
+                ExecutablePath = Path.Combine(cwd, "sox", "sox.exe").AddPathQuotesIfRequired(),
                 InputSampleRate = sampleRate,
                 OutputSampleRate = 16000,
                 OutputRaw = false,

@@ -6,6 +6,8 @@ using PiperSharp;
 namespace VoiceDispatcherMod.PiperSharp {
     public class SoxConfiguration {
         
+        public string ExecutablePath { get; set; }
+        
         public int InputSampleRate { get; set; } = 16000;
         public int OutputSampleRate { get; set; } = 8000;
         
@@ -18,8 +20,7 @@ namespace VoiceDispatcherMod.PiperSharp {
             var soxArgs = soxConfiguration.BuildSoxArguments();
             return new Process {
                 StartInfo = new ProcessStartInfo {
-                    FileName =
-                        Path.Combine(PiperDownloader.DefaultLocation, "sox", "sox.exe").AddPathQuotesIfRequired(),
+                    FileName = soxConfiguration.ExecutablePath,
                     Arguments = soxArgs,
                     RedirectStandardInput = true,
                     RedirectStandardOutput = soxConfiguration.OutputRaw,

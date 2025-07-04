@@ -6,8 +6,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using PiperSharp.Models;
-using UnityEngine;
-using UnityEngine.Networking;
 using VoiceDispatcherMod.PiperSharp;
 
 namespace PiperSharp {

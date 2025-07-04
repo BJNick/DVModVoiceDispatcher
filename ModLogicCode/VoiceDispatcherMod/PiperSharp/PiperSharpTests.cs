@@ -106,7 +106,7 @@ namespace PiperSharp.Tests.Tests
                 UseCuda = true,
             };
             var result = await PiperProvider.InferAsync("Hello there! I am alive! I can talk! and! you have a shunting order!", piperModelConfig);
-            var clip = await PiperProvider.LoadAudioClipFromFileAsync(result);
+            var clip = await VoiceGenerator.LoadAudioClipFromFileAsync(result);
             clip.Play2D();
             Main.Logger.Log("Playing TTS inference test...");
         }

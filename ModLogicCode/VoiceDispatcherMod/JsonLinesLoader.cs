@@ -51,13 +51,16 @@ namespace VoiceDispatcherMod {
         }
         
         public static string Replace(string text, Dictionary<string, string> replacements) {
+            if (replacements == null || replacements.Count == 0) {
+                return text;
+            }
             foreach (var kvp in replacements) {
                 text = text.Replace(kvp.Key, kvp.Value);
             }
             return text;
         }
         
-        public static string GetRandomAndReplace(string groupName, Dictionary<string, string> replacements) {
+        public static string GetRandomAndReplace(string groupName, Dictionary<string, string> replacements = null) {
             var group = GetLineGroup(groupName);
             var line = Randomizer.GetRandomLine(group);
             return Replace(line, replacements);

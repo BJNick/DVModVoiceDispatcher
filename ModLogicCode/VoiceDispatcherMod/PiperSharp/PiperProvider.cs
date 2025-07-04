@@ -42,20 +42,6 @@ namespace PiperSharp {
             
             return configuration.OutputFilePath;
         }
-        
-        public static async Task<AudioClip> LoadAudioClipFromFileAsync(string filePath, AudioType audioType = AudioType.WAV) {
-            string uri = "file://" + filePath;
-            using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, audioType)) {
-                var request = www.SendWebRequest();
-                while (!request.isDone)
-                    await Task.Yield();
-
-                if (www.responseCode != 200)
-                    throw new IOException($"Failed to load audio: {www.error}");
-
-                return DownloadHandlerAudioClip.GetContent(www);
-            }
-        }
 
         public static async Task<string> InferAsyncWithSox(string text, PiperConfiguration configuration, SoxConfiguration soxConfiguration, CancellationToken token = default) {
             var piperProcess = CreatePiperProcess(configuration);

@@ -9,6 +9,7 @@ using DV.Utils;
 using HarmonyLib;
 using UnityEngine;
 using static VoiceDispatcherMod.CommsRadioNarrator;
+using Task = System.Threading.Tasks.Task;
 
 // Thank you Skin Manager for this beautiful code 
 namespace VoiceDispatcherMod {
@@ -401,6 +402,26 @@ namespace VoiceDispatcherMod {
         private static IEnumerator PlayVoiceLinesCoroutine(string[] lines) {
             var clips = lines.Select(GetVoicedClip).Where(clip => clip != null).ToArray();
             return PlayClipsInCoroutine(clips);
+        }
+        
+        public static async Task GenerateAndPlay(string line, bool withClick = true) {
+            var clip = await VoiceGenerator.CreateClip(line);
+            
+            var clipList = new List<AudioClip> { clip };
+            if (withClick) {
+                clipList.Insert(0, GetVoicedClip("NoiseClick"));
+                clipList.Add(GetVoicedClip("NoiseClick"));
+            }
+            
+            /*if (currentlyReading) {
+                // TODO
+                Main.Logger.Warning("Already reading a voice line, CANNOT QUEUE this one.");
+                return;
+            }*/
+
+            currentlyReading = true;
+            SetupCoroutineRunner();
+            currentCoroutine = coroutineRunner.StartCoroutine(PlayClipsInCoroutine(clipList.ToArray()));
         }
 
         private static IEnumerator PlayClipsInCoroutine(AudioClip[] clips) {

@@ -199,7 +199,7 @@ namespace VoiceDispatcherMod {
             }
             
             if (Input.GetKeyDown(KeyCode.Semicolon)) {
-                // TODO
+                CommsRadioNarrator.GenerateAndPlay(JsonLinesLoader.GetRandomAndReplace("derailment"));
             }
 
             if (JobsManager.Instance != null) {

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using PiperSharp;
 using PiperSharp.Models;
 using UnityEngine;
+using UnityEngine.Networking;
 using VoiceDispatcherMod.PiperSharp;
 
 namespace VoiceDispatcherMod {
@@ -25,8 +26,8 @@ namespace VoiceDispatcherMod {
 
         public static string FilenameOf(string text) {
             var onlyAlphanumeric = System.Text.RegularExpressions.Regex.Replace(text, @"[^a-zA-Z0-9\s]", "");
-            var trimmedToMaxLength = onlyAlphanumeric.Length > 100 ? onlyAlphanumeric.Substring(0, 100) : onlyAlphanumeric;
-            return trimmedToMaxLength + "_" + text.GetHashCode() + ".wav";
+            var trimmedToMaxLength = onlyAlphanumeric.Length > 50 ? onlyAlphanumeric.Substring(0, 50) : onlyAlphanumeric;
+            return trimmedToMaxLength + "_" + (uint)text.GetHashCode() + ".wav";
         }
         
         public static string CheckIfExists(string text) {
@@ -87,6 +88,20 @@ namespace VoiceDispatcherMod {
             };
             return await PiperProvider.InferAsyncWithSox(text, piperModelConfig, soxConfiguration);
         }
+        
+        public static async Task<AudioClip> LoadAudioClipFromFileAsync(string filePath, AudioType audioType = AudioType.WAV) {
+            string uri = "file://" + filePath;
+            using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, audioType)) {
+                var request = www.SendWebRequest();
+                while (!request.isDone)
+                    await Task.Yield();
+
+                if (www.responseCode != 200)
+                    throw new IOException($"Failed to load audio: {www.error}");
+
+                return DownloadHandlerAudioClip.GetContent(www);
+            }
+        }
 
         public static async Task<AudioClip> CreateClip(string text, bool sox = true) {
             var filePath = sox ? await GenerateWithSox(text) : await Generate(text);
@@ -94,7 +109,7 @@ namespace VoiceDispatcherMod {
                 Main.Logger.Error($"Failed to generate clip: {text}");
                 throw new InvalidOperationException("Failed to generate audio clip.");
             }
-            return await PiperProvider.LoadAudioClipFromFileAsync(filePath);
+            return await LoadAudioClipFromFileAsync(filePath);
         }
 
     }

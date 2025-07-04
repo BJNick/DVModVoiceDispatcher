@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace VoiceDispatcherMod {
     [Serializable]
     public class DialogueData {
-        public Dictionary<string, LineGroup> status_lines;
+        public Dictionary<string, LineGroup> line_groups;
         public Dictionary<string, TypeMap> type_maps;
     }
 
@@ -14,6 +15,9 @@ namespace VoiceDispatcherMod {
         public string description;
         public List<string> placeholders;
         public List<string> lines;
+
+        public string match_string;
+        public Dictionary<string, LineGroup> match_map;
     }
 
     [Serializable]
@@ -49,12 +53,58 @@ namespace VoiceDispatcherMod {
             }
         }
         
-        public static LineGroup GetLineGroup(string groupName) {
-            if (DialogueData.status_lines.TryGetValue(groupName, out var group)) {
+        public static LineGroup GetBaseLineGroup(string groupName) {
+            if (DialogueData.line_groups.TryGetValue(groupName, out var group)) {
                 return group;
             }
             LogError($"Line group '{groupName}' not found.");
             return null;
+        }
+        
+        public static LineGroup GetMatchedLineGroup(LineGroup baseLineGroup, Dictionary<string, string> replacements) {
+            if (string.IsNullOrEmpty(baseLineGroup.match_string)) {
+                return baseLineGroup;
+            }
+            var replacedMatchString = Replace(baseLineGroup.match_string, replacements);
+            if (TryFindMatchingInnerGroup(baseLineGroup, replacedMatchString, out var innerGroup)) {
+                return GetMatchedLineGroup(innerGroup, replacements);
+            }
+            // Try match string 'default' if available
+            if (TryFindMatchingInnerGroup(baseLineGroup, "default", out innerGroup)) {
+                return GetMatchedLineGroup(innerGroup, replacements);
+            }
+            LogError($"Could not find matched line group for '{baseLineGroup.description}' with match string '{replacedMatchString}' or default.");
+            // Try any element in the match map
+            if (baseLineGroup.match_map.Count > 0) {
+                return baseLineGroup.match_map.Values.First();
+            }
+            LogError($"Could not find any match for '{baseLineGroup.description}' with match string '{baseLineGroup.match_string}'");
+            return baseLineGroup;
+        }
+        
+        public static bool TryFindMatchingInnerGroup(LineGroup group, string matchString, out LineGroup matchedGroup) {
+            foreach (var groupKey in group.match_map.Keys) {
+                if (IsMatchingRegex(matchString, groupKey)) {
+                    matchedGroup = group.match_map[groupKey];
+                    return true;
+                }
+            }
+            matchedGroup = null;
+            return false;
+        }
+
+        private static bool IsMatchingRegex(string matchString, string caseString) {
+            if (matchString == null || caseString == null) {
+                return false;
+            }
+            try {
+                // Apply caseString as regex to matchString
+                var regex = new System.Text.RegularExpressions.Regex(caseString, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                return regex.IsMatch(matchString);
+            } catch (Exception e) {
+                LogError($"Error matching '{matchString}' with case string '{caseString}': {e.Message}");
+                return false;
+            }
         }
         
         public static string Replace(string text, Dictionary<string, string> replacements) {
@@ -68,7 +118,7 @@ namespace VoiceDispatcherMod {
         }
         
         public static string GetRandomAndReplace(string groupName, Dictionary<string, string> replacements = null) {
-            var group = GetLineGroup(groupName);
+            var group = GetMatchedLineGroup(GetBaseLineGroup(groupName), replacements);
             var line = Randomizer.GetRandomLine(group);
             return Replace(line, replacements);
         }

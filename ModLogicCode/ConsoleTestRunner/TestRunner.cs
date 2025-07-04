@@ -19,7 +19,7 @@ namespace VoiceDispatcherMod {
             Dictionary<string, string> replacements = new Dictionary<string, string>();
 
             do {
-                Console.WriteLine("Groups: " + string.Join(", ", JsonLinesLoader.DialogueData.status_lines.Keys));
+                Console.WriteLine("Groups: " + string.Join(", ", JsonLinesLoader.DialogueData.line_groups.Keys));
                 Console.WriteLine("Enter a line group name (enter to regenerate last, or 'q' to quit):");
                 var lineGroupName = Console.ReadLine();
                 if (lineGroupName?.ToLower() == "q") {
@@ -29,13 +29,13 @@ namespace VoiceDispatcherMod {
                 JsonLinesLoader.Init(lines);
                 
                 var groupName = string.IsNullOrEmpty(lineGroupName) ? lastGroupName : lineGroupName;
-                var group = JsonLinesLoader.GetLineGroup(groupName);
-                if (group == null) {
+                var baseGroup = JsonLinesLoader.GetBaseLineGroup(groupName);
+                if (baseGroup == null) {
                     Console.WriteLine($"Line group '{groupName}' not found. Please try again.");
                     continue;
                 }
                 lastGroupName = groupName;
-                var toReplace = group.placeholders;
+                var toReplace = baseGroup.placeholders;
                 
                 foreach (var key in toReplace) {
                     Console.WriteLine($"Enter replacement for {key} (or press Enter to skip):");
@@ -45,21 +45,23 @@ namespace VoiceDispatcherMod {
                     }
                 }
                 
+                var matchedGroup = JsonLinesLoader.GetMatchedLineGroup(baseGroup, replacements);
+                
                 Console.WriteLine($"Which line do you want to use? (or press Enter for random):");
-                for (var i = 0; i < group.lines.Count; i++) {
-                    var line = group.lines[i];
+                for (var i = 0; i < matchedGroup.lines.Count; i++) {
+                    var line = matchedGroup.lines[i];
                     Console.WriteLine($"{i+1} {line}");
                 }
                 var lineIndexInput = Console.ReadLine();
                 int lineIndex = 0;
                 if (string.IsNullOrEmpty(lineIndexInput)) {
-                    lineIndex = new Random().Next(0, group.lines.Count);
+                    lineIndex = new Random().Next(0, matchedGroup.lines.Count);
                 } else {
                     int.TryParse(lineIndexInput, out var lineIndexInputInt);
                     lineIndex = lineIndexInputInt - 1;
                 }
                 
-                var selectedLine = group.lines[lineIndex];
+                var selectedLine = matchedGroup.lines[lineIndex];
                 foreach (var placeholder in replacements) {
                     selectedLine = selectedLine.Replace(placeholder.Key, placeholder.Value);
                 }

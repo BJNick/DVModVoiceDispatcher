@@ -74,14 +74,14 @@
       "placeholders": [
         "{job_type_name}",
         "{job_type_id}",
-        "{number_of_cars}",
+        "{car_count}",
         "{starting_track_name}",
         "{starting_yard_name}",
         "{destination_track_name}",
         "{destination_yard_name}"
       ],
       "lines": [
-        "A {job_type_name}. Pick up {number_of_cars} cars from track {starting_track_name} in {starting_yard_name}. Then drop them off at track {destination_track_name} in {destination_yard_name}."
+        "{job_type_name}. Pick up {car_count} from track {starting_track_name} in {starting_yard_name}. Then drop them off at track {destination_track_name} in {destination_yard_name}."
       ]
     },
     "shunting_load_job_overview": {
@@ -91,38 +91,38 @@
         "{number_of_pickups}",
         "{loading_track_name}",
         "{destination_track_name}",
-        "{destination_number_of_cars}",
+        "{destination_car_count}",
         "{pickup_1_track_name}",
-        "{pickup_1_number_of_cars}",
+        "{pickup_1_car_count}",
         "{pickup_2_track_name}",
-        "{pickup_2_number_of_cars}",
+        "{pickup_2_car_count}",
         "{pickup_3_track_name}",
-        "{pickup_3_number_of_cars}"
+        "{pickup_3_car_count}"
       ],
       "match_string": "{number_of_pickups}",
       "match_map": {
         "1": {
           "description": "A job with one pickup.",
           "lines": [
-            "A {job_type_name}. Couple {pickup_1_number_of_cars} cars at track {pickup_1_track_name}. Then load at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
+            "{job_type_name}. Couple {pickup_1_car_count} at track {pickup_1_track_name}. Then load at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
           ]
         },
         "2": {
           "description": "A job with two pickups.",
           "lines": [
-            "A {job_type_name}. Couple {pickup_1_number_of_cars} cars at track {pickup_1_track_name}, and {pickup_2_number_of_cars} cars at track {pickup_2_track_name}. Then load {destination_number_of_cars} cars at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
+            "{job_type_name}. Couple {pickup_1_car_count} at track {pickup_1_track_name}, and {pickup_2_car_count} at track {pickup_2_track_name}. Then load {destination_car_count} at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
           ]
         },
         "3": {
           "description": "A job with three pickups.",
           "lines": [
-            "A {job_type_name}. Couple {pickup_1_number_of_cars} cars at track {pickup_1_track_name}, {pickup_2_number_of_cars} cars at track {pickup_2_track_name}, and {pickup_3_number_of_cars} cars at track {pickup_3_track_name}. Then load {destination_number_of_cars} cars at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
+            "{job_type_name}. Couple {pickup_1_car_count} at track {pickup_1_track_name}, {pickup_2_car_count} at track {pickup_2_track_name}, and {pickup_3_car_count} at track {pickup_3_track_name}. Then load {destination_car_count} at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
           ]
         },
         "default": {
           "description": "A job with a high number of pickups.",
           "lines": [
-            "A {job_type_name}. It has {number_of_pickups} pickups, and with that I wish you luck. Load those {destination_number_of_cars} cars at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
+            "{job_type_name}. It has {number_of_pickups} pickups, and with that I wish you luck. Load those {destination_car_count} at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
           ]
         }
       }
@@ -134,38 +134,81 @@
         "{number_of_dropoffs}",
         "{unloading_track_name}",
         "{starting_track_name}",
-        "{starting_number_of_cars}",
+        "{starting_car_count}",
         "{dropoff_1_track_name}",
-        "{dropoff_1_number_of_cars}",
+        "{dropoff_1_car_count}",
         "{dropoff_2_track_name}",
-        "{dropoff_2_number_of_cars}",
+        "{dropoff_2_car_count}",
         "{dropoff_3_track_name}",
-        "{dropoff_3_number_of_cars}"
+        "{dropoff_3_car_count}"
       ],
       "match_string": "{number_of_dropoffs}",
       "match_map": {
         "1": {
           "description": "A job with one dropoff.",
           "lines": [
-            "A {job_type_name}. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple at track {dropoff_1_track_name} to complete the order."
+            "{job_type_name}. Pick up {starting_car_count} at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple at track {dropoff_1_track_name} to complete the order."
           ]
         },
         "2": {
           "description": "A job with two dropoffs.",
           "lines": [
-            "A {job_type_name}. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple {dropoff_1_number_of_cars} cars at track {dropoff_1_track_name}, and {dropoff_2_number_of_cars} cars at track {dropoff_2_track_name} to complete the order."
+            "{job_type_name}. Pick up {starting_car_count} at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple {dropoff_1_car_count} at track {dropoff_1_track_name}, and {dropoff_2_car_count} at track {dropoff_2_track_name} to complete the order."
           ]
         },
         "3": {
           "description": "A job with three dropoffs.",
           "lines": [
-            "A {job_type_name}. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple {dropoff_1_number_of_cars} cars at track {dropoff_1_track_name}, {dropoff_2_number_of_cars} cars at track {dropoff_2_track_name}, and {dropoff_3_number_of_cars} cars at track {dropoff_3_track_name} to complete the order."
+            "{job_type_name}. Pick up {starting_car_count} at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple {dropoff_1_car_count} at track {dropoff_1_track_name}, {dropoff_2_car_count} at track {dropoff_2_track_name}, and {dropoff_3_car_count} at track {dropoff_3_track_name} to complete the order."
           ]
         },
         "default": {
           "description": "A job with a high number of dropoffs.",
           "lines": [
-            "A {job_type_name}. It has {number_of_dropoffs} dropoffs, and with that I wish you luck. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple at a bunch of different tracks to complete the order."
+            "{job_type_name}. It has {number_of_dropoffs} dropoffs, and with that I wish you luck. Pick up {starting_car_count} at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple at a bunch of different tracks to complete the order."
+          ]
+        }
+      }
+    },
+    "car_count": {
+      "description": "Number followed by 'cars' in the proper plural form.",
+      "placeholders": [
+        "{count}"
+      ],
+      "match_string": "{count}",
+      "match_map": {
+        "1": {
+          "lines": [
+            "{count} car"
+          ]
+        },
+        "default": {
+          "lines": [
+            "{count} cars"
+          ]
+        }
+      }
+    },
+    "car_count_russian_example": {
+      "description": "Number followed by 'cars' in the proper plural form in Russian.",
+      "placeholders": [
+        "{count}"
+      ],
+      "match_string": "{count}",
+      "match_map": {
+        ".*(?<!1)1": {
+          "lines": [
+            "{count} vagon"
+          ]
+        },
+        ".*(?<!1)[234]": {
+          "lines": [
+            "{count} vagona"
+          ]
+        },
+        "default": {
+          "lines": [
+            "{count} vagonov"
           ]
         }
       }
@@ -306,14 +349,14 @@
       }
     },
     "job_type": {
-      "description": "Takes the job type ID and returns the full name of the job type.",
+      "description": "Takes the job type ID and returns the full name of a single instance of job type order.",
       "map": {
-        "ShuntingLoad": "Loading Order",
-        "ShuntingUnload": "Unloading Order",
-        "Transport": "Transport Order",
-        "EmptyHaul": "Logistical Order",
-        "ComplexTransport": "Complex Order",
-        "default": "Custom Order"
+        "ShuntingLoad": "a loading order",
+        "ShuntingUnload": "an unloading order",
+        "Transport": "a transport order",
+        "EmptyHaul": "a logistical order",
+        "ComplexTransport": "a complex order",
+        "default": "a custom order"
       }
     }
   }

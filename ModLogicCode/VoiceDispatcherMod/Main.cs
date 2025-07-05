@@ -95,7 +95,9 @@ namespace VoiceDispatcherMod {
             modEntry.OnUpdate = null;
             modEntry.OnSessionStart = null;
             PlayerManager.CarChanged -= OnCarChanged;
-            voicedLines.Unload(true);
+            if (voicedLines) {
+                voicedLines.Unload(true);
+            }
             CommsRadioNarrator.OnDisableMod();
         }
 

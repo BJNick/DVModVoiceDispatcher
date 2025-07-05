@@ -59,7 +59,7 @@ namespace VoiceDispatcherMod {
             //var lineBuilder = new List<string>();
             //lineBuilder.Add("YouHave");
             //AddJobSpecificLines(lineBuilder, job);
-            var line = CreateShuntingUnloadJobLineFromJson(job);
+            var line = CreateJobSpecificLineFromJson(job);
             Main.Logger.Log(line);
             CommsRadioNarrator.GenerateAndPlay(line);
         }
@@ -86,6 +86,21 @@ namespace VoiceDispatcherMod {
                 default:
                     AddGenericJobLines(lineBuilder, job);
                     break;
+            }
+        }
+        
+        public static string CreateJobSpecificLineFromJson(Job job) {
+            switch (job.jobType) {
+                case JobType.ShuntingLoad:
+                    return CreateShuntingLoadJobLineFromJson(job);
+                case JobType.ShuntingUnload:
+                    return CreateShuntingUnloadJobLineFromJson(job);
+                case JobType.Transport:
+                    return CreateTransportJobLineFromJson(job);
+                case JobType.EmptyHaul:
+                    return CreateEmptyHaulJobLineFromJson(job);
+                default:
+                    return "Error: Unsupported job type.";
             }
         }
 
@@ -130,12 +145,7 @@ namespace VoiceDispatcherMod {
         }
 
         public static string CreateShuntingLoadJobLineFromJson(Job job) {
-            if (job == null) {
-                Main.Logger.Error("Invalid job or no tasks found.");
-                return "Error parsing job data.";
-            }
-
-            if (job.tasks == null || job.tasks.Count == 0) {
+            if (job?.tasks == null || job.tasks.Count == 0) {
                 Main.Logger.Error("Invalid job or no tasks found.");
                 return "Error parsing job data.";
             }
@@ -274,6 +284,43 @@ namespace VoiceDispatcherMod {
             lineBuilder.AddRange(VoicedTrackId(destinationTrack));
             lineBuilder.Add("In");
             lineBuilder.Add(GetYardName(destinationTrack));
+        }
+        
+        public static string CreateTransportJobLineFromJson(Job job) {
+            if (job?.tasks == null || job.tasks.Count == 0) {
+                Main.Logger.Error("Invalid job or no tasks found.");
+                return "Error parsing job data.";
+            }
+
+            var jobInfo = JobDataExtractor.ExtractTransportJobData(new Job_data(job));
+            return CreateBasicTransportJobLineFromJson(job.jobType, jobInfo.transportingCars,
+                jobInfo.startingTrack, jobInfo.destinationTrack);
+        }
+        
+        public static string CreateEmptyHaulJobLineFromJson(Job job) {
+            if (job == null || job.tasks == null || job.tasks.Count == 0) {
+                Main.Logger.Error("Invalid job or no tasks found.");
+                return "Error parsing job data.";
+            }
+
+            var jobInfo = JobDataExtractor.ExtractEmptyHaulJobData(new Job_data(job));
+            return CreateBasicTransportJobLineFromJson(job.jobType, jobInfo.transportingCars,
+                jobInfo.startingTrack, jobInfo.destinationTrack);
+        }
+
+        public static string CreateBasicTransportJobLineFromJson(JobType jobType,
+            List<Car_data> transportingCars,
+            TrackID startingTrack, TrackID destinationTrack) {
+            Dictionary<string, string> replacements = new Dictionary<string, string> {
+                { "job_type_name", jobType.MapToJobTypeName() },
+                { "job_type_id", jobType.ToString() },
+                { "car_count", transportingCars.MapToCarCount() },
+                { "starting_track_name", startingTrack.MapToTrackName() },
+                { "starting_yard_name", startingTrack.MapToYardName() },
+                { "destination_track_name", destinationTrack.MapToTrackName() },
+                { "destination_yard_name", destinationTrack.MapToYardName() }
+            };
+            return JsonLinesLoader.GetRandomAndReplace("transport_job_overview", replacements);
         }
 
         public static void AddTaskLines(Task task, List<string> lineBuilder) {

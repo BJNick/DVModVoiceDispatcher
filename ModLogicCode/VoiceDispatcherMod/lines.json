@@ -81,7 +81,7 @@
         "{destination_yard_name}"
       ],
       "lines": [
-        "{job_type_name}. Pick up {car_count} from track {starting_track_name} in {starting_yard_name}. Then drop them off at track {destination_track_name} in {destination_yard_name}."
+        "{job_type_name}. Pick up {car_count} from track {starting_track_name} in {starting_yard_name}. Deliver them to {destination_yard_name}. Then drop them off at track {destination_track_name}."
       ]
     },
     "shunting_load_job_overview": {
@@ -351,12 +351,12 @@
     "job_type": {
       "description": "Takes the job type ID and returns the full name of a single instance of job type order.",
       "map": {
-        "ShuntingLoad": "a loading order",
-        "ShuntingUnload": "an unloading order",
-        "Transport": "a transport order",
-        "EmptyHaul": "a logistical order",
-        "ComplexTransport": "a complex order",
-        "default": "a custom order"
+        "ShuntingLoad": "A loading order",
+        "ShuntingUnload": "An unloading order",
+        "Transport": "A freight haul order",
+        "EmptyHaul": "A logistical order",
+        "ComplexTransport": "A complex order",
+        "default": "A custom order"
       }
     }
   }

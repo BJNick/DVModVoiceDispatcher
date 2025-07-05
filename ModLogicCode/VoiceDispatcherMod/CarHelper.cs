@@ -48,7 +48,7 @@ namespace VoiceDispatcherMod {
                 case JobType.Transport:
                 case JobType.EmptyHaul:
                     lineBuilder.Add("BoundFor");
-                    lineBuilder.Add(GetYardName(JobHelper.ExtractTransportDestinationTrack(job)));
+                    lineBuilder.Add(GetYardName(JobHelper.ExtractSomeDestinationTrack(job)));
                     break;
                 default:
                     lineBuilder.Add("PartOf");

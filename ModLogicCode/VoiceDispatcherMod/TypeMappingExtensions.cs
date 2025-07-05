@@ -14,7 +14,6 @@ namespace VoiceDispatcherMod {
                 { "order_number", trimmedOrderNumber },
                 { "track_type", trackId.trackType }
             };
-            Main.Logger.Warning(replacements.ToString());
             return JsonLinesLoader.GetRandomAndReplace("track_name", replacements);
         }
         

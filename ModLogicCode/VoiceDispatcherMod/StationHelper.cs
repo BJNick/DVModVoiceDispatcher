@@ -42,48 +42,59 @@ namespace VoiceDispatcherMod {
                 }
             }
         }
-
-        public static void AddWelcomeToYardMessage(List<string> lineBuilder, StationController station) {
-            lineBuilder.Add(Randomizer.GetRandomLine("EnteringYard", 1, 5));
-            lineBuilder.Add(GetYardName(station.stationInfo));
-            lineBuilder.Add("ShortSilence");
+        
+        public static string CreateWelcomeToStationOfficeLine(StationController station) {
+            if (station == null || station.stationInfo == null) {
+                Main.Logger.Error("Cannot create welcome line for station: station or stationInfo is null.");
+                return string.Empty;
+            }
+            return JsonLinesLoader.GetRandomAndReplace("station_office_entry", new() {
+                { "yard_name", station.stationInfo.MapToYardName() },
+                { "yard_id", station.stationInfo.YardID }
+            });
         }
-
-        public static void AddWelcomeToStationMessage(List<string> lineBuilder, StationController station) {
-            lineBuilder.Add(Randomizer.GetRandomLine("EnteringStation", 1, 5));
-            lineBuilder.Add(GetYardName(station.stationInfo));
-            lineBuilder.Add("ShortSilence");
+        
+        public static string CreateWelcomeToYardLine(StationController station) {
+            if (station == null || station.stationInfo == null) {
+                Main.Logger.Error("Cannot create welcome line for yard: station or stationInfo is null.");
+                return string.Empty;
+            }
+            return JsonLinesLoader.GetRandomAndReplace("yard_entry", new() {
+                { "yard_name", station.stationInfo.MapToYardName() },
+                { "yard_id", station.stationInfo.YardID }
+            });
         }
-
-        public static void AddExitingYardMessage(List<string> lineBuilder, StationController station) {
-            lineBuilder.Add(Randomizer.GetRandomLine("ExitingYard", 1, 5));
-            lineBuilder.Add(GetYardName(station.stationInfo));
-            lineBuilder.Add("ShortSilence");
+        
+        public static string CreateExitingYardLine(StationController station) {
+            if (station == null || station.stationInfo == null) {
+                Main.Logger.Error("Cannot create exiting line for yard: station or stationInfo is null.");
+                return string.Empty;
+            }
+            return JsonLinesLoader.GetRandomAndReplace("yard_exit", new() {
+                { "yard_name", station.stationInfo.MapToYardName() },
+                { "yard_id", station.stationInfo.YardID }
+            });
         }
-
-        public static void AddHighestPayingJob(List<string> lineBuilder, StationController station) {
+        
+        public static string CreateHighestPayingJobLine(StationController station) {
+            if (!station || station.logicStation?.availableJobs == null) {
+                Main.Logger.Error("Cannot create highest paying job line: station or its jobs are null.");
+                return string.Empty;
+            }
             var allJobs = station.logicStation.availableJobs;
             var job = allJobs.OrderByDescending(it => it.initialWage).FirstOrDefault();
             if (job == null) {
-                lineBuilder.Add("0");
-                lineBuilder.Add("Orders");
-                return;
+                Main.Logger.Error("No jobs available to create highest paying job line.");
+                return String.Empty;
             }
 
-            lineBuilder.Add("HighestPayingJob");
-            lineBuilder.Add("JobType" + job.jobType);
-
-            if (job.jobType is JobType.Transport or JobType.EmptyHaul) {
-                lineBuilder.Add("BoundFor");
-                lineBuilder.Add(GetYardName(JobHelper.ExtractTransportDestinationTrack(job)));
-            }
-
-            lineBuilder.Add("ShortSilence");
-
-            lineBuilder.Add("Over");
-            int wage = Mathf.RoundToInt(job.initialWage);
-            lineBuilder.AddRange(RoundedDown(wage));
-            lineBuilder.Add("Dollars");
+            var replacements = new Dictionary<string, string> {
+                { "job_type", job.jobType.MapToJobTypeName() },
+                { "destination", JobHelper.ExtractSomeDestinationTrack(job).MapToYardName() },
+                { "exact_payout", Mathf.RoundToInt(job.initialWage).ToString() },
+                { "rounded_payout", RoundDown(Mathf.RoundToInt(job.initialWage)).ToString() }
+            };
+            return JsonLinesLoader.GetRandomAndReplace("highest_paying_job", replacements);
         }
 
         public static StationController GetPlayerStation() {

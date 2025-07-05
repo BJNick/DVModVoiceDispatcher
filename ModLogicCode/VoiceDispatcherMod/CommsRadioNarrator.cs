@@ -172,9 +172,9 @@ namespace VoiceDispatcherMod {
                         return;
                     }
                     CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform);
-                    var lineBuilder = new List<string>();
-                    StationHelper.AddHighestPayingJob(lineBuilder, StationHelper.playerYard);
-                    PlayWithClick(lineBuilder);
+                    var line = StationHelper.CreateHighestPayingJobLine(StationHelper.playerYard);
+                    Main.Logger.Log(line);
+                    GenerateAndPlay(line);
                     SetState(State.MainView);
                 }),
                 new ActionItem("Edit Settings", () => {

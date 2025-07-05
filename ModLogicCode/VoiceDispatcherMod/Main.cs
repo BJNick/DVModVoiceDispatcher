@@ -147,9 +147,9 @@ namespace VoiceDispatcherMod {
                 return;
             }
 
-            var lineBuilder = new List<string>();
-            StationHelper.AddWelcomeToYardMessage(lineBuilder, station);
-            CommsRadioNarrator.PlayWithClick(lineBuilder);
+            var line = StationHelper.CreateWelcomeToYardLine(station);
+            Logger.Log(line);
+            CommsRadioNarrator.GenerateAndPlay(line);
         }
 
         static void OnYardExited(StationController previousStation) {
@@ -162,26 +162,24 @@ namespace VoiceDispatcherMod {
                 return;
             }
 
-            var lineBuilder = new List<string>();
-            StationHelper.AddExitingYardMessage(lineBuilder, previousStation);
-            CommsRadioNarrator.PlayWithClick(lineBuilder);
+            var line = StationHelper.CreateExitingYardLine(previousStation);
+            Logger.Log(line);
+            CommsRadioNarrator.GenerateAndPlay(line);
         }
 
         static void OnStationEntered(StationController station) {
-            if (station == null || station.logicStation?.availableJobs?.Count < 1) {
+            if (station == null || station.logicStation?.availableJobs?.Count == 0) {
                 return;
             }
 
             // TODO: Increase interval back to 10 minutes after testing
-            if (RateLimiter.CannotYetPlay("StationWelcome" + station.stationInfo.YardID, 5)) {
+            if (RateLimiter.CannotYetPlay("StationWelcome" + station.stationInfo.YardID, 10)) {
                 return;
             }
 
-            var fullYardName = JsonLinesLoader.MapType("yard_id", station.stationInfo.YardID);
-
-            var line = JsonLinesLoader.GetRandomAndReplace("station_office_entry", new Dictionary<string, string> {
-                { "{yard_name}", fullYardName }
-            });
+            var line = StationHelper.CreateWelcomeToStationOfficeLine(station);
+            line += " " + StationHelper.CreateHighestPayingJobLine(station);
+            Logger.Log(line);
             CommsRadioNarrator.GenerateAndPlay(line);
         }
 

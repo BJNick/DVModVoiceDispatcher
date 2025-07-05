@@ -26,26 +26,20 @@
         "Moving towards {direction}"
       ]
     },
-    "highest_job": {
+    "highest_paying_job": {
       "description": "Lines reporting the highest paying job available. {job_type} is replaced with the type of job, {destination} with the destination, and {payout} with the payout amount.",
       "placeholders": [
         "{job_type}",
         "{destination}",
-        "{payout}"
+        "{exact_payout}",
+        "{rounded_payout}"
       ],
       "lines": [
-        "The highest paying job is: a {job_type} to {destination} at a rate of {payout} dollars.",
-        "If you want a good payout, consider taking the {job_type} to {destination} for {payout} dollars.",
-        "Attention! {payout} dollars are on the table for a {job_type} to {destination}.",
-        "Looking to go to {destination}? The {job_type} on the way there pays {payout} dollars.",
-        "Jackpot! {payout} dollars await for a {job_type} heading to {destination}.",
-        "Big money move: Take the {job_type} to {destination} and earn {payout} dollars.",
-        "Feeling ambitious? The {job_type} to {destination} pays a cool {payout} dollars.",
-        "All aboard for riches! {job_type} to {destination} nets you {payout} dollars.",
-        "Highest stakes: {job_type} bound for {destination}, payout is {payout} dollars.",
-        "Chasing profits? {job_type} to {destination} is your ticket to {payout} dollars.",
-        "Ready for a windfall? {job_type} to {destination} pays out {payout} dollars.",
-        "Top of the board: {job_type} to {destination} with a reward of {payout} dollars."
+        "The highest paying job is: {job_type} to {destination} at a rate of {rounded_payout} dollars.",
+        "If you want a good payout, consider taking {job_type} to {destination} for {rounded_payout} dollars.",
+        "{rounded_payout} dollars are on the table for {job_type} to {destination}.",
+        "Chasing profits? {job_type} to {destination} is your ticket to {rounded_payout} dollars.",
+        "Top of the board: {job_type} to {destination} with a reward of {rounded_payout} dollars."
       ]
     },
     "derailment": {
@@ -62,7 +56,8 @@
     "station_office_entry": {
       "description": "Lines that play when the player enters the station office.",
       "placeholders": [
-        "{yard_name}"
+        "{yard_name}",
+        "{yard_id}"
       ],
       "lines": [
         "Glad to have you at {yard_name}.",
@@ -70,7 +65,35 @@
         "It's always a pleasure to see you at the {yard_name} office.",
         "Enjoy your stay at the {yard_name} station office.",
         "There's always something happening at {yard_name}.",
-        "Busy day at {yard_name}, isn't it?"
+        "Busy day at {yard_name} isn't it?"
+      ]
+    },
+    "yard_entry": {
+      "description": "Lines that play when the player enters a yard area.",
+      "placeholders": [
+        "{yard_name}",
+        "{yard_id}"
+      ],
+      "lines": [
+        "Entering {yard_name}.",
+        "Clear to enter {yard_name}.",
+        "Welcome to {yard_name}.",
+        "Approaching {yard_name}.",
+        "Permission granted for {yard_name}."
+      ]
+    },
+    "yard_exit": {
+      "description": "Lines that play when the player exits a yard area.",
+      "placeholders": [
+        "{yard_name}",
+        "{yard_id}"
+      ],
+      "lines": [
+        "Exiting {yard_name}.",
+        "Leaving {yard_name}.",
+        "Departing {yard_name}.",
+        "Safe travels from {yard_name}.",
+        "See you next time at {yard_name}."
       ]
     },
     "transport_job_overview": {

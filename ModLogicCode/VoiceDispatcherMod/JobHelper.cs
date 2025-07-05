@@ -194,17 +194,15 @@ namespace VoiceDispatcherMod {
             return JsonLinesLoader.GetRandomAndReplace("generic_job_task", replacements);
         }
 
-        public static TrackID ExtractTransportDestinationTrack(Job job) {
+        public static TrackID ExtractSomeDestinationTrack(Job job) {
             var jobData = new Job_data(job);
-            if (jobData.type == JobType.EmptyHaul) {
-                var haulJobData = JobDataExtractor.ExtractEmptyHaulJobData(jobData);
-                return haulJobData.destinationTrack;
-            } else if (jobData.type == JobType.Transport) {
-                var transportJobData = JobDataExtractor.ExtractTransportJobData(jobData);
-                return transportJobData.destinationTrack;
-            } else {
-                throw new System.Exception("Unexpected job type for extracting destination track: " + jobData.type);
-            }
+            return job.jobType switch {
+                JobType.ShuntingLoad => JobDataExtractor.ExtractShuntingLoadJobData(jobData).destinationTrack,
+                JobType.ShuntingUnload => JobDataExtractor.ExtractShuntingUnloadJobData(jobData).destinationTracksData[0].track,
+                JobType.Transport => JobDataExtractor.ExtractTransportJobData(jobData).destinationTrack,
+                JobType.EmptyHaul => JobDataExtractor.ExtractEmptyHaulJobData(jobData).destinationTrack,
+                _ => new TrackID("Unknown", "Unknown Destination", "", "Unknown")
+            };
         }
     }
 }

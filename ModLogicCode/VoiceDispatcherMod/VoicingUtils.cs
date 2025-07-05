@@ -83,16 +83,16 @@ namespace VoiceDispatcherMod {
         }
 
         public static string[] SayApproximateNumber(int number) {
-            var leadingDigit = number.ToString()[0] - '0';
-            var totalDigits = number.ToString().Length;
-            // If the leading digit is 1, say 2 digits, otherwise say 1 digit.
-            if (leadingDigit == 1) {
-                var tenthPower = (int)Math.Pow(10, totalDigits - 2);
-                return SayFullNumber(number / tenthPower * tenthPower);
-            } else {
-                var tenthPower = (int)Math.Pow(10, totalDigits - 1);
-                return SayFullNumber(number / tenthPower * tenthPower);
+            return SayFullNumber(RoundDown(number));
+        }
+        
+        public static int RoundDown(int number) {
+            if (number < 100) {
+                return number;
             }
+            var totalDigits = number.ToString().Length;
+            var tenthPower = (int)Math.Pow(10, totalDigits - 2);
+            return number / tenthPower * tenthPower;
         }
 
         public static string[] Exact(int number) {

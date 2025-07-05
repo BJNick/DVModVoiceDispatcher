@@ -81,7 +81,7 @@
         "{destination_yard_name}"
       ],
         "lines": [
-            "You have a new {job_type_name}. Pick up {number_of_cars} cars from track {starting_track_name} in {starting_yard_name}. Then drop them off at track {destination_track_name} in {destination_yard_name}."
+            "A {job_type_name}. Pick up {number_of_cars} cars from track {starting_track_name} in {starting_yard_name}. Then drop them off at track {destination_track_name} in {destination_yard_name}."
         ]
     },
     "shunting_load_job_overview": {
@@ -104,25 +104,25 @@
         "1": {
           "description": "A job with one pickup.",
           "lines": [
-            "You have a new {job_type_name}. Couple {pickup_1_number_of_cars} cars at track {pickup_1_track_name}. Then load at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
+            "A {job_type_name}. Couple {pickup_1_number_of_cars} cars at track {pickup_1_track_name}. Then load at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
           ]
         },
         "2": {
           "description": "A job with two pickups.",
           "lines": [
-            "You have a new {job_type_name}. Couple {pickup_1_number_of_cars} cars at track {pickup_1_track_name}, and {pickup_2_number_of_cars} cars at track {pickup_2_track_name}. Then load at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
+            "A {job_type_name}. Couple {pickup_1_number_of_cars} cars at track {pickup_1_track_name}, and {pickup_2_number_of_cars} cars at track {pickup_2_track_name}. Then load at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
           ]
         },
         "3": {
           "description": "A job with three pickups.",
           "lines": [
-            "You have a new {job_type_name}. Couple {pickup_1_number_of_cars} cars at track {pickup_1_track_name}, {pickup_2_number_of_cars} cars at track {pickup_2_track_name}, and {pickup_3_number_of_cars} cars at track {pickup_3_track_name}. Then load at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
+            "A {job_type_name}. Couple {pickup_1_number_of_cars} cars at track {pickup_1_track_name}, {pickup_2_number_of_cars} cars at track {pickup_2_track_name}, and {pickup_3_number_of_cars} cars at track {pickup_3_track_name}. Then load at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
           ]
         },
         "default": {
           "description": "A job with a high number of pickups.",
           "lines": [
-            "You have a new {job_type_name}. It has {number_of_pickups} pickups, and with that I wish you luck. Load those {destination_number_of_cars} cars at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
+            "A {job_type_name}. It has {number_of_pickups} pickups, and with that I wish you luck. Load those {destination_number_of_cars} cars at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
           ]
         }
       }
@@ -147,25 +147,25 @@
         "1": {
           "description": "A job with one dropoff.",
           "lines": [
-            "You have a new {job_type_name}. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple at track {dropoff_1_track_name} to complete the order."
+            "A {job_type_name}. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple at track {dropoff_1_track_name} to complete the order."
           ]
         },
         "2": {
           "description": "A job with two dropoffs.",
           "lines": [
-            "You have a new {job_type_name}. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple {dropoff_1_number_of_cars} cars at track {dropoff_1_track_name}, and {dropoff_2_number_of_cars} cars at track {dropoff_2_track_name} to complete the order."
+            "A {job_type_name}. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple {dropoff_1_number_of_cars} cars at track {dropoff_1_track_name}, and {dropoff_2_number_of_cars} cars at track {dropoff_2_track_name} to complete the order."
           ]
         },
         "3": {
           "description": "A job with three dropoffs.",
           "lines": [
-            "You have a new {job_type_name}. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple {dropoff_1_number_of_cars} cars at track {dropoff_1_track_name}, {dropoff_2_number_of_cars} cars at track {dropoff_2_track_name}, and {dropoff_3_number_of_cars} cars at track {dropoff_3_track_name} to complete the order."
+            "A {job_type_name}. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple {dropoff_1_number_of_cars} cars at track {dropoff_1_track_name}, {dropoff_2_number_of_cars} cars at track {dropoff_2_track_name}, and {dropoff_3_number_of_cars} cars at track {dropoff_3_track_name} to complete the order."
           ]
         },
         "default": {
           "description": "A job with a high number of dropoffs.",
           "lines": [
-            "You have a new {job_type_name}. It has {number_of_dropoffs} dropoffs, and with that I wish you luck. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple at a bunch of different tracks to complete the order."
+            "A {job_type_name}. It has {number_of_dropoffs} dropoffs, and with that I wish you luck. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple at a bunch of different tracks to complete the order."
           ]
         }
       }

@@ -324,6 +324,7 @@
     <Publicize Include="Assembly-CSharp" IncludeCompilerGeneratedMembers="false" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="dialogue_data.schema.json" />
     <Content Include="lines.json" />
   </ItemGroup>
 </Project>

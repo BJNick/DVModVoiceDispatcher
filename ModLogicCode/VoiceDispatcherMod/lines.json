@@ -22,19 +22,6 @@
         "Moving towards {direction}"
       ]
     },
-    "transport_job_overview": {
-      "description": "Lines reporting the current transport job.",
-      "placeholders": [
-        "{number_of_cars}",
-        "{pickup_track}",
-        "{pickup_yard}",
-        "{dropoff_track}",
-        "{dropoff_yard}"
-      ],
-      "lines": [
-        "You have a freight haul order. Pickup {number_of_cars} cars from track {pickup_track} in {pickup_yard}, then drop them off at track {dropoff_track} in {dropoff_yard}."
-      ]
-    },
     "highest_job": {
       "description": "Lines reporting the highest paying job available. {job_type} is replaced with the type of job, {destination} with the destination, and {payout} with the payout amount.",
       "placeholders": [
@@ -82,19 +69,120 @@
         "Busy day at {yard_name}, isn't it?"
       ]
     },
+    "transport_job_overview": {
+      "description": "A full job overview when accepting a new freight haul or logistical haul job.",
+      "placeholders": [
+        "{job_type_name}",
+        "{job_type_id}",
+        "{number_of_cars}",
+        "{starting_track_name}",
+        "{starting_yard_name}",
+        "{destination_track_name}",
+        "{destination_yard_name}"
+      ],
+        "lines": [
+            "You have a new {job_type_name}. Pick up {number_of_cars} cars from track {starting_track_name} in {starting_yard_name}. Then drop them off at track {destination_track_name} in {destination_yard_name}."
+        ]
+    },
+    "shunting_load_job_overview": {
+      "description": "A full job overview when accepting a new shunting load job.",
+      "placeholders": [
+        "{job_type_name}",
+        "{number_of_pickups}",
+        "{loading_track_name}",
+        "{destination_track_name}",
+        "{destination_number_of_cars}",
+        "{pickup_1_track_name}",
+        "{pickup_1_number_of_cars}",
+        "{pickup_2_track_name}",
+        "{pickup_2_number_of_cars}",
+        "{pickup_3_track_name}",
+        "{pickup_3_number_of_cars}"
+      ],
+      "match_string": "{number_of_pickups}",
+      "match_map": {
+        "1": {
+          "description": "A job with one pickup.",
+          "lines": [
+            "You have a new {job_type_name}. Couple {pickup_1_number_of_cars} cars at track {pickup_1_track_name}. Then load at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
+          ]
+        },
+        "2": {
+          "description": "A job with two pickups.",
+          "lines": [
+            "You have a new {job_type_name}. Couple {pickup_1_number_of_cars} cars at track {pickup_1_track_name}, and {pickup_2_number_of_cars} cars at track {pickup_2_track_name}. Then load at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
+          ]
+        },
+        "3": {
+          "description": "A job with three pickups.",
+          "lines": [
+            "You have a new {job_type_name}. Couple {pickup_1_number_of_cars} cars at track {pickup_1_track_name}, {pickup_2_number_of_cars} cars at track {pickup_2_track_name}, and {pickup_3_number_of_cars} cars at track {pickup_3_track_name}. Then load at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
+          ]
+        },
+        "default": {
+          "description": "A job with a high number of pickups.",
+          "lines": [
+            "You have a new {job_type_name}. It has {number_of_pickups} pickups, and with that I wish you luck. Load those {destination_number_of_cars} cars at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
+          ]
+        }
+      }
+    },
+    "shunting_unload_job_overview": {
+      "description": "A full job overview when accepting a new shunting unload job.",
+      "placeholders": [
+        "{job_type_name}",
+        "{number_of_dropoffs}",
+        "{unloading_track_name}",
+        "{starting_track_name}",
+        "{starting_number_of_cars}",
+        "{dropoff_1_track_name}",
+        "{dropoff_1_number_of_cars}",
+        "{dropoff_2_track_name}",
+        "{dropoff_2_number_of_cars}",
+        "{dropoff_3_track_name}",
+        "{dropoff_3_number_of_cars}"
+      ],
+      "match_string": "{number_of_dropoffs}",
+      "match_map": {
+        "1": {
+          "description": "A job with one dropoff.",
+          "lines": [
+            "You have a new {job_type_name}. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple at track {dropoff_1_track_name} to complete the order."
+          ]
+        },
+        "2": {
+          "description": "A job with two dropoffs.",
+          "lines": [
+            "You have a new {job_type_name}. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple {dropoff_1_number_of_cars} cars at track {dropoff_1_track_name}, and {dropoff_2_number_of_cars} cars at track {dropoff_2_track_name} to complete the order."
+          ]
+        },
+        "3": {
+          "description": "A job with three dropoffs.",
+          "lines": [
+            "You have a new {job_type_name}. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple {dropoff_1_number_of_cars} cars at track {dropoff_1_track_name}, {dropoff_2_number_of_cars} cars at track {dropoff_2_track_name}, and {dropoff_3_number_of_cars} cars at track {dropoff_3_track_name} to complete the order."
+          ]
+        },
+        "default": {
+          "description": "A job with a high number of dropoffs.",
+          "lines": [
+            "You have a new {job_type_name}. It has {number_of_dropoffs} dropoffs, and with that I wish you luck. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple at a bunch of different tracks to complete the order."
+          ]
+        }
+      }
+    },
     "parametrization_test": {
       "description": "Lines used for testing the parametrization of the mod. These lines are not meant to be used in the game.",
       "placeholders": [
-          "{param1}",
-          "{param2}",
-          "{param3}"
+        "{param1}",
+        "{param2}",
+        "{param3}"
       ],
       "match_string": "{param1}",
       "match_map": {
         "alfa": {
           "description": "This is a test line for param1=alfa.",
           "lines": [
-              "Apple: Param 1 is set to {param1}, param 2 is {param2}, and param 3 is {param3}."
+            "Apple: Param 1 is set to {param1}, param 2 is {param2}, and param 3 is {param3}."
           ]
         },
         "bravo": {
@@ -106,32 +194,32 @@
         "charlie": {
           "description": "This is a test line for param1=charlie.",
           "match_string": "{param2}",
-            "match_map": {
-                "delta": {
-                "description": "This is a test line for param1=charlie and param2=delta.",
-                "lines": [
-                    "Citron: Param 1 is {param1}, param 2 is {param2}, and param 3 is {param3}."
-                ]
-                },
-                "echo": {
-                "description": "This is a test line for param1=charlie and param2=echo.",
-                "lines": [
-                    "Dandelion: Param 1 is {param1}, param 2 is {param2}, and param 3 is {param3}."
-                ]
-                }
+          "match_map": {
+            "delta": {
+              "description": "This is a test line for param1=charlie and param2=delta.",
+              "lines": [
+                "Citron: Param 1 is {param1}, param 2 is {param2}, and param 3 is {param3}."
+              ]
+            },
+            "echo": {
+              "description": "This is a test line for param1=charlie and param2=echo.",
+              "lines": [
+                "Dandelion: Param 1 is {param1}, param 2 is {param2}, and param 3 is {param3}."
+              ]
             }
+          }
         },
         ".*nana": {
-            "description": "This is a test line for param1 ending with 'nana'.",
-            "lines": [
-                "String ended with nana!"
-            ]
+          "description": "This is a test line for param1 ending with 'nana'.",
+          "lines": [
+            "String ended with nana!"
+          ]
         },
         "default": {
-            "description": "This is a catch-all test line for any other value of param1.",
-            "lines": [
-                "Catch-all: Param 1 is set to {param1}, param 2 is {param2}, and param 3 is {param3}."
-            ]
+          "description": "This is a catch-all test line for any other value of param1.",
+          "lines": [
+            "Catch-all: Param 1 is set to {param1}, param 2 is {param2}, and param 3 is {param3}."
+          ]
         }
       }
     }

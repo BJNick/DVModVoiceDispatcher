@@ -99,7 +99,8 @@ namespace VoiceDispatcherMod {
             }
             try {
                 // Apply caseString as regex to matchString
-                var regex = new System.Text.RegularExpressions.Regex(caseString, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                var pattern = "^" + caseString + "$"; // Ensure full match
+                var regex = new System.Text.RegularExpressions.Regex(pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                 return regex.IsMatch(matchString);
             } catch (Exception e) {
                 LogError($"Error matching '{matchString}' with case string '{caseString}': {e.Message}");

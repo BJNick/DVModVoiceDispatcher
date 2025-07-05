@@ -1,0 +1,56 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DialogueData",
+  "type": "object",
+  "properties": {
+    "line_groups": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/LineGroup"
+      }
+    },
+    "type_maps": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/TypeMap"
+      }
+    }
+  },
+  "required": ["line_groups", "type_maps"],
+  "definitions": {
+    "LineGroup": {
+      "type": "object",
+      "properties": {
+        "description": { "type": "string" },
+        "placeholders": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "lines": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "match_string": { "type": "string" },
+        "match_map": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/definitions/LineGroup" }
+        }
+      },
+      "oneOf": [
+        { "required": ["lines"] },
+        { "required": ["match_string", "match_map"] }
+      ]
+    },
+    "TypeMap": {
+      "type": "object",
+      "properties": {
+        "description": { "type": "string" },
+        "map": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      },
+      "required": ["map"]
+    }
+  }
+}

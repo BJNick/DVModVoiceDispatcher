@@ -113,7 +113,8 @@ namespace VoiceDispatcherMod {
                 return text;
             }
             foreach (var kvp in replacements) {
-                text = text.Replace(kvp.Key, kvp.Value);
+                var key = kvp.Key.StartsWith("{") ? kvp.Key : "{" + kvp.Key + "}";
+                text = text.Replace(key, kvp.Value);
             }
             return text;
         }
@@ -129,9 +130,12 @@ namespace VoiceDispatcherMod {
                 if (typeMap.map.TryGetValue(key, out var mappedValue)) {
                     return mappedValue;
                 }
+                if (typeMap.map.TryGetValue("default", out var defaultMappedValue)) {
+                    return defaultMappedValue;
+                }
             }
             LogError($"Mapping for type '{type}' and key '{key}' not found.");
             return key; // Return the original key if no mapping is found
     }
-        }
+    }
 }

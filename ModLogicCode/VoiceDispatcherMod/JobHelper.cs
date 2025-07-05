@@ -56,10 +56,12 @@ namespace VoiceDispatcherMod {
         }
 
         public static void ReadJobOverview(Job job) {
-            var lineBuilder = new List<string>();
-            lineBuilder.Add("YouHave");
-            AddJobSpecificLines(lineBuilder, job);
-            CommsRadioNarrator.PlayWithClick(lineBuilder);
+            //var lineBuilder = new List<string>();
+            //lineBuilder.Add("YouHave");
+            //AddJobSpecificLines(lineBuilder, job);
+            var line = CreateShuntingLoadJobLineFromJson(job);
+            Main.Logger.Log(line);
+            CommsRadioNarrator.GenerateAndPlay(line);
         }
 
         public static void AddJobSpecificLines(List<string> lineBuilder, Job job) {
@@ -125,6 +127,33 @@ namespace VoiceDispatcherMod {
             lineBuilder.Add("AtTrackType" + GetTrackTypeLetter(jobInfo.destinationTrack));
             lineBuilder.AddRange(VoicedTrackId(jobInfo.destinationTrack));
             lineBuilder.Add("ForDeparture");
+        }
+
+        public static string CreateShuntingLoadJobLineFromJson(Job job) {
+            if (job == null || job.tasks == null || job.tasks.Count == 0) {
+                Main.Logger.Error("Invalid job or no tasks found.");
+                return "Error parsing job data.";
+            }
+
+            var jobInfo = JobDataExtractor.ExtractShuntingLoadJobData(new Job_data(job));
+            Dictionary<string, string> replacements = new Dictionary<string, string> {
+                { "job_type_name", job.jobType.MapToJobTypeName() },
+                { "job_type_id", job.jobType.ToString() },
+                { "yard_id", jobInfo.destinationTrack.yardId },
+                { "yard_name", jobInfo.destinationTrack.MapToYardName() },
+                { "number_of_pickups", jobInfo.startingTracksData.Count.ToString() },
+                { "loading_track_name", jobInfo.loadMachineTrack.MapToTrackName() },
+                { "destination_track_name", jobInfo.destinationTrack.MapToTrackName() },
+                { "destination_number_of_cars", jobInfo.allCarsToLoad.Count.ToString() },
+            };
+            for (var i = 0; i < jobInfo.startingTracksData.Count; i++) {
+                var trackData = jobInfo.startingTracksData[i];
+                var trackName = trackData.track.MapToTrackName();
+                var carCount = trackData.cars.Count.ToString();
+                replacements.Add($"pickup_{i+1}_track_name", trackName);
+                replacements.Add($"pickup_{i+1}_number_of_cars", carCount);
+            }
+            return JsonLinesLoader.GetRandomAndReplace("shunting_load_job_overview", replacements);
         }
 
         public static void AddShuntingUnloadJobLines(List<string> lineBuilder, Job job) {

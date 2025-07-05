@@ -41,6 +41,9 @@ namespace VoiceDispatcherMod {
             if (lineGroup == null || lineGroup.lines.Count == 0) {
                 return string.Empty;
             }
+            if (lineGroup.lines.Count == 1) {
+                return lineGroup.lines[0];
+            }
 
             int lastIndex = LastSelectedIndexMap.TryGetValue(lineGroup.description, out var value) ? value : -1;
             int generatedIndex = -1;

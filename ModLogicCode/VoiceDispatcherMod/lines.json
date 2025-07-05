@@ -80,9 +80,9 @@
         "{destination_track_name}",
         "{destination_yard_name}"
       ],
-        "lines": [
-            "A {job_type_name}. Pick up {number_of_cars} cars from track {starting_track_name} in {starting_yard_name}. Then drop them off at track {destination_track_name} in {destination_yard_name}."
-        ]
+      "lines": [
+        "A {job_type_name}. Pick up {number_of_cars} cars from track {starting_track_name} in {starting_yard_name}. Then drop them off at track {destination_track_name} in {destination_yard_name}."
+      ]
     },
     "shunting_load_job_overview": {
       "description": "A full job overview when accepting a new shunting load job.",
@@ -110,13 +110,13 @@
         "2": {
           "description": "A job with two pickups.",
           "lines": [
-            "A {job_type_name}. Couple {pickup_1_number_of_cars} cars at track {pickup_1_track_name}, and {pickup_2_number_of_cars} cars at track {pickup_2_track_name}. Then load at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
+            "A {job_type_name}. Couple {pickup_1_number_of_cars} cars at track {pickup_1_track_name}, and {pickup_2_number_of_cars} cars at track {pickup_2_track_name}. Then load {destination_number_of_cars} cars at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
           ]
         },
         "3": {
           "description": "A job with three pickups.",
           "lines": [
-            "A {job_type_name}. Couple {pickup_1_number_of_cars} cars at track {pickup_1_track_name}, {pickup_2_number_of_cars} cars at track {pickup_2_track_name}, and {pickup_3_number_of_cars} cars at track {pickup_3_track_name}. Then load at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
+            "A {job_type_name}. Couple {pickup_1_number_of_cars} cars at track {pickup_1_track_name}, {pickup_2_number_of_cars} cars at track {pickup_2_track_name}, and {pickup_3_number_of_cars} cars at track {pickup_3_track_name}. Then load {destination_number_of_cars} cars at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
           ]
         },
         "default": {
@@ -166,6 +166,58 @@
           "description": "A job with a high number of dropoffs.",
           "lines": [
             "A {job_type_name}. It has {number_of_dropoffs} dropoffs, and with that I wish you luck. Pick up {starting_number_of_cars} cars at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple at a bunch of different tracks to complete the order."
+          ]
+        }
+      }
+    },
+    "track_name": {
+      "description": "Maps the name of a track. Should be short like 'Alfa 1'. Example yard_id=HB, sub_yard_id=B, order_number=3, track_type=M",
+      "placeholders": [
+        "{yard_id}",
+        "{sub_yard_id}",
+        "{order_number}",
+        "{track_type}"
+      ],
+      "match_string": "{sub_yard_id}",
+      "match_map": {
+        "A": {
+          "lines": [
+            "Alfa {order_number}"
+          ]
+        },
+        "B": {
+          "lines": [
+            "Bravo {order_number}"
+          ]
+        },
+        "C": {
+          "lines": [
+            "Charlie {order_number}"
+          ]
+        },
+        "D": {
+          "lines": [
+            "Delta {order_number}"
+          ]
+        },
+        "E": {
+          "lines": [
+            "Echo {order_number}"
+          ]
+        },
+        "F": {
+          "lines": [
+            "Foxtrot {order_number}"
+          ]
+        },
+        "G": {
+          "lines": [
+            "Golf {order_number}"
+          ]
+        },
+        "default": {
+          "lines": [
+            "{sub_yard_id} {order_number}"
           ]
         }
       }
@@ -249,7 +301,19 @@
         "OWC": "Oil Well Central",
         "OWN": "Oil Well North",
         "SM": "Steel Mill",
-        "SW": "Sawmill"
+        "SW": "Sawmill",
+        "default": "Unknown Yard"
+      }
+    },
+    "job_type": {
+      "description": "Takes the job type ID and returns the full name of the job type.",
+      "map": {
+        "ShuntingLoad": "Loading Order",
+        "ShuntingUnload": "Unloading Order",
+        "Transport": "Transport Order",
+        "EmptyHaul": "Logistical Order",
+        "ComplexTransport": "Complex Order",
+        "default": "Custom Order"
       }
     }
   }

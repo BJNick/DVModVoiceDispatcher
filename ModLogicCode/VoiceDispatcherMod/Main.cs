@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using DV.Localization;
 using DV.Logic.Job;
 using HarmonyLib;
-using PiperSharp.Tests.Tests;
 using UnityEngine;
 using UnityModManagerNet;
 using static VoiceDispatcherMod.JobHelper;
@@ -203,7 +201,15 @@ namespace VoiceDispatcherMod {
             }
             
             if (Input.GetKeyDown(KeyCode.Semicolon)) {
-                CommsRadioNarrator.GenerateAndPlay(JsonLinesLoader.GetRandomAndReplace("derailment"));
+                List<Line> lines = new List<Line>();
+                lines.Add(new AssetBundleLine("NoiseClick"));
+                lines.Add(new PromptLine("0"));
+                lines.Add(new PromptLine("2"));
+                lines.Add(new PromptLine("5"));
+                lines.Add(new AssetBundleLine("NoiseClick"));
+                var coroutineRunner = new GameObject().AddComponent<CommsRadioNarrator.CoroutineRunner>();
+                coroutineRunner.StartCoroutine(
+                    LineChain.PlayClipsInCoroutine(lines, coroutineRunner));
             }
 
             if (JobsManager.Instance != null) {

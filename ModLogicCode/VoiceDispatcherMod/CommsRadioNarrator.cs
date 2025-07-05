@@ -472,7 +472,7 @@ namespace VoiceDispatcherMod {
             source.Play();
         }
 
-        private static AudioClip GetVoicedClip(string name) {
+        public static AudioClip GetVoicedClip(string name) {
             var voicedLines = Main.GetVoiceLinesBundle();
             if (!voicedLines) {
                 Main.Logger.Error("Voiced lines asset bundle is not loaded.");

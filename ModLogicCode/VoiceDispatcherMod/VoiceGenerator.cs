@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using System.Threading.Tasks;
 using PiperSharp;
@@ -100,6 +101,22 @@ namespace VoiceDispatcherMod {
                     throw new IOException($"Failed to load audio: {www.error}");
 
                 return DownloadHandlerAudioClip.GetContent(www);
+            }
+        }
+        
+        public static IEnumerator LoadAudioClipFromFileCoroutine(string filePath, Action<AudioClip> onLoaded, AudioType audioType = AudioType.WAV) {
+            string uri = "file://" + filePath;
+            using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, audioType)) {
+                yield return www.SendWebRequest();
+
+                if (www.responseCode != 200) {
+                    Main.Logger.Error($"Failed to load audio: {www.error}");
+                    onLoaded?.Invoke(null);
+                    yield break;
+                }
+
+                var clip = DownloadHandlerAudioClip.GetContent(www);
+                onLoaded?.Invoke(clip);
             }
         }
 

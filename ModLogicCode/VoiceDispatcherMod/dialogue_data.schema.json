@@ -40,7 +40,8 @@
       "oneOf": [
         { "required": ["lines"] },
         { "required": ["match_string", "match_map"] }
-      ]
+      ],
+      "additionalProperties": false
     },
     "TypeMap": {
       "type": "object",
@@ -51,7 +52,8 @@
           "additionalProperties": { "type": "string" }
         }
       },
-      "required": ["map"]
+      "required": ["map"],
+      "additionalProperties": false
     },
     "LanguageSettings": {
       "type": "object",
@@ -59,7 +61,8 @@
         "sentence_delimiter": { "type": "string" },
         "clause_delimiter": { "type": "string" }
       },
-      "required": ["sentence_delimiter", "clause_delimiter"]
+      "required": ["sentence_delimiter", "clause_delimiter"],
+      "additionalProperties": false
     }
   }
 }

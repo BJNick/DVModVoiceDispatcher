@@ -189,22 +189,22 @@
       "match_string": "{warehouse_task_type}",
       "match_map": {
         "Unloading": {
-            "lines": [
-                "Unload {car_count} at track {warehouse_track_name} in {warehouse_yard_name}."
-            ]
+          "lines": [
+            "Unload {car_count} at track {warehouse_track_name} in {warehouse_yard_name}."
+          ]
         },
         "Loading": {
-            "lines": [
-                "Load {car_count} at track {warehouse_track_name} in {warehouse_yard_name}."
-            ]
+          "lines": [
+            "Load {car_count} at track {warehouse_track_name} in {warehouse_yard_name}."
+          ]
         },
         "default": {
           "match_string": "{starting_yard_name}-{destination_yard_name}",
           "match_map": {
             "(.+)-\\1": {
-                "lines": [
-                    "Move {car_count} from track {starting_track_name} to track {destination_track_name} in {destination_yard_name}."
-                ]
+              "lines": [
+                "Move {car_count} from track {starting_track_name} to track {destination_track_name} in {destination_yard_name}."
+              ]
             },
             "default": {
               "lines": [
@@ -212,6 +212,30 @@
               ]
             }
           }
+        }
+      }
+    },
+    "you_have_n_orders": {
+      "description": "A sentence that says the player has a certain number of orders.",
+      "placeholders": [
+        "{count}"
+      ],
+      "match_string": "{count}",
+      "match_map": {
+        "0": {
+          "lines": [
+            "You have no orders."
+          ]
+        },
+        "1": {
+          "lines": [
+            "You have {count} order."
+          ]
+        },
+        "default": {
+          "lines": [
+            "You have {count} orders."
+          ]
         }
       }
     },

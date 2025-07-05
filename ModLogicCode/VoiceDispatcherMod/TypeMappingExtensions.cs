@@ -27,7 +27,7 @@ namespace VoiceDispatcherMod {
         }
 
         public static string MapToYardName(this TrackID trackId) {
-            return JsonLinesLoader.MapType("yard_id", trackId.yardId);
+            return JsonLinesLoader.MapType("yard_id", trackId?.yardId);
         }
         
         public static string MapToYardName(this Track track) {
@@ -35,7 +35,7 @@ namespace VoiceDispatcherMod {
         }
 
         public static string MapToYardName(this StationInfo stationInfo) {
-            return JsonLinesLoader.MapType("yard_id", stationInfo.YardID);
+            return JsonLinesLoader.MapType("yard_id", stationInfo?.YardID);
         }
 
         public static string MapToCarCount<T>(this List<T> cars) {

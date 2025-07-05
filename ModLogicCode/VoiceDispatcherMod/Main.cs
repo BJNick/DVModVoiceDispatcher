@@ -203,9 +203,12 @@ namespace VoiceDispatcherMod {
             if (Input.GetKeyDown(KeyCode.Semicolon)) {
                 List<Line> lines = new List<Line>();
                 lines.Add(new AssetBundleLine("NoiseClick"));
-                lines.Add(new PromptLine("0"));
-                lines.Add(new PromptLine("2"));
-                lines.Add(new PromptLine("5"));
+                lines.Add(new PromptLine("This is"));
+                lines.Add(new PromptLine("CFF 4 3 1"));
+                lines.Add(new PromptLine("First line of a prompt"));
+                lines.Add(new PromptLine("Second line of a prompt"));
+                lines.Add(new PromptLine("Third line of a prompt"));
+                lines.Add(new PromptLine("Final line of a prompt"));
                 lines.Add(new AssetBundleLine("NoiseClick"));
                 var coroutineRunner = new GameObject().AddComponent<CommsRadioNarrator.CoroutineRunner>();
                 coroutineRunner.StartCoroutine(

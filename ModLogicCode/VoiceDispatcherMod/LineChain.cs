@@ -161,23 +161,30 @@ namespace VoiceDispatcherMod {
             var index = 0;
             
             while (index < lineChain.Count) {
-                Main.Logger.Log("Creating line: " + lineChain[index].SubtitleText);
                 var currentLine = lineChain[index];
                 currentLine.CreateClip(coroutineRunner);
             
                 while (!currentLine.IsClipReady && !currentLine.IsClipFailed) {
                     yield return null;
                 }
-            
-                if (index + 1 < lineChain.Count) {
-                    var nextLine = lineChain[index + 1];
-                    nextLine.CreateClip(coroutineRunner);
-                }
                 
                 Main.Logger.Log("Playing line: " + lineChain[index].SubtitleText);
                 CommsRadioNarrator.PlayRadioClip(currentLine.AudioClip);
                 
                 while (source.isPlaying) {
+                    // Pre-generate the upcoming line clips while the current one is playing
+                    for (int i = index + 1; i < lineChain.Count; i++) {
+                        var upcomingLine = lineChain[i];
+                        if (upcomingLine.IsClipInProgress) {
+                            break;
+                        }
+                        if (!upcomingLine.IsClipReady && !upcomingLine.IsClipFailed) {
+                            Main.Logger.Log("Creating line: " + lineChain[i].SubtitleText);
+                            upcomingLine.CreateClip(coroutineRunner);
+                            break;
+                        }
+                    }
+                    
                     yield return null;
                 }
                 index++;

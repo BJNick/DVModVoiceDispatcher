@@ -90,7 +90,9 @@ namespace VoiceDispatcherMod {
 
             var replacements = new Dictionary<string, string> {
                 { "job_type", job.jobType.MapToJobTypeName() },
-                { "destination", JobHelper.ExtractSomeDestinationTrack(job).MapToYardName() },
+                { "job_type_id", job.jobType.ToString() },
+                { "destination_yard_name", JobHelper.ExtractSomeDestinationTrack(job).MapToYardName() },
+                { "destination_track_name", JobHelper.ExtractSomeDestinationTrack(job).MapToTrackName() },
                 { "exact_payout", Mathf.RoundToInt(job.initialWage).ToString() },
                 { "rounded_payout", RoundDown(Mathf.RoundToInt(job.initialWage)).ToString() }
             };

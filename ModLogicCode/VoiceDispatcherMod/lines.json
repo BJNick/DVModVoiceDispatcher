@@ -30,17 +30,35 @@
       "description": "Lines reporting the highest paying job available. {job_type} is replaced with the type of job, {destination} with the destination, and {payout} with the payout amount.",
       "placeholders": [
         "{job_type}",
-        "{destination}",
+        "{job_type_id}",
+        "{destination_yard_name}",
+        "{destination_track_name}",
         "{exact_payout}",
         "{rounded_payout}"
       ],
-      "lines": [
-        "The highest paying job is: {job_type} to {destination} at a rate of {rounded_payout} dollars.",
-        "If you want a good payout, consider taking {job_type} to {destination} for {rounded_payout} dollars.",
-        "{rounded_payout} dollars are on the table for {job_type} to {destination}.",
-        "Chasing profits? {job_type} to {destination} is your ticket to {rounded_payout} dollars.",
-        "Top of the board: {job_type} to {destination} with a reward of {rounded_payout} dollars."
-      ]
+      "match_string": "{job_type_id}",
+      "match_map": {
+        "ShuntingLoad|ShuntingUnload": {
+          "description": "Lines for shunting load or unload jobs. Destination is the current yard.",
+          "lines": [
+            "The highest paying job is: {job_type} at a rate of {rounded_payout} dollars.",
+            "If you want a good payout, consider taking {job_type} here for {rounded_payout} dollars.",
+            "{rounded_payout} dollars are on the table for {job_type} right here at {destination_yard_name}.",
+            "Chasing profits? {job_type} here is your ticket to {rounded_payout} dollars.",
+            "Top of the board: {job_type} with a reward of {rounded_payout} dollars."
+          ]
+        },
+        "default": {
+            "description": "Lines for transport or empty haul jobs. Destination is a different yard.",
+          "lines": [
+            "The highest paying job is: {job_type} to {destination_yard_name} at a rate of {rounded_payout} dollars.",
+            "If you want a good payout, consider taking {job_type} to {destination_yard_name} for {rounded_payout} dollars.",
+            "{rounded_payout} dollars are on the table for {job_type} to {destination_yard_name}.",
+            "Chasing profits? {job_type} to {destination_yard_name} is your ticket to {rounded_payout} dollars.",
+            "Top of the board: {job_type} to {destination_yard_name} with a reward of {rounded_payout} dollars."
+          ]
+        }
+      }
     },
     "derailment": {
       "description": "Lines that play when the player derails the train. These lines are meant to be humorous and sarcastic.",

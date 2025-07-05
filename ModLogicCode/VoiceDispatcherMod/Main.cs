@@ -195,9 +195,9 @@ namespace VoiceDispatcherMod {
             }
 
             if (Input.GetKeyDown(KeyCode.P)) {
-                var lineBuilder = new List<string>();
-                AddGenericJobLines(lineBuilder, JobsManager.Instance.currentJobs.First());
-                CommsRadioNarrator.PlayWithClick(lineBuilder);
+                var line = CreateGenericJobLineFromJson(JobsManager.Instance.currentJobs.First());
+                Logger.Log(line);
+                CommsRadioNarrator.GenerateAndPlay(line);
             }
 
             if (Input.GetKeyDown(KeyCode.O)) {

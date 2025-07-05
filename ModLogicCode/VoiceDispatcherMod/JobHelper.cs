@@ -17,6 +17,19 @@ namespace VoiceDispatcherMod {
                 AddTaskLines(task, lineBuilder);
             }
         }
+        
+        public static string CreateGenericJobLineFromJson(Job job) {
+            if (job == null || job.tasks == null || job.tasks.Count == 0) {
+                Main.Logger.Error("Invalid job or no tasks found.");
+                return "Error parsing job data.";
+            }
+            var lineBuilder = new List<string>();
+            lineBuilder.Add(job.jobType.MapToJobTypeName() + ".");
+            foreach (var task in job.tasks) {
+                lineBuilder.Add(CreateTaskLineFromJson(task));
+            }
+            return string.Join(" ", lineBuilder);
+        }
 
         public static void ReadFirstJobOverview() {
             if (JobsManager.Instance == null || JobsManager.Instance.currentJobs == null ||
@@ -366,6 +379,33 @@ namespace VoiceDispatcherMod {
 
                 lineBuilder.AddRange(VoicedTrackId(end.ID));
             }
+        }
+        
+        public static string CreateTaskLineFromJson(Task task) {
+            var taskData = task.GetTaskData();
+            if (taskData.nestedTasks != null && taskData.nestedTasks.Count > 0) {
+                var nestedLines = new List<string>();
+                foreach (var nestedTask in taskData.nestedTasks) {
+                    nestedLines.Add(CreateTaskLineFromJson(nestedTask));
+                }
+                return string.Join(" ", nestedLines);
+            }
+
+            var start = taskData.startTrack;
+            var end = taskData.destinationTrack;
+            
+            Dictionary<string, string> replacements = new Dictionary<string, string> {
+                { "warehouse_task_type", taskData.warehouseTaskType.ToString() },
+                { "car_count",  taskData.cars?.MapToCarCount() ?? "" },
+                { "starting_track_name", start?.MapToTrackName() ?? "" },
+                { "starting_yard_name", start?.MapToYardName() ?? "" },
+                { "destination_track_name", end?.MapToTrackName() ?? "" },
+                { "destination_yard_name", end?.MapToYardName() ?? "" },
+                { "warehouse_track_name", end?.MapToTrackName() ?? "" },
+                { "warehouse_yard_name", end?.MapToYardName() ?? "" }
+            };
+
+            return JsonLinesLoader.GetRandomAndReplace("generic_job_task", replacements);
         }
 
         public static TrackID ExtractTransportDestinationTrack(Job job) {

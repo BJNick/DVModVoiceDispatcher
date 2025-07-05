@@ -17,6 +17,10 @@ namespace VoiceDispatcherMod {
             Main.Logger.Warning(replacements.ToString());
             return JsonLinesLoader.GetRandomAndReplace("track_name", replacements);
         }
+        
+        public static string MapToTrackName(this Track track) {
+            return track.ID.MapToTrackName();
+        }
 
         public static string MapToJobTypeName(this JobType jobType) {
             return JsonLinesLoader.MapType("job_type", jobType.ToString());
@@ -24,6 +28,10 @@ namespace VoiceDispatcherMod {
 
         public static string MapToYardName(this TrackID trackId) {
             return JsonLinesLoader.MapType("yard_id", trackId.yardId);
+        }
+        
+        public static string MapToYardName(this Track track) {
+            return track.ID.MapToYardName();
         }
 
         public static string MapToYardName(this StationInfo stationInfo) {

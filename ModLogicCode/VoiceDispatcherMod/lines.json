@@ -170,6 +170,47 @@
         }
       }
     },
+    "generic_job_task": {
+      "description": "Sentence of an overview for a job that is not a typical type (modded).",
+      "placeholders": [
+        "{warehouse_task_type}",
+        "{car_count}",
+        "{starting_track_name}",
+        "{starting_yard_name}",
+        "{destination_track_name}",
+        "{destination_yard_name}",
+        "{warehouse_track_name}",
+        "{warehouse_yard_name}"
+      ],
+      "match_string": "{warehouse_task_type}",
+      "match_map": {
+        "Unloading": {
+            "lines": [
+                "Unload {car_count} at track {warehouse_track_name} in {warehouse_yard_name}."
+            ]
+        },
+        "Loading": {
+            "lines": [
+                "Load {car_count} at track {warehouse_track_name} in {warehouse_yard_name}."
+            ]
+        },
+        "default": {
+          "match_string": "{starting_yard_name}-{destination_yard_name}",
+          "match_map": {
+            "(.+)-\\1": {
+                "lines": [
+                    "Move {car_count} from track {starting_track_name} to track {destination_track_name} in {destination_yard_name}."
+                ]
+            },
+            "default": {
+              "lines": [
+                "Move {car_count} from track {starting_track_name} in {starting_yard_name} to track {destination_track_name} in {destination_yard_name}."
+              ]
+            }
+          }
+        }
+      }
+    },
     "car_count": {
       "description": "Number followed by 'cars' in the proper plural form.",
       "placeholders": [

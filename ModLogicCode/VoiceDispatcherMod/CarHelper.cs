@@ -9,14 +9,17 @@ namespace VoiceDispatcherMod {
         public static string lastClickedCarId = string.Empty;
 
         public static void OnCarClicked(TrainCar car) {
-            var job = JobsManager.Instance.GetJobOfCar(car.logicCar);
+            /*var job = JobsManager.Instance.GetJobOfCar(car.logicCar);
             if (job != null && lastClickedCarId != car.ID && JobsManager.Instance.currentJobs.Count > 0) {
                 TerseCommentOnCarJob(job);
                 lastClickedCarId = car.ID;
             } else {
                 DetailedCommentOnCar(car, job);
                 lastClickedCarId = "";
-            }
+            }*/
+            var line = CreateCarIdLine(car);
+            Main.Logger.Log(line);
+            CommsRadioNarrator.GenerateAndPlay(line);
         }
 
         public static void TerseCommentOnCarJob(Job job) {
@@ -29,6 +32,14 @@ namespace VoiceDispatcherMod {
             }
 
             CommsRadioNarrator.PlayWithClick(lineBuilder);
+        }
+        
+        public static string CreateCarIdLine(TrainCar car) {
+            if (car == null || string.IsNullOrEmpty(car.ID)) {
+                Main.Logger.Error("Cannot create car ID line: car is null or ID is empty.");
+                return "UnknownCar";
+            }
+            return car.MapToCarID();
         }
 
         public static void DetailedCommentOnCar(TrainCar car, Job job) {

@@ -7,21 +7,6 @@ using static VoiceDispatcherMod.VoicingUtils;
 
 namespace VoiceDispatcherMod {
     public static class JobHelper {
-        public static string CreateGenericJobLineFromJson(Job job) {
-            if (job == null || job.tasks == null || job.tasks.Count == 0) {
-                Main.Logger.Error("Invalid job or no tasks found.");
-                return "Error parsing job data.";
-            }
-
-            var lineBuilder = new List<string>();
-            lineBuilder.Add(job.jobType.MapToJobTypeName() + JsonLinesLoader.SentenceDelimiter());
-            foreach (var task in job.tasks) {
-                lineBuilder.Add(CreateTaskLineFromJson(task));
-            }
-
-            return string.Join(" ", lineBuilder);
-        }
-
         public static void ReadFirstJobOverview() {
             if (JobsManager.Instance == null || JobsManager.Instance.currentJobs == null ||
                 JobsManager.Instance.currentJobs.Count == 0) {
@@ -50,7 +35,7 @@ namespace VoiceDispatcherMod {
             }));
 
             foreach (var job in jobs) {
-                lineBuilder.Add(CreateJobSpecificLineFromJson(job));
+                lineBuilder.Add(CreateJobSpecificLine(job));
             }
             var fullJobOverview = string.Join(" ", lineBuilder);
 
@@ -58,22 +43,22 @@ namespace VoiceDispatcherMod {
         }
 
         public static void ReadJobOverview(Job job) {
-            var line = CreateJobSpecificLineFromJson(job);
+            var line = CreateJobSpecificLine(job);
             Main.Logger.Log(line);
             CommsRadioNarrator.GenerateAndPlay(line);
         }
 
-        public static string CreateJobSpecificLineFromJson(Job job) {
+        public static string CreateJobSpecificLine(Job job) {
             return job.jobType switch {
-                JobType.ShuntingLoad => CreateShuntingLoadJobLineFromJson(job),
-                JobType.ShuntingUnload => CreateShuntingUnloadJobLineFromJson(job),
-                JobType.Transport => CreateTransportJobLineFromJson(job),
-                JobType.EmptyHaul => CreateEmptyHaulJobLineFromJson(job),
-                _ => CreateGenericJobLineFromJson(job)
+                JobType.ShuntingLoad => CreateShuntingLoadJobLine(job),
+                JobType.ShuntingUnload => CreateShuntingUnloadJobLine(job),
+                JobType.Transport => CreateTransportJobLine(job),
+                JobType.EmptyHaul => CreateEmptyHaulJobLine(job),
+                _ => CreateGenericJobLine(job)
             };
         }
         
-        public static string CreateShuntingLoadJobLineFromJson(Job job) {
+        public static string CreateShuntingLoadJobLine(Job job) {
             if (job?.tasks == null || job.tasks.Count == 0) {
                 Main.Logger.Error("Invalid job or no tasks found.");
                 return "Error parsing job data.";
@@ -101,7 +86,7 @@ namespace VoiceDispatcherMod {
             return JsonLinesLoader.GetRandomAndReplace("shunting_load_job_overview", replacements);
         }
         
-        public static string CreateShuntingUnloadJobLineFromJson(Job job) {
+        public static string CreateShuntingUnloadJobLine(Job job) {
             if (job?.tasks == null || job.tasks.Count == 0) {
                 Main.Logger.Error("Invalid job or no tasks found.");
                 return "Error parsing job data.";
@@ -129,29 +114,29 @@ namespace VoiceDispatcherMod {
             return JsonLinesLoader.GetRandomAndReplace("shunting_unload_job_overview", replacements);
         }
 
-        public static string CreateTransportJobLineFromJson(Job job) {
+        public static string CreateTransportJobLine(Job job) {
             if (job?.tasks == null || job.tasks.Count == 0) {
                 Main.Logger.Error("Invalid job or no tasks found.");
                 return "Error parsing job data.";
             }
 
             var jobInfo = JobDataExtractor.ExtractTransportJobData(new Job_data(job));
-            return CreateBasicTransportJobLineFromJson(job.jobType, jobInfo.transportingCars,
+            return CreateBasicTransportJobLine(job.jobType, jobInfo.transportingCars,
                 jobInfo.startingTrack, jobInfo.destinationTrack);
         }
 
-        public static string CreateEmptyHaulJobLineFromJson(Job job) {
+        public static string CreateEmptyHaulJobLine(Job job) {
             if (job == null || job.tasks == null || job.tasks.Count == 0) {
                 Main.Logger.Error("Invalid job or no tasks found.");
                 return "Error parsing job data.";
             }
 
             var jobInfo = JobDataExtractor.ExtractEmptyHaulJobData(new Job_data(job));
-            return CreateBasicTransportJobLineFromJson(job.jobType, jobInfo.transportingCars,
+            return CreateBasicTransportJobLine(job.jobType, jobInfo.transportingCars,
                 jobInfo.startingTrack, jobInfo.destinationTrack);
         }
 
-        public static string CreateBasicTransportJobLineFromJson(JobType jobType,
+        public static string CreateBasicTransportJobLine(JobType jobType,
             List<Car_data> transportingCars,
             TrackID startingTrack, TrackID destinationTrack) {
             Dictionary<string, string> replacements = new Dictionary<string, string> {
@@ -166,12 +151,27 @@ namespace VoiceDispatcherMod {
             return JsonLinesLoader.GetRandomAndReplace("transport_job_overview", replacements);
         }
         
-        public static string CreateTaskLineFromJson(Task task) {
+        public static string CreateGenericJobLine(Job job) {
+            if (job == null || job.tasks == null || job.tasks.Count == 0) {
+                Main.Logger.Error("Invalid job or no tasks found.");
+                return "Error parsing job data.";
+            }
+
+            var lineBuilder = new List<string>();
+            lineBuilder.Add(job.jobType.MapToJobTypeName() + JsonLinesLoader.SentenceDelimiter());
+            foreach (var task in job.tasks) {
+                lineBuilder.Add(CreateGenericTaskLine(task));
+            }
+
+            return string.Join(" ", lineBuilder);
+        }
+        
+        public static string CreateGenericTaskLine(Task task) {
             var taskData = task.GetTaskData();
             if (taskData.nestedTasks != null && taskData.nestedTasks.Count > 0) {
                 var nestedLines = new List<string>();
                 foreach (var nestedTask in taskData.nestedTasks) {
-                    nestedLines.Add(CreateTaskLineFromJson(nestedTask));
+                    nestedLines.Add(CreateGenericTaskLine(nestedTask));
                 }
 
                 return string.Join(" ", nestedLines);

@@ -270,6 +270,7 @@
     <Compile Include="CommsRadioNarrator.cs" />
     <Compile Include="JobHelper.cs" />
     <Compile Include="JsonLinesLoader.cs" />
+    <Compile Include="LineChain.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="NarratorLineQueue.cs" />
     <Compile Include="PiperSharp\Extensions.cs" />

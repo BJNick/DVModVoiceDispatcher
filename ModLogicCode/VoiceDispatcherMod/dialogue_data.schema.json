@@ -14,9 +14,10 @@
       "additionalProperties": {
         "$ref": "#/definitions/TypeMap"
       }
-    }
+    },
+    "language_settings": { "$ref":"#/definitions/LanguageSettings" }
   },
-  "required": ["line_groups", "type_maps"],
+  "required": ["line_groups", "type_maps", "language_settings"],
   "definitions": {
     "LineGroup": {
       "type": "object",
@@ -51,6 +52,14 @@
         }
       },
       "required": ["map"]
+    },
+    "LanguageSettings": {
+      "type": "object",
+      "properties": {
+        "sentence_delimiter": { "type": "string" },
+        "clause_delimiter": { "type": "string" }
+      },
+      "required": ["sentence_delimiter", "clause_delimiter"]
     }
   }
 }

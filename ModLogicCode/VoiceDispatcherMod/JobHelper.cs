@@ -24,7 +24,7 @@ namespace VoiceDispatcherMod {
                 return "Error parsing job data.";
             }
             var lineBuilder = new List<string>();
-            lineBuilder.Add(job.jobType.MapToJobTypeName() + ".");
+            lineBuilder.Add(job.jobType.MapToJobTypeName() + JsonLinesLoader.SentenceDelimiter());
             foreach (var task in job.tasks) {
                 lineBuilder.Add(CreateTaskLineFromJson(task));
             }

@@ -8,6 +8,7 @@ namespace VoiceDispatcherMod {
     public class DialogueData {
         public Dictionary<string, LineGroup> line_groups;
         public Dictionary<string, TypeMap> type_maps;
+        public LanguageSettings language_settings;
     }
 
     [Serializable]
@@ -26,11 +27,17 @@ namespace VoiceDispatcherMod {
         public Dictionary<string, string> map;
     }
 
+    [Serializable]
+    public class LanguageSettings {
+        public string sentence_delimiter = ".";
+        public string clause_delimiter = ",";
+    }
+
     public static class JsonLinesLoader {
         private static string Path;
 
         public static DialogueData DialogueData;
-        
+
         public static Action<string> LogError = Console.WriteLine;
 
         public static void Init(string path) {
@@ -52,36 +59,43 @@ namespace VoiceDispatcherMod {
                 return null;
             }
         }
-        
+
         public static LineGroup GetBaseLineGroup(string groupName) {
             if (DialogueData.line_groups.TryGetValue(groupName, out var group)) {
                 return group;
             }
+
             LogError($"Line group '{groupName}' not found.");
             return null;
         }
-        
+
         public static LineGroup GetMatchedLineGroup(LineGroup baseLineGroup, Dictionary<string, string> replacements) {
             if (string.IsNullOrEmpty(baseLineGroup.match_string)) {
                 return baseLineGroup;
             }
+
             var replacedMatchString = Replace(baseLineGroup.match_string, replacements);
             if (TryFindMatchingInnerGroup(baseLineGroup, replacedMatchString, out var innerGroup)) {
                 return GetMatchedLineGroup(innerGroup, replacements);
             }
+
             // Try match string 'default' if available
             if (TryFindMatchingInnerGroup(baseLineGroup, "default", out innerGroup)) {
                 return GetMatchedLineGroup(innerGroup, replacements);
             }
-            LogError($"Could not find matched line group for '{baseLineGroup.description}' with match string '{replacedMatchString}' or default.");
+
+            LogError(
+                $"Could not find matched line group for '{baseLineGroup.description}' with match string '{replacedMatchString}' or default.");
             // Try any element in the match map
             if (baseLineGroup.match_map.Count > 0) {
                 return baseLineGroup.match_map.Values.First();
             }
-            LogError($"Could not find any match for '{baseLineGroup.description}' with match string '{baseLineGroup.match_string}'");
+
+            LogError(
+                $"Could not find any match for '{baseLineGroup.description}' with match string '{baseLineGroup.match_string}'");
             return baseLineGroup;
         }
-        
+
         public static bool TryFindMatchingInnerGroup(LineGroup group, string matchString, out LineGroup matchedGroup) {
             foreach (var groupKey in group.match_map.Keys) {
                 if (IsMatchingRegex(matchString, groupKey)) {
@@ -89,6 +103,7 @@ namespace VoiceDispatcherMod {
                     return true;
                 }
             }
+
             matchedGroup = null;
             return false;
         }
@@ -97,45 +112,59 @@ namespace VoiceDispatcherMod {
             if (matchString == null || caseString == null) {
                 return false;
             }
+
             try {
                 // Apply caseString as regex to matchString
                 var pattern = "^" + caseString + "$"; // Ensure full match
-                var regex = new System.Text.RegularExpressions.Regex(pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                var regex = new System.Text.RegularExpressions.Regex(pattern,
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                 return regex.IsMatch(matchString);
             } catch (Exception e) {
                 LogError($"Error matching '{matchString}' with case string '{caseString}': {e.Message}");
                 return false;
             }
         }
-        
+
         public static string Replace(string text, Dictionary<string, string> replacements) {
             if (replacements == null || replacements.Count == 0) {
                 return text;
             }
+
             foreach (var kvp in replacements) {
                 var key = kvp.Key.StartsWith("{") ? kvp.Key : "{" + kvp.Key + "}";
                 text = text.Replace(key, kvp.Value);
             }
+
             return text;
         }
-        
+
         public static string GetRandomAndReplace(string groupName, Dictionary<string, string> replacements = null) {
             var group = GetMatchedLineGroup(GetBaseLineGroup(groupName), replacements);
             var line = Randomizer.GetRandomLine(group);
             return Replace(line, replacements);
         }
-        
+
         public static string MapType(string type, string key) {
             if (DialogueData.type_maps.TryGetValue(type, out var typeMap)) {
                 if (typeMap.map.TryGetValue(key, out var mappedValue)) {
                     return mappedValue;
                 }
+
                 if (typeMap.map.TryGetValue("default", out var defaultMappedValue)) {
                     return defaultMappedValue;
                 }
             }
+
             LogError($"Mapping for type '{type}' and key '{key}' not found.");
             return key; // Return the original key if no mapping is found
-    }
+        }
+        
+        public static string SentenceDelimiter() {
+            return DialogueData?.language_settings?.sentence_delimiter ?? ".";
+        }
+        
+        public static string ClauseDelimiter() {
+            return DialogueData?.language_settings?.clause_delimiter ?? ",";
+        }
     }
 }

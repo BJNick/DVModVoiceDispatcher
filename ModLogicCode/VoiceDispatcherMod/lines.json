@@ -1,4 +1,8 @@
 ﻿{
+  "language_settings": {
+    "sentence_delimiter": ".",
+    "clause_delimiter": ","
+  },
   "line_groups": {
     "speed_report": {
       "description": "Lines reporting the player's current speed in km/h. {speed} is replaced with the number.",

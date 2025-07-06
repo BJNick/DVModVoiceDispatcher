@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using PiperSharp;
 using PiperSharp.Models;
@@ -15,6 +16,8 @@ namespace VoiceDispatcherMod {
         const string lines = "D:\\Projects\\Mods\\DVVoiceAssistant\\ModLogicCode\\VoiceDispatcherMod\\lines.json";
         
         public static void Main(string[] args) {
+            Console.InputEncoding = Encoding.UTF8;
+            Console.OutputEncoding = Encoding.UTF8;
             Randomizer.RandomRange = new Random().Next;
             JsonLinesLoader.Init(lines);
             string lastGroupName = "speed_report";

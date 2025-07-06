@@ -48,9 +48,10 @@ namespace PiperSharp {
             var soxProcess = SoxConfiguration.CreateSoxProcess(soxConfiguration);
             soxProcess.Start();
             
-            await piperProcess.StandardInput.WriteLineAsync(text.ToUtf8());
-            await piperProcess.StandardInput.FlushAsync();
-            piperProcess.StandardInput.Close();
+            using (var writer = new StreamWriter(piperProcess.StandardInput.BaseStream, Encoding.UTF8)) {
+                await writer.WriteLineAsync(text);
+                await writer.FlushAsync();
+            }
             
             using var ms = new MemoryStream();
             

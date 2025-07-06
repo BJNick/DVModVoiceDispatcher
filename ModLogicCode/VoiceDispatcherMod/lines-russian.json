@@ -126,7 +126,7 @@
         "{destination_track_name}",
         "{destination_yard_name}"
       ],
-      "line": "{job_type_name}. Заберите {car_count} с пути {starting_track_name} в {starting_yard_name}. Доставьте их в {destination_yard_name}. Затем оставьте на пути {destination_track_name}."
+      "line": "{job_type_name}. Заберите {car_count} с пути, {starting_track_name}, на станции {starting_yard_name}. Доставьте их на станцию {destination_yard_name}. Затем оставьте на пути, {destination_track_name}."
     },
     "you_have_n_orders": {
       "description": "A sentence that says the player has a certain number of orders.",
@@ -284,31 +284,15 @@
         "{track_type}"
       ],
       "match_string": "{sub_yard_id}",
-      "match_map": {
-        "A": {
-          "line": "Андрей {order_number}"
-        },
-        "B": {
-          "line": "Борис {order_number}"
-        },
-        "C": {
-          "line": "Центр {order_number}"
-        },
-        "D": {
-          "line": "Дмитрий {order_number}"
-        },
-        "E": {
-          "line": "Елена {order_number}"
-        },
-        "F": {
-          "line": "Фёдор {order_number}"
-        },
-        "G": {
-          "line": "Григорий {order_number}"
-        },
-        "default": {
-          "line": "{sub_yard_id} {order_number}"
-        }
+      "simple_match_map": {
+        "A": "Парк А, Путь {order_number}",
+        "B": "Парк Б, Путь {order_number}",
+        "C": "Парк Ц, Путь {order_number}",
+        "D": "Парк Д, Путь {order_number}",
+        "E": "Парк Е, Путь {order_number}",
+        "F": "Парк Ф, Путь {order_number}",
+        "G": "Парк Г, Путь {order_number}",
+        "default": "Парк {yard_id} Путь {order_number}"
       }
     },
     "car_id": {
@@ -324,14 +308,6 @@
         "{car_type_name}"
       ],
       "line": "{letter_part} {first_digit} {second_digit} {third_digit}"
-    },
-    "volume_check": {
-      "description": "Lines that play when the player checks the volume of the mod.",
-      "placeholders": [
-        "{volume}",
-        "{volume_spelled}"
-      ],
-      "line": "Проверка громкости. {volume_spelled}"
     },
     "parametrization_test": {
       "description": "Lines used for testing the parametrization of the mod. These lines are not meant to be used in the game.",
@@ -373,12 +349,14 @@
           "line": "Общий случай: Param 1 задан как {param1}, param 2 — {param2}, а param 3 — {param3}."
         }
       }
-    }
-  },
-  "type_maps": {
-    "yard_id": {
+    },
+    "yard_name": {
       "description": "Takes the yard ID and returns the full name of the yard.",
-      "map": {
+      "placeholders": [
+        "yard_id"
+      ],
+      "match_string": "{yard_id}",
+      "simple_match_map": {
         "CME": "Угольная шахта Восток",
         "CMS": "Угольная шахта Юг",
         "CP": "Угольная электростанция",
@@ -401,23 +379,31 @@
         "OWN": "Нефтяная вышка Северная",
         "SM": "Металлургический завод",
         "SW": "Лесопилка",
-        "default": "Неизвестная станция"
+        "default": "{yard_id}"
       }
     },
     "job_type": {
       "description": "Takes the job type ID and returns the full name of a single instance of job type order.",
-      "map": {
-        "ShuntingLoad": "Задание на загрузку",
+      "placeholders": [
+        "{job_type_id}"
+      ],
+      "match_string": "{job_type_id}",
+      "simple_match_map": {
+        "ShuntingLoad": "Задание на погрузку",
         "ShuntingUnload": "Задание на разгрузку",
-        "Transport": "Грузовое задание",
+        "Transport": "Задание на перевозку",
         "EmptyHaul": "Логистическое задание",
         "ComplexTransport": "Сложное задание",
         "default": "Пользовательское задание"
       }
     },
-    "digit": {
+    "number_name": {
       "description": "Takes a small number and returns its full name. Needed for some TTS engines that do not support numbers or have trouble saying them.",
-      "map": {
+      "placeholders": [
+        "{number}"
+      ],
+      "match_string": "{number}",
+      "simple_match_map": {
         "0": "ноль",
         "1": "один",
         "2": "два",
@@ -429,46 +415,7 @@
         "8": "восемь",
         "9": "девять",
         "10": "десять",
-        "default": "ошибка"
-      }
-    },
-    "train_car_type": {
-      "description": "Takes the train car type ID and returns the full name of a train car type (v1).",
-      "map": {
-        "LocoShunter": "Тепловоз DE2",
-        "LocoSteamHeavy": "Паровоз S282",
-        "Tender": "Тендер",
-        "LocoS060": "Паровоз S060",
-        "LocoRailbus": "Рельсовый автобус",
-        "LocoDM1U": "Тепловоз DM1U",
-        "LocoDiesel": "Дизельный локомотив",
-        "LocoDE6Slug": "Локомотив DE6 Slug",
-        "LocoDH4": "Локомотив DH4",
-        "LocoDM3": "Локомотив DM3",
-        "LocoMicroshunter": "Микро-маневровый локомотив",
-        "FlatbedEmpty": "Платформа",
-        "FlatbedStakes": "Платформа с стойками",
-        "FlatbedMilitary": "Военная платформа",
-        "FlatbedShort": "Короткая платформа",
-        "AutorackRed": "Автовоз красный",
-        "AutorackBlue": "Автовоз синий",
-        "AutorackGreen": "Автовоз зелёный",
-        "AutorackYellow": "Автовоз жёлтый",
-        "TankOrange": "Оранжевая цистерна",
-        "TankWhite": "Белая цистерна",
-        "TankYellow": "Жёлтая цистерна",
-        "TankBlue": "Синяя цистерна",
-        "TankChrome": "Хромированная цистерна",
-        "TankBlack": "Чёрная цистерна",
-        "TankShortMilk": "Молочная цистерна",
-        "StockRed": "Красный товарный вагон",
-        "StockGreen": "Зелёный товарный вагон",
-        "StockBrown": "Коричневый товарный вагон",
-        "BoxcarBrown": "Коричневый крытый вагон",
-        "BoxcarGreen": "Зелёный крытый вагон",
-        "BoxcarPink": "Розовый крытый вагон",
-        "BoxcarRed": "Красный крытый вагон",
-        "BoxcarMilitary": "Военный крытый вагон"
+        "default": "{number}"
       }
     }
   }

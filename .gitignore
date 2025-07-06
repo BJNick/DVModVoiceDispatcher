@@ -9,3 +9,5 @@ _ReSharper*/
 *.DotSettings.user
 
 output.wav
+
+localization-terms*.txt

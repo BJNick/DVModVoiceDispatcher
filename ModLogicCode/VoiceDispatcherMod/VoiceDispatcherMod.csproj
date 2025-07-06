@@ -177,6 +177,9 @@
     <Reference Include="DV.WorldTools.Runtime.Common">
       <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Derail Valley\DerailValley_Data\Managed\DV.WorldTools.Runtime.Common.dll</HintPath>
     </Reference>
+    <Reference Include="I2.Localization">
+      <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Derail Valley\DerailValley_Data\Managed\I2.Localization.dll</HintPath>
+    </Reference>
     <Reference Include="net.smkd.vector3d">
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Derail Valley\DerailValley_Data\Managed\net.smkd.vector3d.dll</HintPath>
     </Reference>

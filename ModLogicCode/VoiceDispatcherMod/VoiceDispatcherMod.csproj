@@ -327,6 +327,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="dialogue_data.schema.json" />
+    <Content Include="lines-russian.json" />
     <Content Include="lines.json" />
   </ItemGroup>
 </Project>

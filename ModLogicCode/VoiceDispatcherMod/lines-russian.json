@@ -1,0 +1,475 @@
+﻿{
+  "language_settings": {
+    "sentence_delimiter": ".",
+    "clause_delimiter": ",",
+    "sentence_split_regex": "[.!?]\\s+"
+  },
+  "line_groups": {
+    "speed_report": {
+      "description": "Lines reporting the player's current speed in km/h. {speed} is replaced with the number.",
+      "placeholders": [
+        "{speed}"
+      ],
+      "lines": [
+        "Ваша скорость {speed} километров в час",
+        "Сейчас вы едете со скоростью {speed} километров в час",
+        "Скорость: {speed} километров в час"
+      ]
+    },
+    "direction_report": {
+      "description": "Lines reporting the player's current direction. {direction} is replaced with a direction (e.g., north).",
+      "placeholders": [
+        "{direction}"
+      ],
+      "lines": [
+        "Вы движетесь в направлении {direction}",
+        "Направление: {direction}",
+        "Двигаетесь в сторону {direction}"
+      ]
+    },
+    "highest_paying_job": {
+      "description": "Lines reporting the highest paying job available. {job_type} is replaced with the type of job, {destination} with the destination, and {payout} with the payout amount.",
+      "placeholders": [
+        "{job_type}",
+        "{job_type_id}",
+        "{destination_yard_name}",
+        "{destination_track_name}",
+        "{exact_payout}",
+        "{rounded_payout}"
+      ],
+      "match_string": "{job_type_id}",
+      "match_map": {
+        "ShuntingLoad|ShuntingUnload": {
+          "description": "Lines for shunting load or unload jobs. Destination is the current yard.",
+          "lines": [
+            "Самая прибыльная работа: {job_type} с оплатой {rounded_payout} долларов.",
+            "Если хотите хороший заработок, возьмите {job_type} здесь за {rounded_payout} долларов.",
+            "{rounded_payout} долларов ждут тебя за {job_type} прямо здесь, на станции {destination_yard_name}!",
+            "Гонитесь за прибылью? {job_type} здесь принесёт вам {rounded_payout} долларов.",
+            "Лидирует по оплате: {job_type} с наградой {rounded_payout} долларов."
+          ]
+        },
+        "default": {
+          "description": "Lines for transport or empty haul jobs. Destination is a different yard.",
+          "lines": [
+            "Самая прибыльная работа: {job_type} в {destination_yard_name} с оплатой {rounded_payout} долларов.",
+            "Хотите хорошо заработать? Возьмите {job_type} в {destination_yard_name} за {rounded_payout} долларов.",
+            "{rounded_payout} долларов ждут тебя за {job_type} в {destination_yard_name}.",
+            "Жаждете прибыли? {job_type} в {destination_yard_name} — ваш шанс на {rounded_payout} долларов.",
+            "Топ по оплате: {job_type} в {destination_yard_name} с наградой {rounded_payout} долларов."
+          ]
+        }
+      }
+    },
+    "derailment": {
+      "description": "Lines that play when the player derails the train. These lines are meant to be humorous and sarcastic.",
+      "placeholders": [],
+      "lines": [
+        "Ну что ж, физика снова победила.",
+        "Ты превзошёл себя. Надеюсь, ты не слишком привязался к этому поезду.",
+        "Я же говорил — сбавь скорость! Но что мне знать, я всего лишь диспетчер.",
+        "Опять начинать бумажную волокиту... Купи мне потом выпивку.",
+        "Поздравляю! Ты только что показал, как НЕ надо водить поезд."
+      ]
+    },
+    "station_office_entry": {
+      "description": "Lines that play when the player enters the station office.",
+      "placeholders": [
+        "{yard_name}",
+        "{yard_id}"
+      ],
+      "lines": [
+        "Рад видеть вас на {yard_name}.",
+        "Добро пожаловать в офис станции {yard_name}, располагайтесь.",
+        "Всегда приятно видеть вас в офисе {yard_name}.",
+        "Хорошего пребывания в офисе станции {yard_name}.",
+        "В {yard_name} всегда что-то происходит.",
+        "Загруженный день в {yard_name}, не так ли?"
+      ]
+    },
+    "yard_entry": {
+      "description": "Lines that play when the player enters a yard area.",
+      "placeholders": [
+        "{yard_name}",
+        "{yard_id}"
+      ],
+      "lines": [
+        "Вход в {yard_name}.",
+        "Разрешено войти в {yard_name}.",
+        "Добро пожаловать в {yard_name}.",
+        "Приближение к {yard_name}.",
+        "Разрешение получено: {yard_name}."
+      ]
+    },
+    "yard_exit": {
+      "description": "Lines that play when the player exits a yard area.",
+      "placeholders": [
+        "{yard_name}",
+        "{yard_id}"
+      ],
+      "lines": [
+        "Выход из {yard_name}.",
+        "Покидаем {yard_name}.",
+        "Отправляемся из {yard_name}.",
+        "Счастливого пути из {yard_name}.",
+        "До встречи в {yard_name}."
+      ]
+    },
+    "transport_job_overview": {
+      "description": "A full job overview when accepting a new freight haul or logistical haul job.",
+      "placeholders": [
+        "{job_type_name}",
+        "{job_type_id}",
+        "{car_count}",
+        "{starting_track_name}",
+        "{starting_yard_name}",
+        "{destination_track_name}",
+        "{destination_yard_name}"
+      ],
+      "line": "{job_type_name}. Заберите {car_count} с пути {starting_track_name} в {starting_yard_name}. Доставьте их в {destination_yard_name}. Затем оставьте на пути {destination_track_name}."
+    },
+    "you_have_n_orders": {
+      "description": "A sentence that says the player has a certain number of orders.",
+      "placeholders": [
+        "{count}"
+      ],
+      "match_string": "{count}",
+      "match_map": {
+        "0": {
+          "line": "У вас нет заказов."
+        },
+        "1": {
+          "line": "У вас {count} заказ."
+        },
+        "default": {
+          "line": "У вас {count} заказов."
+        }
+      }
+    },
+    "volume_check": {
+      "description": "Lines that play when the player checks the volume of the mod.",
+      "placeholders": [
+        "{volume}",
+        "{volume_spelled}"
+      ],
+      "line": "Проверка громкости. {volume_spelled}"
+    },
+    "shunting_load_job_overview": {
+      "description": "A full job overview when accepting a new shunting load job.",
+      "placeholders": [
+        "{job_type_name}",
+        "{number_of_pickups}",
+        "{loading_track_name}",
+        "{destination_track_name}",
+        "{destination_car_count}",
+        "{pickup_1_track_name}",
+        "{pickup_1_car_count}",
+        "{pickup_2_track_name}",
+        "{pickup_2_car_count}",
+        "{pickup_3_track_name}",
+        "{pickup_3_car_count}"
+      ],
+      "match_string": "{number_of_pickups}",
+      "match_map": {
+        "1": {
+          "description": "A job with one pickup.",
+          "line": "{job_type_name}. Прицепите {pickup_1_car_count} на пути {pickup_1_track_name}. Затем загрузите на пути {loading_track_name}. После этого отцепите на пути {destination_track_name} для завершения задания."
+        },
+        "2": {
+          "description": "A job with two pickups.",
+          "line": "{job_type_name}. Прицепите {pickup_1_car_count} на пути {pickup_1_track_name}, и {pickup_2_car_count} на пути {pickup_2_track_name}. Затем загрузите {destination_car_count} на пути {loading_track_name}. После этого отцепите на пути {destination_track_name} для завершения задания."
+        },
+        "3": {
+          "description": "A job with three pickups.",
+          "line": "{job_type_name}. Прицепите {pickup_1_car_count} на пути {pickup_1_track_name}, {pickup_2_car_count} на пути {pickup_2_track_name}, и {pickup_3_car_count} на пути {pickup_3_track_name}. Затем загрузите {destination_car_count} на пути {loading_track_name}. После этого отцепите на пути {destination_track_name} для завершения задания."
+        },
+        "default": {
+          "description": "A job with a high number of pickups.",
+          "line": "{job_type_name}. Всего {number_of_pickups} точек прицепки — удачи вам! Загрузите {destination_car_count} на пути {loading_track_name}. Затем отцепите на пути {destination_track_name} для завершения задания."
+        }
+      }
+    },
+    "shunting_unload_job_overview": {
+      "description": "A full job overview when accepting a new shunting unload job.",
+      "placeholders": [
+        "{job_type_name}",
+        "{number_of_dropoffs}",
+        "{unloading_track_name}",
+        "{starting_track_name}",
+        "{starting_car_count}",
+        "{dropoff_1_track_name}",
+        "{dropoff_1_car_count}",
+        "{dropoff_2_track_name}",
+        "{dropoff_2_car_count}",
+        "{dropoff_3_track_name}",
+        "{dropoff_3_car_count}"
+      ],
+      "match_string": "{number_of_dropoffs}",
+      "match_map": {
+        "1": {
+          "description": "A job with one dropoff.",
+          "line": "{job_type_name}. Заберите {starting_car_count} с пути {starting_track_name}. Затем разгрузите на пути {unloading_track_name}. После этого отцепите на пути {dropoff_1_track_name} для завершения задания."
+        },
+        "2": {
+          "description": "A job with two dropoffs.",
+          "line": "{job_type_name}. Заберите {starting_car_count} с пути {starting_track_name}. Затем разгрузите на пути {unloading_track_name}. После этого отцепите {dropoff_1_car_count} на пути {dropoff_1_track_name}, и {dropoff_2_car_count} на пути {dropoff_2_track_name} для завершения задания."
+        },
+        "3": {
+          "description": "A job with three dropoffs.",
+          "line": "{job_type_name}. Заберите {starting_car_count} с пути {starting_track_name}. Затем разгрузите на пути {unloading_track_name}. После этого отцепите {dropoff_1_car_count} на пути {dropoff_1_track_name}, {dropoff_2_car_count} на пути {dropoff_2_track_name}, и {dropoff_3_car_count} на пути {dropoff_3_track_name} для завершения задания."
+        },
+        "default": {
+          "description": "A job with a high number of dropoffs.",
+          "line": "{job_type_name}. Всего {number_of_dropoffs} точек разгрузки — удачи вам! Заберите {starting_car_count} с пути {starting_track_name}. Затем разгрузите на пути {unloading_track_name}. После этого отцепите на множестве путей для завершения задания."
+        }
+      }
+    },
+    "generic_job_task": {
+      "description": "Sentence of an overview for a job that is not a typical type (modded).",
+      "placeholders": [
+        "{warehouse_task_type}",
+        "{car_count}",
+        "{starting_track_name}",
+        "{starting_yard_name}",
+        "{destination_track_name}",
+        "{destination_yard_name}",
+        "{warehouse_track_name}",
+        "{warehouse_yard_name}"
+      ],
+      "match_string": "{warehouse_task_type}",
+      "match_map": {
+        "Unloading": {
+          "line": "Разгрузите {car_count} на пути {warehouse_track_name} в {warehouse_yard_name}."
+        },
+        "Loading": {
+          "line": "Загрузите {car_count} на пути {warehouse_track_name} в {warehouse_yard_name}."
+        },
+        "default": {
+          "match_string": "{starting_yard_name}-{destination_yard_name}",
+          "match_map": {
+            "(.+)-\\1": {
+              "line": "Переместите {car_count} с пути {starting_track_name} на путь {destination_track_name} в {destination_yard_name}."
+            },
+            "default": {
+              "line": "Переместите {car_count} с пути {starting_track_name} в {starting_yard_name} на путь {destination_track_name} в {destination_yard_name}."
+            }
+          }
+        }
+      }
+    },
+    "car_count": {
+      "description": "Number followed by 'cars' in the proper plural form in Russian.",
+      "placeholders": [
+        "{count}"
+      ],
+      "match_string": "{count}",
+      "match_map": {
+        ".*(?<!1)1": {
+          "line": "{count} вагон"
+        },
+        ".*(?<!1)[234]": {
+          "line": "{count} вагона"
+        },
+        "default": {
+          "line": "{count} вагонов"
+        }
+      }
+    },
+    "track_name": {
+      "description": "Maps the name of a track. Should be short like 'Alfa 1'. Example yard_id=HB, sub_yard_id=B, order_number=3, track_type=M",
+      "placeholders": [
+        "{yard_id}",
+        "{sub_yard_id}",
+        "{order_number}",
+        "{track_type}"
+      ],
+      "match_string": "{sub_yard_id}",
+      "match_map": {
+        "A": {
+          "line": "Андрей {order_number}"
+        },
+        "B": {
+          "line": "Борис {order_number}"
+        },
+        "C": {
+          "line": "Центр {order_number}"
+        },
+        "D": {
+          "line": "Дмитрий {order_number}"
+        },
+        "E": {
+          "line": "Елена {order_number}"
+        },
+        "F": {
+          "line": "Фёдор {order_number}"
+        },
+        "G": {
+          "line": "Григорий {order_number}"
+        },
+        "default": {
+          "line": "{sub_yard_id} {order_number}"
+        }
+      }
+    },
+    "car_id": {
+      "description": "Specifies how to pronounce a car ID, such as CFF123 or L-012",
+      "placeholders": [
+        "{full_car_id}",
+        "{letter_part}",
+        "{digit_part}",
+        "{first_digit}",
+        "{second_digit}",
+        "{third_digit}",
+        "{car_type_id}",
+        "{car_type_name}"
+      ],
+      "line": "{letter_part} {first_digit} {second_digit} {third_digit}"
+    },
+    "volume_check": {
+      "description": "Lines that play when the player checks the volume of the mod.",
+      "placeholders": [
+        "{volume}",
+        "{volume_spelled}"
+      ],
+      "line": "Проверка громкости. {volume_spelled}"
+    },
+    "parametrization_test": {
+      "description": "Lines used for testing the parametrization of the mod. These lines are not meant to be used in the game.",
+      "placeholders": [
+        "{param1}",
+        "{param2}",
+        "{param3}"
+      ],
+      "match_string": "{param1}",
+      "match_map": {
+        "alfa": {
+          "description": "This is a test line for param1=alfa.",
+          "line": "Яблоко: Param 1 задан как {param1}, param 2 — {param2}, а param 3 — {param3}."
+        },
+        "bravo": {
+          "description": "This is a test line for param1=bravo.",
+          "line": "Банан: Param 1 задан как {param1}, param 2 — {param2}, а param 3 — {param3}."
+        },
+        "charlie": {
+          "description": "This is a test line for param1=charlie.",
+          "match_string": "{param2}",
+          "match_map": {
+            "delta": {
+              "description": "This is a test line for param1=charlie and param2=delta.",
+              "line": "Цитрон: Param 1 — {param1}, param 2 — {param2}, а param 3 — {param3}."
+            },
+            "echo": {
+              "description": "This is a test line for param1=charlie and param2=echo.",
+              "line": "Одуванчик: Param 1 — {param1}, param 2 — {param2}, а param 3 — {param3}."
+            }
+          }
+        },
+        ".*nana": {
+          "description": "This is a test line for param1 ending with 'nana'.",
+          "line": "Строка оканчивается на nana!"
+        },
+        "default": {
+          "description": "This is a catch-all test line for any other value of param1.",
+          "line": "Общий случай: Param 1 задан как {param1}, param 2 — {param2}, а param 3 — {param3}."
+        }
+      }
+    }
+  },
+  "type_maps": {
+    "yard_id": {
+      "description": "Takes the yard ID and returns the full name of the yard.",
+      "map": {
+        "CME": "Угольная шахта Восток",
+        "CMS": "Угольная шахта Юг",
+        "CP": "Угольная электростанция",
+        "CS": "Город Юг",
+        "CW": "Город Запад",
+        "FF": "Продовольственный завод",
+        "FM": "Сельскохозяйственный рынок",
+        "FRC": "Лес Центральный",
+        "FRS": "Лес Южный",
+        "GF": "Завод товаров",
+        "HB": "Гавань",
+        "HMB": "База гавани",
+        "IME": "Железная шахта Восток",
+        "IMW": "Железная шахта Запад",
+        "MB": "Военная база",
+        "MF": "Машиностроительный завод",
+        "MFMB": "База машиностроительного завода",
+        "OR": "Нефтеперерабатывающий завод",
+        "OWC": "Нефтяная вышка Центральная",
+        "OWN": "Нефтяная вышка Северная",
+        "SM": "Металлургический завод",
+        "SW": "Лесопилка",
+        "default": "Неизвестная станция"
+      }
+    },
+    "job_type": {
+      "description": "Takes the job type ID and returns the full name of a single instance of job type order.",
+      "map": {
+        "ShuntingLoad": "Задание на загрузку",
+        "ShuntingUnload": "Задание на разгрузку",
+        "Transport": "Грузовое задание",
+        "EmptyHaul": "Логистическое задание",
+        "ComplexTransport": "Сложное задание",
+        "default": "Пользовательское задание"
+      }
+    },
+    "digit": {
+      "description": "Takes a small number and returns its full name. Needed for some TTS engines that do not support numbers or have trouble saying them.",
+      "map": {
+        "0": "ноль",
+        "1": "один",
+        "2": "два",
+        "3": "три",
+        "4": "четыре",
+        "5": "пять",
+        "6": "шесть",
+        "7": "семь",
+        "8": "восемь",
+        "9": "девять",
+        "10": "десять",
+        "default": "ошибка"
+      }
+    },
+    "train_car_type": {
+      "description": "Takes the train car type ID and returns the full name of a train car type (v1).",
+      "map": {
+        "LocoShunter": "Тепловоз DE2",
+        "LocoSteamHeavy": "Паровоз S282",
+        "Tender": "Тендер",
+        "LocoS060": "Паровоз S060",
+        "LocoRailbus": "Рельсовый автобус",
+        "LocoDM1U": "Тепловоз DM1U",
+        "LocoDiesel": "Дизельный локомотив",
+        "LocoDE6Slug": "Локомотив DE6 Slug",
+        "LocoDH4": "Локомотив DH4",
+        "LocoDM3": "Локомотив DM3",
+        "LocoMicroshunter": "Микро-маневровый локомотив",
+        "FlatbedEmpty": "Платформа",
+        "FlatbedStakes": "Платформа с стойками",
+        "FlatbedMilitary": "Военная платформа",
+        "FlatbedShort": "Короткая платформа",
+        "AutorackRed": "Автовоз красный",
+        "AutorackBlue": "Автовоз синий",
+        "AutorackGreen": "Автовоз зелёный",
+        "AutorackYellow": "Автовоз жёлтый",
+        "TankOrange": "Оранжевая цистерна",
+        "TankWhite": "Белая цистерна",
+        "TankYellow": "Жёлтая цистерна",
+        "TankBlue": "Синяя цистерна",
+        "TankChrome": "Хромированная цистерна",
+        "TankBlack": "Чёрная цистерна",
+        "TankShortMilk": "Молочная цистерна",
+        "StockRed": "Красный товарный вагон",
+        "StockGreen": "Зелёный товарный вагон",
+        "StockBrown": "Коричневый товарный вагон",
+        "BoxcarBrown": "Коричневый крытый вагон",
+        "BoxcarGreen": "Зелёный крытый вагон",
+        "BoxcarPink": "Розовый крытый вагон",
+        "BoxcarRed": "Красный крытый вагон",
+        "BoxcarMilitary": "Военный крытый вагон"
+      }
+    }
+  }
+}

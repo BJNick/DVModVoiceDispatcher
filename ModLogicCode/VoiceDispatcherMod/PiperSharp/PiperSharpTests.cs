@@ -65,8 +65,10 @@ namespace PiperSharp.Tests.Tests
         {
             string[] modelNames =
             {
-                "ru_RU-irina-medium",
                 "en_US-ljspeech-high",
+                "en_US-joe-medium",
+                "ru_RU-irina-medium",
+                "ru_RU-denis-medium",
             };
 
             foreach (var modelName in modelNames)

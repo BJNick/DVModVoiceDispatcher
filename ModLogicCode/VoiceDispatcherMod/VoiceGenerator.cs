@@ -10,11 +10,13 @@ using VoiceDispatcherMod.PiperSharp;
 
 namespace VoiceDispatcherMod {
     public static class VoiceGenerator {
+        private static string _modelName;
         
         private static string _workingDirectory;
         private static string _outputDirectory;
         
         public static void Init() {
+            _modelName = Main.settings.Model;
             _workingDirectory = Path.Combine(Main.mod.Path, "Piper");
             _outputDirectory = Path.Combine(_workingDirectory, "output");
             if (!Directory.Exists(_workingDirectory)) {
@@ -26,8 +28,11 @@ namespace VoiceDispatcherMod {
         }
 
         public static string FilenameOf(string text) {
-            var onlyAlphanumeric = System.Text.RegularExpressions.Regex.Replace(text, @"[^a-zA-Z0-9\s]", "");
+            var onlyAlphanumeric = System.Text.RegularExpressions.Regex.Replace(text, @"[^a-zA-Z0-9\s]", "").Trim();
             var trimmedToMaxLength = onlyAlphanumeric.Length > 50 ? onlyAlphanumeric.Substring(0, 50) : onlyAlphanumeric;
+            if (string.IsNullOrWhiteSpace(trimmedToMaxLength)) {
+                return (uint)text.GetHashCode() + ".wav";;
+            }
             return trimmedToMaxLength + "_" + (uint)text.GetHashCode() + ".wav";
         }
         
@@ -46,8 +51,7 @@ namespace VoiceDispatcherMod {
                 return existingFile;
             }
             
-            const string modelName = "en_US-ljspeech-high";
-            var modelPath = Path.Combine(_workingDirectory, modelName);
+            var modelPath = Path.Combine(_workingDirectory, _modelName);
             var piperPath = Path.Combine(_workingDirectory, "piper",
                 Environment.OSVersion.Platform == PlatformID.Win32NT ? "piper.exe" : "piper");
             var model = await VoiceModel.LoadModel(modelPath);
@@ -67,8 +71,7 @@ namespace VoiceDispatcherMod {
                 return existingFile;
             }
             
-            const string modelName = "en_US-ljspeech-high";
-            var modelPath = Path.Combine(_workingDirectory, modelName);
+            var modelPath = Path.Combine(_workingDirectory, _modelName);
             var piperPath = Path.Combine(_workingDirectory, "piper",
                 Environment.OSVersion.Platform == PlatformID.Win32NT ? "piper.exe" : "piper");
             var model = await VoiceModel.LoadModel(modelPath);

@@ -104,7 +104,7 @@ namespace VoiceDispatcherMod {
         }
 
         public static async Task GenerateWithSox(string text) {
-            const string modelName = "en_US-ljspeech-high";
+            const string modelName = "glados";
             var modelPath = Path.Combine(cwd, modelName);
             var piperPath = Path.Combine(cwd, "piper",
                 Environment.OSVersion.Platform == PlatformID.Win32NT ? "piper.exe" : "piper");

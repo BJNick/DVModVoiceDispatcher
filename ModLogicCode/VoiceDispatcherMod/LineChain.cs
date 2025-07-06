@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -161,7 +162,7 @@ namespace VoiceDispatcherMod {
     // Represents a chain of lines (sentences) to be played in sequence
     public class LineChain {
 
-        public static List<Line> SplitIntoLines(string text) {
+        public static List<Line> SplitIntoChain(string text) {
             var split = JsonLinesLoader.SentenceSplitRegex();
             var splitPattern = $"(?<={split})";
             var lines = new List<Line>();
@@ -185,8 +186,7 @@ namespace VoiceDispatcherMod {
             return oldLines.Select(it => new AssetBundleLine(it, it)).ToList<Line>();
         }
         
-        public static IEnumerator PlayLinesInCoroutine(List<Line> lineChain, MonoBehaviour coroutineRunner) {
-            var source = CommsRadioNarrator.source;
+        public static IEnumerator PlayLinesInCoroutine(List<Line> lineChain, MonoBehaviour coroutineRunner, Action onComplete = null) {
             var index = 0;
             
             while (index < lineChain.Count) {
@@ -200,7 +200,7 @@ namespace VoiceDispatcherMod {
                 Main.Logger.Log("Playing line: " + lineChain[index].SubtitleText);
                 CommsRadioNarrator.PlayRadioClip(currentLine.AudioClip);
                 
-                while (source.isPlaying) {
+                while (CommsRadioNarrator.source.isPlaying) {
                     // Pre-generate the upcoming line clips while the current one is playing
                     for (int i = index + 1; i < lineChain.Count; i++) {
                         var upcomingLine = lineChain[i];
@@ -218,6 +218,7 @@ namespace VoiceDispatcherMod {
                 }
                 index++;
             }
+            onComplete?.Invoke();
         }
     }
 }

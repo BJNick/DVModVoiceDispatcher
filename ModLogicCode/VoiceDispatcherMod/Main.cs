@@ -147,7 +147,7 @@ namespace VoiceDispatcherMod {
 
             var line = StationHelper.CreateWelcomeToYardLine(station);
             Logger.Log(line);
-            CommsRadioNarrator.GenerateAndPlay(line);
+            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
         }
 
         static void OnYardExited(StationController previousStation) {
@@ -162,7 +162,7 @@ namespace VoiceDispatcherMod {
 
             var line = StationHelper.CreateExitingYardLine(previousStation);
             Logger.Log(line);
-            CommsRadioNarrator.GenerateAndPlay(line);
+            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
         }
 
         static void OnStationEntered(StationController station) {
@@ -178,7 +178,7 @@ namespace VoiceDispatcherMod {
             var line = StationHelper.CreateWelcomeToStationOfficeLine(station);
             line += " " + StationHelper.CreateHighestPayingJobLine(station);
             Logger.Log(line);
-            CommsRadioNarrator.GenerateAndPlay(line);
+            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
         }
 
         static void OnSessionStart(UnityModManager.ModEntry modEntry) { }
@@ -193,7 +193,7 @@ namespace VoiceDispatcherMod {
             if (Input.GetKeyDown(KeyCode.P)) {
                 var line = CreateGenericJobLine(JobsManager.Instance.currentJobs.First());
                 Logger.Log(line);
-                CommsRadioNarrator.GenerateAndPlay(line);
+                CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
             }
 
             if (Input.GetKeyDown(KeyCode.O)) {

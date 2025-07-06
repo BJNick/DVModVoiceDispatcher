@@ -174,7 +174,7 @@ namespace VoiceDispatcherMod {
                     CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform);
                     var line = StationHelper.CreateHighestPayingJobLine(StationHelper.playerYard);
                     Main.Logger.Log(line);
-                    GenerateAndPlay(line);
+                    PlayWithClick(LineChain.SplitIntoChain(line));
                     SetState(State.MainView);
                 }),
                 new ActionItem("Edit Settings", () => {
@@ -192,7 +192,7 @@ namespace VoiceDispatcherMod {
                     { "volume", Main.settings.Volume.ToString() },
                     { "volume_spelled", Main.settings.Volume.MapToDigit() }
                 });
-                Play(LineChain.SplitIntoLines(line));
+                Play(LineChain.SplitIntoChain(line));
                 menuList.RenderActions();
             }
             settingsActions = new() {
@@ -404,7 +404,16 @@ namespace VoiceDispatcherMod {
             }
 
             SetupCoroutineRunner();
-            currentCoroutine = coroutineRunner.StartCoroutine(LineChain.PlayLinesInCoroutine(lineBuilder, coroutineRunner));
+            currentCoroutine = coroutineRunner.StartCoroutine(LineChain.PlayLinesInCoroutine(lineBuilder, coroutineRunner, CheckQueueAndPlay));
+        }
+        
+        public static void CheckQueueAndPlay() {
+            currentlyReading = false;
+            if (NarratorQueue.HasLines()) {
+                Main.Logger.Log("Playing queued voice line.");
+                // TODO: With click?
+                PlayWithClick(NarratorQueue.Dequeue());
+            }
         }
 
         private static IEnumerator PlayVoiceLinesCoroutine(string[] lines) {

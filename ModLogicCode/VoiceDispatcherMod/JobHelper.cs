@@ -39,13 +39,14 @@ namespace VoiceDispatcherMod {
             }
             var fullJobOverview = string.Join(" ", lineBuilder);
 
-            CommsRadioNarrator.GenerateAndPlay(fullJobOverview);
+            Main.Logger.Log(fullJobOverview);
+            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(fullJobOverview));
         }
 
         public static void ReadJobOverview(Job job) {
             var line = CreateJobSpecificLine(job);
             Main.Logger.Log(line);
-            CommsRadioNarrator.GenerateAndPlay(line);
+            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
         }
 
         public static string CreateJobSpecificLine(Job job) {

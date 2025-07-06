@@ -9,17 +9,18 @@ namespace VoiceDispatcherMod {
         public static string lastClickedCarId = string.Empty;
 
         public static void OnCarClicked(TrainCar car) {
-            /*var job = JobsManager.Instance.GetJobOfCar(car.logicCar);
+            var job = JobsManager.Instance.GetJobOfCar(car.logicCar);
             if (job != null && lastClickedCarId != car.ID && JobsManager.Instance.currentJobs.Count > 0) {
-                TerseCommentOnCarJob(job);
+                //TerseCommentOnCarJob(job);
+                var line = CreateCarIdLine(car);
+                Main.Logger.Log(line);
+                CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
+                
                 lastClickedCarId = car.ID;
             } else {
                 DetailedCommentOnCar(car, job);
                 lastClickedCarId = "";
-            }*/
-            var line = CreateCarIdLine(car);
-            Main.Logger.Log(line);
-            CommsRadioNarrator.GenerateAndPlay(line);
+            }
         }
 
         public static void TerseCommentOnCarJob(Job job) {

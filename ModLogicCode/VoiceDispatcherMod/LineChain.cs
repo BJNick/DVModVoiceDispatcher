@@ -138,7 +138,7 @@ namespace VoiceDispatcherMod {
             }
         }
     }
-    /*CommsRadioNarrator.GetVoicedClip(string)*/
+
     public class AssetBundleLine : Line {
         public string AssetName { get; set; }
 
@@ -156,6 +156,22 @@ namespace VoiceDispatcherMod {
                 clipCreationCompleted = true;
             }
             yield break;
+        }
+    }
+    
+    public class PauseLine : Line {
+        public float Duration { get; set; }
+
+        public PauseLine(float duration) : base("") {
+            Duration = duration;
+            SubtitleText = "*pause*";
+        }
+
+        protected override IEnumerator CreateClipCoroutine() {
+            clipCreationStarted = true;
+            AudioClip = AudioClip.Create("Pause", (int)(Duration * 8000), 1, 8000, false);
+            clipCreationCompleted = true;
+            yield return null;
         }
     }
 

@@ -29,18 +29,20 @@ namespace VoiceDispatcherMod {
                 return;
             }
 
-            var lineBuilder = new List<string>();
-            lineBuilder.Add(JsonLinesLoader.GetRandomAndReplace("you_have_n_orders", new() {
+            var lineBuilder = new List<Line>();
+            lineBuilder.AddRange(LineChain.SplitIntoChain(JsonLinesLoader.GetRandomAndReplace("you_have_n_orders", new() {
                 { "count", jobs.Count.ToString() }
-            }));
+            })));
 
-            foreach (var job in jobs) {
-                lineBuilder.Add(CreateJobSpecificLine(job));
+            for (var i = 0; i < jobs.Count; i++) {
+                lineBuilder.AddRange(LineChain.SplitIntoChain(CreateJobSpecificLine(jobs[i])));
+                if (i < jobs.Count - 1) {
+                    lineBuilder.Add(new PauseLine(0.5f));
+                }
             }
-            var fullJobOverview = string.Join(" ", lineBuilder);
 
-            Main.Logger.Log(fullJobOverview);
-            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(fullJobOverview));
+            Main.Logger.Log(string.Join(" ", lineBuilder));
+            CommsRadioNarrator.PlayWithClick(lineBuilder);
         }
 
         public static void ReadJobOverview(Job job) {

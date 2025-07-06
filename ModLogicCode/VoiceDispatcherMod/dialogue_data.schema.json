@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "DialogueData",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "line_groups": {
       "type": "object",
@@ -9,7 +10,8 @@
         "$ref": "#/definitions/LineGroup"
       }
     },
-    "language_settings": { "$ref":"#/definitions/LanguageSettings" }
+    "language_settings": { "$ref":"#/definitions/LanguageSettings" },
+    "additionalProperties": false
   },
   "required": ["line_groups", "language_settings"],
   "definitions": {

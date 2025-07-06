@@ -343,11 +343,11 @@
     "call_test": {
         "description": "Lines used for testing the call replacements of the mod. These lines are not meant to be used in the game.",
         "placeholders": [
-          "{count}",
-          "{sub_yard_id}",
-          "{order_number}"
+          "{destination_count}",
+          "{destination_sub_yard_id}",
+          "{destination_order_number}"
         ],
-        "line": "Make sure to go to track {@track_name}. Pick up {@car_count} from there."
+        "line": "Make sure to go to track {@track_name(sub_yard_id={destination_sub_yard_id},order_number={destination_order_number})}. Pick up {@car_count(count={destination_count})} from there. Also check out {@track_name(sub_yard_id=E, order_number=1)} for more cars.}"
     },
     "parametrization_test": {
       "description": "Lines used for testing the parametrization of the mod. These lines are not meant to be used in the game.",

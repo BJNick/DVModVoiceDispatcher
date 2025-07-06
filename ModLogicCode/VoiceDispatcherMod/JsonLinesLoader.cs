@@ -141,16 +141,32 @@ namespace VoiceDispatcherMod {
             return text;
         }
         
+        /* Must be called after ReplacePlaceholders to ensure all placeholders are replaced before processing calls */
         public static string ReplaceCalls(string text, Dictionary<string, string> replacements) {
-            var callPattern = @"\{@(\w+)\}";
+            var callPattern = @"\{@(\w+)\(([^)]*)\)\}";
             var matches = System.Text.RegularExpressions.Regex.Matches(text, callPattern);
             foreach (System.Text.RegularExpressions.Match match in matches) {
                 var key = match.Groups[1].Value;
+                var parameters = match.Groups[2].Value.Split(',');
                 if (GetBaseLineGroup(key) == null) {
                     LogError($"Line group '{key}' not found in text: {text}");
                     continue;
                 }
-                var value = GetRandomAndReplace(key, replacements);
+                var innerReplacements = new Dictionary<string, string>(replacements);
+                foreach (var param in parameters) {
+                    var paramParts = param.Split('=');
+                    try {
+                        if (paramParts.Length == 2) {
+                            innerReplacements[paramParts[0].Trim()] = paramParts[1].Trim();
+                        } else {
+                            LogError($"Invalid parameter format '{param}' in call '{match.Value}' in text: {text}");
+                        }
+                    } catch (KeyNotFoundException e) {
+                        LogError($"Parameter '{paramParts[1].Trim()}' not found in replacements: {e.Message}");
+                    }
+                }
+                
+                var value = GetRandomAndReplace(key, innerReplacements);
                 if (value != null) {
                     text = text.Replace(match.Value, value);
                 } else {

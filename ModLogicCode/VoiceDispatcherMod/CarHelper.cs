@@ -31,7 +31,7 @@ namespace VoiceDispatcherMod {
                 lineBuilder.Add(Randomizer.GetRandomLine("CarNotInJob", 1, 3));
             }
 
-            CommsRadioNarrator.PlayWithClick(lineBuilder);
+            CommsRadioNarrator.PlayWithClick(LineChain.FromAssetBundleLines(lineBuilder));
         }
         
         public static string CreateCarIdLine(TrainCar car) {
@@ -67,7 +67,7 @@ namespace VoiceDispatcherMod {
                     break;
             }
 
-            CommsRadioNarrator.PlayWithClick(lineBuilder);
+            CommsRadioNarrator.PlayWithClick(LineChain.FromAssetBundleLines(lineBuilder));
         }
     }
 }

@@ -29,8 +29,9 @@ namespace VoiceDispatcherMod {
 
     [Serializable]
     public class LanguageSettings {
-        public string sentence_delimiter = ".";
-        public string clause_delimiter = ",";
+        public string sentence_delimiter;
+        public string clause_delimiter;
+        public string sentence_split_regex;
     }
 
     public static class JsonLinesLoader {
@@ -165,6 +166,10 @@ namespace VoiceDispatcherMod {
         
         public static string ClauseDelimiter() {
             return DialogueData?.language_settings?.clause_delimiter ?? ",";
+        }
+        
+        public static string SentenceSplitRegex() {
+            return DialogueData?.language_settings?.sentence_split_regex ?? "[.!?]\\s+";
         }
     }
 }

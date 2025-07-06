@@ -187,7 +187,7 @@ namespace VoiceDispatcherMod {
                 CutCoroutineShort();
                 Main.settings.Volume = Mathf.Clamp(newVolume, 1, 10);
                 Main.settings.Save(Main.mod);
-                Play(new List<string> { Main.settings.Volume.ToString() });
+                Play(new PromptLine(Main.settings.Volume.ToString()));
                 menuList.RenderActions();
             }
             settingsActions = new() {
@@ -373,11 +373,15 @@ namespace VoiceDispatcherMod {
 
         #region Coroutine Management
 
-        public static void PlayWithClick(List<string> lineBuilder) {
+        public static void PlayWithClick(List<Line> lineBuilder) {
             Play(lineBuilder, true);
         }
+        
+        public static void Play(Line line, bool withClick = false) {
+            Play(new List<Line> { line }, withClick);
+        }
 
-        public static void Play(List<string> lineBuilder, bool withClick = false) {
+        public static void Play(List<Line> lineBuilder, bool withClick = false) {
             if (currentlyReading) {
                 Main.Logger.Warning("Already reading a voice line, queuing this one.");
                 NarratorQueue.Enqueue(lineBuilder);
@@ -391,12 +395,11 @@ namespace VoiceDispatcherMod {
             currentlyReading = true;
             Main.Logger.Log("Generated voice line: " + string.Join(" ", lineBuilder));
             if (withClick) {
-                lineBuilder.Insert(0, "NoiseClick");
-                lineBuilder.Add("NoiseClick");
+                LineChain.AddNoiseClicks(lineBuilder);
             }
 
             SetupCoroutineRunner();
-            currentCoroutine = coroutineRunner.StartCoroutine(PlayVoiceLinesCoroutine(lineBuilder.ToArray()));
+            currentCoroutine = coroutineRunner.StartCoroutine(LineChain.PlayLinesInCoroutine(lineBuilder, coroutineRunner));
         }
 
         private static IEnumerator PlayVoiceLinesCoroutine(string[] lines) {
@@ -405,6 +408,9 @@ namespace VoiceDispatcherMod {
         }
         
         public static async Task GenerateAndPlay(string line, bool withClick = true) {
+            Main.Logger.Log("Ignoring voice line: " + line);
+            return;
+            
             var clip = await VoiceGenerator.CreateClip(line);
             
             var clipList = new List<AudioClip> { clip };
@@ -449,7 +455,7 @@ namespace VoiceDispatcherMod {
         }
 
         private static void CutCoroutineShort(bool playClick = true) {
-            if (currentCoroutine != null) {
+            if (currentCoroutine != null && currentlyReading) {
                 if (coroutineRunner != null) coroutineRunner.StopCoroutine(currentCoroutine);
                 currentlyReading = false;
                 if (playClick) {

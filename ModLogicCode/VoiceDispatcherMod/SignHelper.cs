@@ -80,7 +80,7 @@ namespace VoiceDispatcherMod {
             lineBuilder.Add("In");
             lineBuilder.AddRange(VoicingUtils.RoundedDown((int)Math.Round(speedLimit.span)));
             lineBuilder.Add("Meters");
-            CommsRadioNarrator.PlayWithClick(lineBuilder);
+            CommsRadioNarrator.PlayWithClick(LineChain.FromAssetBundleLines(lineBuilder));
         }
 
         private static void PlaySpeedingWarning() {
@@ -90,7 +90,7 @@ namespace VoiceDispatcherMod {
 
             var lineBuilder = new List<string>();
             lineBuilder.Add(Randomizer.GetRandomLine("SpeedingWarning", 1, 5));
-            CommsRadioNarrator.PlayWithClick(lineBuilder);
+            CommsRadioNarrator.PlayWithClick(LineChain.FromAssetBundleLines(lineBuilder));
         }
 
         private static void PlayDerailmentMessage() {
@@ -111,7 +111,7 @@ namespace VoiceDispatcherMod {
 
             var lineBuilder = new List<string>();
             lineBuilder.Add(Randomizer.GetRandomLine("Derailment", 1, 5));
-            CommsRadioNarrator.PlayWithClick(lineBuilder);
+            CommsRadioNarrator.PlayWithClick(LineChain.FromAssetBundleLines(lineBuilder));
         }
     }
 }

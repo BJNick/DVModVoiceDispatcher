@@ -1,7 +1,8 @@
 ﻿{
   "language_settings": {
     "sentence_delimiter": ".",
-    "clause_delimiter": ","
+    "clause_delimiter": ",",
+    "sentence_split_regex": "[.!?]\\s+"
   },
   "line_groups": {
     "speed_report": {

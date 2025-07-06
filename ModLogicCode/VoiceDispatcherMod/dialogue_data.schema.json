@@ -59,7 +59,8 @@
       "type": "object",
       "properties": {
         "sentence_delimiter": { "type": "string" },
-        "clause_delimiter": { "type": "string" }
+        "clause_delimiter": { "type": "string" },
+        "sentence_split_regex": { "type": "string" }
       },
       "required": ["sentence_delimiter", "clause_delimiter"],
       "additionalProperties": false

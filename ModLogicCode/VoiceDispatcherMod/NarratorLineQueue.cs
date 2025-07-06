@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace VoiceDispatcherMod {
     public class NarratorLineQueue {
@@ -6,7 +7,7 @@ namespace VoiceDispatcherMod {
         private readonly HashSet<QueueItem> _inQueue = new HashSet<QueueItem>();
         public int Count => _queue.Count;
 
-        public void Enqueue(List<string> lines) {
+        public void Enqueue(List<Line> lines) {
             var queueItem = new QueueItem(lines);
             Enqueue(queueItem);
         }
@@ -22,7 +23,7 @@ namespace VoiceDispatcherMod {
             _inQueue.Add(queueItem);
         }
         
-        public List<string> Dequeue() {
+        public List<Line> Dequeue() {
             if (_queue.Count == 0) {
                 return null; // No items to dequeue
             }
@@ -43,10 +44,10 @@ namespace VoiceDispatcherMod {
     }
 
     public class QueueItem {
-        public readonly List<string> lines;
-        public string key => string.Join(",", lines);
+        public readonly List<Line> lines;
+        public string key => string.Join(" ", lines.Select(it => it.SubtitleText));
         
-        public QueueItem(List<string> lines) {
+        public QueueItem(List<Line> lines) {
             this.lines = lines;
         }
 

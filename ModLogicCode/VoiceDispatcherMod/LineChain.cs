@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace VoiceDispatcherMod {
@@ -60,6 +62,10 @@ namespace VoiceDispatcherMod {
                 }
             }
             yield return AudioClip;
+        }
+        
+        public override string ToString() {
+            return SubtitleText;
         }
     }
 
@@ -135,8 +141,9 @@ namespace VoiceDispatcherMod {
     public class AssetBundleLine : Line {
         public string AssetName { get; set; }
 
-        public AssetBundleLine(string assetName) : base(assetName) {
+        public AssetBundleLine(string assetName, string subtitleText) : base(assetName) {
             AssetName = assetName;
+            SubtitleText = subtitleText;
         }
 
         protected override IEnumerator CreateClipCoroutine() {
@@ -154,9 +161,31 @@ namespace VoiceDispatcherMod {
     // Represents a chain of lines (sentences) to be played in sequence
     public class LineChain {
 
-        // TODO: Add more methods as needed for playback control, etc.
+        public static List<Line> SplitIntoLines(string text) {
+            var split = JsonLinesLoader.SentenceSplitRegex();
+            var splitPattern = $"(?<={split})";
+            var lines = new List<Line>();
+            var sentences = Regex.Split(text, splitPattern, RegexOptions.Compiled);
+            foreach (var sentence in sentences) {
+                if (string.IsNullOrWhiteSpace(sentence)) continue;
+                var trimmedSentence = sentence.Trim();
+                if (trimmedSentence.Length > 0) {
+                    lines.Add(new PromptLine(trimmedSentence));
+                }
+            }
+            return lines;
+        }
         
-        public static IEnumerator PlayClipsInCoroutine(List<Line> lineChain, MonoBehaviour coroutineRunner) {
+        public static void AddNoiseClicks(List<Line> lineChain) {
+            lineChain.Insert(0, new AssetBundleLine("NoiseClick", "*click*"));
+            lineChain.Add(new AssetBundleLine("NoiseClick", "*click*"));
+        }
+        
+        public static List<Line> FromAssetBundleLines(List<string> oldLines) {
+            return oldLines.Select(it => new AssetBundleLine(it, it)).ToList<Line>();
+        }
+        
+        public static IEnumerator PlayLinesInCoroutine(List<Line> lineChain, MonoBehaviour coroutineRunner) {
             var source = CommsRadioNarrator.source;
             var index = 0;
             

@@ -30,6 +30,7 @@
     "highest_paying_job": {
       "description": "Lines reporting the highest paying job available. {job_type} is replaced with the type of job, {destination} with the destination, and {payout} with the payout amount.",
       "placeholders": [
+        "{job_type}",
         "{job_type_id}",
         "{destination_yard_name}",
         "{destination_track_name}",
@@ -326,8 +327,7 @@
         "{first_digit}",
         "{second_digit}",
         "{third_digit}",
-        "{car_type_id}",
-        "{car_type_name}"
+        "{car_type_id}"
       ],
       "line": "{letter_part} {first_digit} {second_digit} {third_digit}"
     },
@@ -424,7 +424,7 @@
     "job_type": {
       "description": "Takes the job type ID and returns the full name of a single instance of job type order.",
       "placeholders": [
-          "{job_type_id}"
+        "{job_type_id}"
       ],
       "match_string": "{job_type_id}",
       "simple_match_map": {
@@ -439,7 +439,7 @@
     "number_name": {
       "description": "Takes a small number and returns its full name. Needed for some TTS engines that do not support numbers or have trouble saying them.",
       "placeholders": [
-          "{number}"
+        "{number}"
       ],
       "match_string": "{number}",
       "simple_match_map": {

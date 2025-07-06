@@ -27,7 +27,7 @@ namespace VoiceDispatcherMod {
         }
 
         public static string MapToYardName(this TrackID trackId) {
-            return JsonLinesLoader.MapType("yard_id", trackId?.yardId);
+            return JsonLinesLoader.MapType("yard_name", trackId?.yardId);
         }
         
         public static string MapToYardName(this Track track) {
@@ -35,16 +35,15 @@ namespace VoiceDispatcherMod {
         }
 
         public static string MapToYardName(this StationInfo stationInfo) {
-            return JsonLinesLoader.MapType("yard_id", stationInfo?.YardID);
+            return JsonLinesLoader.MapType("yard_name", stationInfo?.YardID);
         }
 
         public static string MapToCarCount<T>(this List<T> cars) {
-            return JsonLinesLoader.GetRandomAndReplace("car_count",
-                new() { { "count", cars.Count.ToString() } });
+            return JsonLinesLoader.MapType("car_count", cars.Count.ToString());
         }
 
-        public static string MapToDigit(this int digit) {
-            return JsonLinesLoader.MapType("digit", digit.ToString());
+        public static string MapToNumberName(this int digit) {
+            return JsonLinesLoader.MapType("number_name", digit.ToString());
         }
         
         public static string MapToCarID(this TrainCar car) {
@@ -63,13 +62,8 @@ namespace VoiceDispatcherMod {
                 { "second_digit", digitPart[1].ToString() },
                 { "third_digit", digitPart[2].ToString() },
                 { "car_type_id", carType?.ToString() ?? "Unknown" },
-                { "car_type_name", carType?.MapToCarTypeName() ?? "Unknown" }
             };
             return JsonLinesLoader.GetRandomAndReplace("car_id", replacements);
-        }
-        
-        public static string MapToCarTypeName(this TrainCarType carType) {
-            return JsonLinesLoader.MapType("train_car_type", carType.ToString());
         }
     }
 }

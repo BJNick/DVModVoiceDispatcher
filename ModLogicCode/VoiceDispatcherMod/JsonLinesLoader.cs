@@ -7,7 +7,6 @@ namespace VoiceDispatcherMod {
     [Serializable]
     public class DialogueData {
         public Dictionary<string, LineGroup> line_groups;
-        public Dictionary<string, TypeMap> type_maps;
         public LanguageSettings language_settings;
     }
 
@@ -221,19 +220,14 @@ namespace VoiceDispatcherMod {
             return ReplaceAll(line, replacements);
         }
 
-        public static string MapType(string type, string key) {
-            if (DialogueData.type_maps.TryGetValue(type, out var typeMap)) {
-                if (typeMap.map.TryGetValue(key, out var mappedValue)) {
-                    return mappedValue;
-                }
-
-                if (typeMap.map.TryGetValue("default", out var defaultMappedValue)) {
-                    return defaultMappedValue;
-                }
+        public static string MapType(string type, string value) {
+            var group = GetBaseLineGroup(type);
+            if (group?.placeholders == null) {
+                LogError($"Proper type mapping for '{type}' not found.");
+                return value; // Return the original key if no mapping is found
             }
-
-            LogError($"Mapping for type '{type}' and key '{key}' not found.");
-            return key; // Return the original key if no mapping is found
+            var replacements = new Dictionary<string, string> { { group.placeholders[0], value } };
+            return GetRandomAndReplace(type, replacements);
         }
         
         public static string SentenceDelimiter() {

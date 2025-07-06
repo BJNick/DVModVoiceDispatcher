@@ -190,7 +190,7 @@ namespace VoiceDispatcherMod {
                 Main.settings.Save(Main.mod);
                 var line = JsonLinesLoader.GetRandomAndReplace("volume_check", new() {
                     { "volume", Main.settings.Volume.ToString() },
-                    { "volume_spelled", Main.settings.Volume.MapToDigit() }
+                    { "volume_spelled", Main.settings.Volume.MapToNumberName() }
                 });
                 Play(LineChain.SplitIntoChain(line));
                 menuList.RenderActions();

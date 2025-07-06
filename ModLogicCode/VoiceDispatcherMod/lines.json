@@ -30,7 +30,6 @@
     "highest_paying_job": {
       "description": "Lines reporting the highest paying job available. {job_type} is replaced with the type of job, {destination} with the destination, and {payout} with the payout amount.",
       "placeholders": [
-        "{job_type}",
         "{job_type_id}",
         "{destination_yard_name}",
         "{destination_track_name}",
@@ -421,40 +420,14 @@
         "SW": "Sawmill",
         "default": "{yard_id}"
       }
-    }
-  },
-  "type_maps": {
-    "yard_id": {
-      "description": "Takes the yard ID and returns the full name of the yard.",
-      "map": {
-        "CME": "Coal Mine East",
-        "CMS": "Coal Mine South",
-        "CP": "Coal Plant",
-        "CS": "City South",
-        "CW": "City West",
-        "FF": "Food Factory",
-        "FM": "Farm Market",
-        "FRC": "Forest Central",
-        "FRS": "Forest South",
-        "GF": "Goods Factory",
-        "HB": "Harbor",
-        "HMB": "Harbor Base",
-        "IME": "Iron Mine East",
-        "IMW": "Iron Mine West",
-        "MB": "Military Base",
-        "MF": "Machine Factory",
-        "MFMB": "Machine Factory Base",
-        "OR": "Oil Refinery",
-        "OWC": "Oil Well Central",
-        "OWN": "Oil Well North",
-        "SM": "Steel Mill",
-        "SW": "Sawmill",
-        "default": "Unknown Yard"
-      }
     },
     "job_type": {
       "description": "Takes the job type ID and returns the full name of a single instance of job type order.",
-      "map": {
+      "placeholders": [
+          "{job_type_id}"
+      ],
+      "match_string": "{job_type_id}",
+      "simple_match_map": {
         "ShuntingLoad": "A loading order",
         "ShuntingUnload": "An unloading order",
         "Transport": "A freight haul order",
@@ -463,9 +436,13 @@
         "default": "A custom order"
       }
     },
-    "digit": {
+    "number_name": {
       "description": "Takes a small number and returns its full name. Needed for some TTS engines that do not support numbers or have trouble saying them.",
-      "map": {
+      "placeholders": [
+          "{number}"
+      ],
+      "match_string": "{number}",
+      "simple_match_map": {
         "0": "zero",
         "1": "one",
         "2": "two",
@@ -477,46 +454,7 @@
         "8": "eight.",
         "9": "nine",
         "10": "ten",
-        "default": "error"
-      }
-    },
-    "train_car_type": {
-      "description": "Takes the train car type ID and returns the full name of a train car type (v1).",
-      "map": {
-        "LocoShunter": "DE2 Locomotive",
-        "LocoSteamHeavy": "S282 Locomotive",
-        "Tender": "Tender",
-        "LocoS060": "S060 Locomotive",
-        "LocoRailbus": "Railbus Locomotive",
-        "LocoDM1U": "DM1U Locomotive",
-        "LocoDiesel": "Diesel Locomotive",
-        "LocoDE6Slug": "DE6 Slug Locomotive",
-        "LocoDH4": "DH4 Locomotive",
-        "LocoDM3": "DM3 Locomotive",
-        "LocoMicroshunter": "Microshunter",
-        "FlatbedEmpty": "Flatbed",
-        "FlatbedStakes": "Flatbed with Stakes",
-        "FlatbedMilitary": "Military Flatbed",
-        "FlatbedShort": "Short Flatbed",
-        "AutorackRed": "Red Autorack",
-        "AutorackBlue": "Blue Autorack",
-        "AutorackGreen": "Green Autorack",
-        "AutorackYellow": "Yellow Autorack",
-        "TankOrange": "Orange Tank",
-        "TankWhite": "White Tank",
-        "TankYellow": "Yellow Tank",
-        "TankBlue": "Blue Tank",
-        "TankChrome": "Chrome Tank",
-        "TankBlack": "Black Tank",
-        "TankShortMilk": "Milk Tank",
-        "StockRed": "Red Stock",
-        "StockGreen": "Green Stock",
-        "StockBrown": "Brown Stock",
-        "BoxcarBrown": "Brown Boxcar",
-        "BoxcarGreen": "Green Boxcar",
-        "BoxcarPink": "Pink Boxcar",
-        "BoxcarRed": "Red Boxcar",
-        "BoxcarMilitary": "Military Boxcar"
+        "default": "{number}"
       }
     }
   }

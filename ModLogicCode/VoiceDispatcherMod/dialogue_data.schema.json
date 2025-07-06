@@ -9,15 +9,9 @@
         "$ref": "#/definitions/LineGroup"
       }
     },
-    "type_maps": {
-      "type": "object",
-      "additionalProperties": {
-        "$ref": "#/definitions/TypeMap"
-      }
-    },
     "language_settings": { "$ref":"#/definitions/LanguageSettings" }
   },
-  "required": ["line_groups", "type_maps", "language_settings"],
+  "required": ["line_groups", "language_settings"],
   "definitions": {
     "LineGroup": {
       "type": "object",
@@ -50,18 +44,6 @@
         { "required": ["match_string", "match_map"] },
         { "required": ["match_string", "simple_match_map"] }
       ],
-      "additionalProperties": false
-    },
-    "TypeMap": {
-      "type": "object",
-      "properties": {
-        "description": { "type": "string" },
-        "map": {
-          "type": "object",
-          "additionalProperties": { "type": "string" }
-        }
-      },
-      "required": ["map"],
       "additionalProperties": false
     },
     "LanguageSettings": {

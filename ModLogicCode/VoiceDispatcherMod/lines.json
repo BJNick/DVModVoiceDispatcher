@@ -126,9 +126,7 @@
         "{destination_track_name}",
         "{destination_yard_name}"
       ],
-      "lines": [
-        "{job_type_name}. Pick up {car_count} from track {starting_track_name} in {starting_yard_name}. Deliver them to {destination_yard_name}. Then drop them off at track {destination_track_name}."
-      ]
+      "line": "{job_type_name}. Pick up {car_count} from track {starting_track_name} in {starting_yard_name}. Deliver them to {destination_yard_name}. Then drop them off at track {destination_track_name}."
     },
     "shunting_load_job_overview": {
       "description": "A full job overview when accepting a new shunting load job.",
@@ -149,27 +147,19 @@
       "match_map": {
         "1": {
           "description": "A job with one pickup.",
-          "lines": [
-            "{job_type_name}. Couple {pickup_1_car_count} at track {pickup_1_track_name}. Then load at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
-          ]
+          "line": "{job_type_name}. Couple {pickup_1_car_count} at track {pickup_1_track_name}. Then load at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
         },
         "2": {
           "description": "A job with two pickups.",
-          "lines": [
-            "{job_type_name}. Couple {pickup_1_car_count} at track {pickup_1_track_name}, and {pickup_2_car_count} at track {pickup_2_track_name}. Then load {destination_car_count} at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
-          ]
+          "line": "{job_type_name}. Couple {pickup_1_car_count} at track {pickup_1_track_name}, and {pickup_2_car_count} at track {pickup_2_track_name}. Then load {destination_car_count} at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
         },
         "3": {
           "description": "A job with three pickups.",
-          "lines": [
-            "{job_type_name}. Couple {pickup_1_car_count} at track {pickup_1_track_name}, {pickup_2_car_count} at track {pickup_2_track_name}, and {pickup_3_car_count} at track {pickup_3_track_name}. Then load {destination_car_count} at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
-          ]
+          "line": "{job_type_name}. Couple {pickup_1_car_count} at track {pickup_1_track_name}, {pickup_2_car_count} at track {pickup_2_track_name}, and {pickup_3_car_count} at track {pickup_3_track_name}. Then load {destination_car_count} at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
         },
         "default": {
           "description": "A job with a high number of pickups.",
-          "lines": [
-            "{job_type_name}. It has {number_of_pickups} pickups, and with that I wish you luck. Load those {destination_car_count} at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
-          ]
+          "line": "{job_type_name}. It has {number_of_pickups} pickups, and with that I wish you luck. Load those {destination_car_count} at track {loading_track_name}. Then uncouple at track {destination_track_name} to complete the order."
         }
       }
     },
@@ -192,27 +182,19 @@
       "match_map": {
         "1": {
           "description": "A job with one dropoff.",
-          "lines": [
-            "{job_type_name}. Pick up {starting_car_count} at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple at track {dropoff_1_track_name} to complete the order."
-          ]
+          "line": "{job_type_name}. Pick up {starting_car_count} at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple at track {dropoff_1_track_name} to complete the order."
         },
         "2": {
           "description": "A job with two dropoffs.",
-          "lines": [
-            "{job_type_name}. Pick up {starting_car_count} at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple {dropoff_1_car_count} at track {dropoff_1_track_name}, and {dropoff_2_car_count} at track {dropoff_2_track_name} to complete the order."
-          ]
+          "line": "{job_type_name}. Pick up {starting_car_count} at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple {dropoff_1_car_count} at track {dropoff_1_track_name}, and {dropoff_2_car_count} at track {dropoff_2_track_name} to complete the order."
         },
         "3": {
           "description": "A job with three dropoffs.",
-          "lines": [
-            "{job_type_name}. Pick up {starting_car_count} at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple {dropoff_1_car_count} at track {dropoff_1_track_name}, {dropoff_2_car_count} at track {dropoff_2_track_name}, and {dropoff_3_car_count} at track {dropoff_3_track_name} to complete the order."
-          ]
+          "line": "{job_type_name}. Pick up {starting_car_count} at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple {dropoff_1_car_count} at track {dropoff_1_track_name}, {dropoff_2_car_count} at track {dropoff_2_track_name}, and {dropoff_3_car_count} at track {dropoff_3_track_name} to complete the order."
         },
         "default": {
           "description": "A job with a high number of dropoffs.",
-          "lines": [
-            "{job_type_name}. It has {number_of_dropoffs} dropoffs, and with that I wish you luck. Pick up {starting_car_count} at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple at a bunch of different tracks to complete the order."
-          ]
+          "line": "{job_type_name}. It has {number_of_dropoffs} dropoffs, and with that I wish you luck. Pick up {starting_car_count} at track {starting_track_name}. Then unload at track {unloading_track_name}. Then uncouple at a bunch of different tracks to complete the order."
         }
       }
     },
@@ -231,27 +213,19 @@
       "match_string": "{warehouse_task_type}",
       "match_map": {
         "Unloading": {
-          "lines": [
-            "Unload {car_count} at track {warehouse_track_name} in {warehouse_yard_name}."
-          ]
+          "line": "Unload {car_count} at track {warehouse_track_name} in {warehouse_yard_name}."
         },
         "Loading": {
-          "lines": [
-            "Load {car_count} at track {warehouse_track_name} in {warehouse_yard_name}."
-          ]
+          "line": "Load {car_count} at track {warehouse_track_name} in {warehouse_yard_name}."
         },
         "default": {
           "match_string": "{starting_yard_name}-{destination_yard_name}",
           "match_map": {
             "(.+)-\\1": {
-              "lines": [
-                "Move {car_count} from track {starting_track_name} to track {destination_track_name} in {destination_yard_name}."
-              ]
+              "line": "Move {car_count} from track {starting_track_name} to track {destination_track_name} in {destination_yard_name}."
             },
             "default": {
-              "lines": [
-                "Move {car_count} from track {starting_track_name} in {starting_yard_name} to track {destination_track_name} in {destination_yard_name}."
-              ]
+              "line": "Move {car_count} from track {starting_track_name} in {starting_yard_name} to track {destination_track_name} in {destination_yard_name}."
             }
           }
         }
@@ -265,19 +239,13 @@
       "match_string": "{count}",
       "match_map": {
         "0": {
-          "lines": [
-            "You have no orders."
-          ]
+          "line": "You have no orders."
         },
         "1": {
-          "lines": [
-            "You have {count} order."
-          ]
+          "line": "You have {count} order."
         },
         "default": {
-          "lines": [
-            "You have {count} orders."
-          ]
+          "line": "You have {count} orders."
         }
       }
     },
@@ -289,14 +257,10 @@
       "match_string": "{count}",
       "match_map": {
         "1": {
-          "lines": [
-            "{count} car"
-          ]
+          "line": "{count} car"
         },
         "default": {
-          "lines": [
-            "{count} cars"
-          ]
+          "line": "{count} cars"
         }
       }
     },
@@ -308,19 +272,13 @@
       "match_string": "{count}",
       "match_map": {
         ".*(?<!1)1": {
-          "lines": [
-            "{count} vagon"
-          ]
+          "line": "{count} vagon"
         },
         ".*(?<!1)[234]": {
-          "lines": [
-            "{count} vagona"
-          ]
+          "line": "{count} vagona"
         },
         "default": {
-          "lines": [
-            "{count} vagonov"
-          ]
+          "line": "{count} vagonov"
         }
       }
     },
@@ -335,44 +293,28 @@
       "match_string": "{sub_yard_id}",
       "match_map": {
         "A": {
-          "lines": [
-            "Alfa {order_number}"
-          ]
+          "line": "Alfa {order_number}"
         },
         "B": {
-          "lines": [
-            "Bravo {order_number}"
-          ]
+          "line": "Bravo {order_number}"
         },
         "C": {
-          "lines": [
-            "Charlie {order_number}"
-          ]
+          "line": "Charlie {order_number}"
         },
         "D": {
-          "lines": [
-            "Delta {order_number}"
-          ]
+          "line": "Delta {order_number}"
         },
         "E": {
-          "lines": [
-            "Echo {order_number}"
-          ]
+          "line": "Echo {order_number}"
         },
         "F": {
-          "lines": [
-            "Foxtrot {order_number}"
-          ]
+          "line": "Foxtrot {order_number}"
         },
         "G": {
-          "lines": [
-            "Golf {order_number}"
-          ]
+          "line": "Golf {order_number}"
         },
         "default": {
-          "lines": [
-            "{sub_yard_id} {order_number}"
-          ]
+          "line": "{sub_yard_id} {order_number}"
         }
       }
     },
@@ -388,9 +330,7 @@
         "{car_type_id}",
         "{car_type_name}"
       ],
-      "lines": [
-        "{letter_part} {first_digit} {second_digit} {third_digit}"
-      ]
+      "line": "{letter_part} {first_digit} {second_digit} {third_digit}"
     },
     "parametrization_test": {
       "description": "Lines used for testing the parametrization of the mod. These lines are not meant to be used in the game.",
@@ -403,15 +343,11 @@
       "match_map": {
         "alfa": {
           "description": "This is a test line for param1=alfa.",
-          "lines": [
-            "Apple: Param 1 is set to {param1}, param 2 is {param2}, and param 3 is {param3}."
-          ]
+          "line": "Apple: Param 1 is set to {param1}, param 2 is {param2}, and param 3 is {param3}."
         },
         "bravo": {
           "description": "This is a test line for param1=bravo.",
-          "lines": [
-            "Banana: Param 1 is set to {param1}, param 2 is {param2}, and param 3 is {param3}."
-          ]
+          "line": "Banana: Param 1 is set to {param1}, param 2 is {param2}, and param 3 is {param3}."
         },
         "charlie": {
           "description": "This is a test line for param1=charlie.",
@@ -419,29 +355,21 @@
           "match_map": {
             "delta": {
               "description": "This is a test line for param1=charlie and param2=delta.",
-              "lines": [
-                "Citron: Param 1 is {param1}, param 2 is {param2}, and param 3 is {param3}."
-              ]
+              "line": "Citron: Param 1 is {param1}, param 2 is {param2}, and param 3 is {param3}."
             },
             "echo": {
               "description": "This is a test line for param1=charlie and param2=echo.",
-              "lines": [
-                "Dandelion: Param 1 is {param1}, param 2 is {param2}, and param 3 is {param3}."
-              ]
+              "line": "Dandelion: Param 1 is {param1}, param 2 is {param2}, and param 3 is {param3}."
             }
           }
         },
         ".*nana": {
           "description": "This is a test line for param1 ending with 'nana'.",
-          "lines": [
-            "String ended with nana!"
-          ]
+          "line": "String ended with nana!"
         },
         "default": {
           "description": "This is a catch-all test line for any other value of param1.",
-          "lines": [
-            "Catch-all: Param 1 is set to {param1}, param 2 is {param2}, and param 3 is {param3}."
-          ]
+          "line": "Catch-all: Param 1 is set to {param1}, param 2 is {param2}, and param 3 is {param3}."
         }
       }
     }

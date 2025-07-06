@@ -46,22 +46,29 @@ namespace VoiceDispatcherMod {
                 }
                 
                 var matchedGroup = JsonLinesLoader.GetMatchedLineGroup(baseGroup, replacements);
-                
-                Console.WriteLine($"Which line do you want to use? (or press Enter for random):");
-                for (var i = 0; i < matchedGroup.lines.Count; i++) {
-                    var line = matchedGroup.lines[i];
-                    Console.WriteLine($"{i+1} {line}");
-                }
-                var lineIndexInput = Console.ReadLine();
-                int lineIndex = 0;
-                if (string.IsNullOrEmpty(lineIndexInput)) {
-                    lineIndex = new Random().Next(0, matchedGroup.lines.Count);
+
+                string selectedLine;
+                if (matchedGroup.line != null) {
+                    selectedLine = matchedGroup.line;
                 } else {
-                    int.TryParse(lineIndexInput, out var lineIndexInputInt);
-                    lineIndex = lineIndexInputInt - 1;
+                    Console.WriteLine($"Which line do you want to use? (or press Enter for random):");
+                    for (var i = 0; i < matchedGroup.lines.Count; i++) {
+                        var line = matchedGroup.lines[i];
+                        Console.WriteLine($"{i + 1} {line}");
+                    }
+
+                    var lineIndexInput = Console.ReadLine();
+                    int lineIndex = 0;
+                    if (string.IsNullOrEmpty(lineIndexInput)) {
+                        lineIndex = new Random().Next(0, matchedGroup.lines.Count);
+                    } else {
+                        int.TryParse(lineIndexInput, out var lineIndexInputInt);
+                        lineIndex = lineIndexInputInt - 1;
+                    }
+
+                    selectedLine = matchedGroup.lines[lineIndex];
                 }
-                
-                var selectedLine = matchedGroup.lines[lineIndex];
+
                 foreach (var placeholder in replacements) {
                     selectedLine = selectedLine.Replace(placeholder.Key, placeholder.Value);
                 }

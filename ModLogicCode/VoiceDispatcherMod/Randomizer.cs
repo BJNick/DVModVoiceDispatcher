@@ -38,7 +38,13 @@ namespace VoiceDispatcherMod {
         }
         
         public static string GetRandomLine(LineGroup lineGroup) {
-            if (lineGroup == null || lineGroup.lines.Count == 0) {
+            if (lineGroup == null) {
+                return string.Empty;
+            }
+            if (lineGroup.line != null) {
+                return lineGroup.line;
+            }
+            if (lineGroup.lines == null || lineGroup.lines.Count == 0) {
                 return string.Empty;
             }
             if (lineGroup.lines.Count == 1) {

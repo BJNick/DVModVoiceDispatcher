@@ -15,8 +15,10 @@ namespace VoiceDispatcherMod {
     public class LineGroup {
         public string description;
         public List<string> placeholders;
+        
+        public string line;
         public List<string> lines;
-
+        
         public string match_string;
         public Dictionary<string, LineGroup> match_map;
     }

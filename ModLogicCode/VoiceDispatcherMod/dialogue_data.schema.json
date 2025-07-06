@@ -27,6 +27,9 @@
           "type": "array",
           "items": { "type": "string" }
         },
+        "line": {
+          "type": "string"
+        },
         "lines": {
           "type": "array",
           "items": { "type": "string" }
@@ -38,6 +41,7 @@
         }
       },
       "oneOf": [
+        { "required": ["line"] },
         { "required": ["lines"] },
         { "required": ["match_string", "match_map"] }
       ],

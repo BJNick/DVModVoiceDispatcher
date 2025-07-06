@@ -340,6 +340,15 @@
         ],
         "line": "Testing volume. {volume_spelled}"
     },
+    "call_test": {
+        "description": "Lines used for testing the call replacements of the mod. These lines are not meant to be used in the game.",
+        "placeholders": [
+          "{count}",
+          "{sub_yard_id}",
+          "{order_number}"
+        ],
+        "line": "Make sure to go to track {@track_name}. Pick up {@car_count} from there."
+    },
     "parametrization_test": {
       "description": "Lines used for testing the parametrization of the mod. These lines are not meant to be used in the game.",
       "placeholders": [

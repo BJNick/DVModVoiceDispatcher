@@ -77,7 +77,7 @@ namespace VoiceDispatcherMod {
                 return baseLineGroup;
             }
 
-            var replacedMatchString = Replace(baseLineGroup.match_string, replacements);
+            var replacedMatchString = ReplacePlaceholders(baseLineGroup.match_string, replacements);
             if (TryFindMatchingInnerGroup(baseLineGroup, replacedMatchString, out var innerGroup)) {
                 return GetMatchedLineGroup(innerGroup, replacements);
             }
@@ -128,7 +128,7 @@ namespace VoiceDispatcherMod {
             }
         }
 
-        public static string Replace(string text, Dictionary<string, string> replacements) {
+        public static string ReplacePlaceholders(string text, Dictionary<string, string> replacements) {
             if (replacements == null || replacements.Count == 0) {
                 return text;
             }
@@ -140,11 +140,37 @@ namespace VoiceDispatcherMod {
 
             return text;
         }
+        
+        public static string ReplaceCalls(string text, Dictionary<string, string> replacements) {
+            var callPattern = @"\{@(\w+)\}";
+            var matches = System.Text.RegularExpressions.Regex.Matches(text, callPattern);
+            foreach (System.Text.RegularExpressions.Match match in matches) {
+                var key = match.Groups[1].Value;
+                if (GetBaseLineGroup(key) == null) {
+                    LogError($"Line group '{key}' not found in text: {text}");
+                    continue;
+                }
+                var value = GetRandomAndReplace(key, replacements);
+                if (value != null) {
+                    text = text.Replace(match.Value, value);
+                } else {
+                    LogError($"No replacement found for key '{key}' in text: {text}");
+                }
+            }
+
+            return text;
+        }
+        
+        public static string ReplaceAll(string text, Dictionary<string, string> replacements) {
+            text = ReplacePlaceholders(text, replacements);
+            text = ReplaceCalls(text, replacements);
+            return text;
+        }
 
         public static string GetRandomAndReplace(string groupName, Dictionary<string, string> replacements = null) {
             var group = GetMatchedLineGroup(GetBaseLineGroup(groupName), replacements);
             var line = Randomizer.GetRandomLine(group);
-            return Replace(line, replacements);
+            return ReplaceAll(line, replacements);
         }
 
         public static string MapType(string type, string key) {

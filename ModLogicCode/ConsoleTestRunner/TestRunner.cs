@@ -15,6 +15,7 @@ namespace VoiceDispatcherMod {
         const string lines = "D:\\Projects\\Mods\\DVVoiceAssistant\\ModLogicCode\\VoiceDispatcherMod\\lines.json";
         
         public static void Main(string[] args) {
+            Randomizer.RandomRange = new Random().Next;
             JsonLinesLoader.Init(lines);
             string lastGroupName = "speed_report";
             Dictionary<string, string> replacements = new Dictionary<string, string>();
@@ -70,9 +71,7 @@ namespace VoiceDispatcherMod {
                     selectedLine = matchedGroup.lines[lineIndex];
                 }
 
-                foreach (var placeholder in replacements) {
-                    selectedLine = selectedLine.Replace(placeholder.Key, placeholder.Value);
-                }
+                selectedLine = JsonLinesLoader.ReplaceAll(selectedLine, replacements);
                 Console.WriteLine($"Generating line: {selectedLine}");
                 GenerateWithSox(selectedLine).GetAwaiter().GetResult();
                 Play();
@@ -104,7 +103,7 @@ namespace VoiceDispatcherMod {
         }
 
         public static async Task GenerateWithSox(string text) {
-            const string modelName = "glados";
+            const string modelName = "en_US-ljspeech-high";
             var modelPath = Path.Combine(cwd, modelName);
             var piperPath = Path.Combine(cwd, "piper",
                 Environment.OSVersion.Platform == PlatformID.Win32NT ? "piper.exe" : "piper");

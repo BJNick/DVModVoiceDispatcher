@@ -184,10 +184,15 @@ namespace VoiceDispatcherMod {
             };
 
             void SetVolume(int newVolume) {
-                CutCoroutineShort();
+                CutCoroutineShort(false);
+                CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform);
                 Main.settings.Volume = Mathf.Clamp(newVolume, 1, 10);
                 Main.settings.Save(Main.mod);
-                Play(new PromptLine(Main.settings.Volume.ToString()));
+                var line = JsonLinesLoader.GetRandomAndReplace("volume_check", new() {
+                    { "volume", Main.settings.Volume.ToString() },
+                    { "volume_spelled", Main.settings.Volume.MapToDigit() }
+                });
+                Play(LineChain.SplitIntoLines(line));
                 menuList.RenderActions();
             }
             settingsActions = new() {

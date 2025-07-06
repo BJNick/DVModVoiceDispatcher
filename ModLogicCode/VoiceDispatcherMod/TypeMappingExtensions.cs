@@ -42,6 +42,10 @@ namespace VoiceDispatcherMod {
             return JsonLinesLoader.GetRandomAndReplace("car_count",
                 new() { { "count", cars.Count.ToString() } });
         }
+
+        public static string MapToDigit(this int digit) {
+            return JsonLinesLoader.MapType("digit", digit.ToString());
+        }
         
         public static string MapToCarID(this TrainCar car) {
             if (!car || string.IsNullOrEmpty(car.ID)) {

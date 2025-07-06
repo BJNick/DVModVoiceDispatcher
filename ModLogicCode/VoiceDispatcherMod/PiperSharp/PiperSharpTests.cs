@@ -13,7 +13,7 @@ namespace PiperSharp.Tests.Tests
         {
             if (!condition)
             {
-                Main.Logger.Error(message);
+                Console.WriteLine(message);
                 throw new Exception("Assertion failed: " + message);
             }
         }
@@ -21,7 +21,7 @@ namespace PiperSharp.Tests.Tests
 
     public class PiperSharpTests
     {
-        string cwd = Path.Combine(Main.mod.Path, "Piper");
+        const string cwd = "D:\\SteamLibrary\\steamapps\\common\\Derail Valley\\Mods\\VoiceDispatcherMod\\Piper";
         
         public async Task RunAllTests()
         {
@@ -65,14 +65,13 @@ namespace PiperSharp.Tests.Tests
         {
             string[] modelNames =
             {
-                "ar_JO-kareem-low",
-                "de_DE-eva_k-x_low",
-                "lv_LV-aivars-medium",
-                "en_US-ljspeech-high"
+                "ru_RU-irina-medium",
+                "en_US-ljspeech-high",
             };
 
             foreach (var modelName in modelNames)
             {
+                Console.WriteLine("Downloading model: " + modelName);
                 //var cwd = Directory.GetCurrentDirectory();
                 var modelPath = Path.Combine(cwd, modelName);
                 if (Directory.Exists(modelPath)) Directory.Delete(modelPath, true);

@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using PiperSharp;
 using PiperSharp.Models;
+using PiperSharp.Tests.Tests;
 using VoiceDispatcherMod.PiperSharp;
 
 namespace VoiceDispatcherMod {
@@ -139,6 +140,14 @@ namespace VoiceDispatcherMod {
                 process.Start();
             } else {
                 Console.WriteLine("Output file does not exist: " + outputFilePath);
+            }
+        }
+
+        public static void DownloadModels() {
+            try {
+                new PiperSharpTests().TestDownloadModel().Wait();
+            } catch (Exception ex) {
+                Console.WriteLine("Error downloading models: " + ex.Message);
             }
         }
         

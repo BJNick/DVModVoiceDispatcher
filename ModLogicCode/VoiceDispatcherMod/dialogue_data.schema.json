@@ -38,12 +38,17 @@
         "match_map": {
           "type": "object",
           "additionalProperties": { "$ref": "#/definitions/LineGroup" }
+        },
+        "simple_match_map": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
         }
       },
       "oneOf": [
         { "required": ["line"] },
         { "required": ["lines"] },
-        { "required": ["match_string", "match_map"] }
+        { "required": ["match_string", "match_map"] },
+        { "required": ["match_string", "simple_match_map"] }
       ],
       "additionalProperties": false
     },

@@ -333,21 +333,21 @@
       "line": "{letter_part} {first_digit} {second_digit} {third_digit}"
     },
     "volume_check": {
-        "description": "Lines that play when the player checks the volume of the mod.",
-        "placeholders": [
-            "{volume}",
-            "{volume_spelled}"
-        ],
-        "line": "Testing volume. {volume_spelled}"
+      "description": "Lines that play when the player checks the volume of the mod.",
+      "placeholders": [
+        "{volume}",
+        "{volume_spelled}"
+      ],
+      "line": "Testing volume. {volume_spelled}"
     },
     "call_test": {
-        "description": "Lines used for testing the call replacements of the mod. These lines are not meant to be used in the game.",
-        "placeholders": [
-          "{destination_count}",
-          "{destination_sub_yard_id}",
-          "{destination_order_number}"
-        ],
-        "line": "Make sure to go to track {@track_name(sub_yard_id={destination_sub_yard_id},order_number={destination_order_number})}. Pick up {@car_count(count={destination_count})} from there. Also check out {@track_name(sub_yard_id=E, order_number=1)} for more cars.}"
+      "description": "Lines used for testing the call replacements of the mod. These lines are not meant to be used in the game.",
+      "placeholders": [
+        "{destination_count}",
+        "{destination_sub_yard_id}",
+        "{destination_order_number}"
+      ],
+      "line": "Make sure to go to track {@track_name(sub_yard_id={destination_sub_yard_id},order_number={destination_order_number})}. Pick up {@car_count(count={destination_count})} from there. Also check out {@track_name(sub_yard_id=E, order_number=1)} for more cars.}"
     },
     "parametrization_test": {
       "description": "Lines used for testing the parametrization of the mod. These lines are not meant to be used in the game.",
@@ -388,6 +388,38 @@
           "description": "This is a catch-all test line for any other value of param1.",
           "line": "Catch-all: Param 1 is set to {param1}, param 2 is {param2}, and param 3 is {param3}."
         }
+      }
+    },
+    "yard_name": {
+      "description": "Takes the yard ID and returns the full name of the yard.",
+      "placeholders": [
+        "yard_id"
+      ],
+      "match_string": "{yard_id}",
+      "simple_match_map": {
+        "CME": "Coal Mine East",
+        "CMS": "Coal Mine South",
+        "CP": "Coal Plant",
+        "CS": "City South",
+        "CW": "City West",
+        "FF": "Food Factory",
+        "FM": "Farm Market",
+        "FRC": "Forest Central",
+        "FRS": "Forest South",
+        "GF": "Goods Factory",
+        "HB": "Harbor",
+        "HMB": "Harbor Base",
+        "IME": "Iron Mine East",
+        "IMW": "Iron Mine West",
+        "MB": "Military Base",
+        "MF": "Machine Factory",
+        "MFMB": "Machine Factory Base",
+        "OR": "Oil Refinery",
+        "OWC": "Oil Well Central",
+        "OWN": "Oil Well North",
+        "SM": "Steel Mill",
+        "SW": "Sawmill",
+        "default": "{yard_id}"
       }
     }
   },

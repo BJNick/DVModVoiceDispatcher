@@ -21,6 +21,7 @@ namespace VoiceDispatcherMod {
         
         public string match_string;
         public Dictionary<string, LineGroup> match_map;
+        public Dictionary<string, string> simple_match_map;
     }
 
     [Serializable]
@@ -78,6 +79,14 @@ namespace VoiceDispatcherMod {
             }
 
             var replacedMatchString = ReplacePlaceholders(baseLineGroup.match_string, replacements);
+            if (TryFindMatchingSimpleGroup(baseLineGroup, replacedMatchString, out var simpleGroup)) {
+                return simpleGroup;
+            }
+            
+            if (TryFindMatchingSimpleGroup(baseLineGroup, "default", out var matchedGroup)) {
+                return GetMatchedLineGroup(matchedGroup, replacements);
+            }
+
             if (TryFindMatchingInnerGroup(baseLineGroup, replacedMatchString, out var innerGroup)) {
                 return GetMatchedLineGroup(innerGroup, replacements);
             }
@@ -100,9 +109,32 @@ namespace VoiceDispatcherMod {
         }
 
         public static bool TryFindMatchingInnerGroup(LineGroup group, string matchString, out LineGroup matchedGroup) {
+            if (group.match_map == null || group.match_map.Count == 0) {
+                matchedGroup = null;
+                return false;
+            }
+            
             foreach (var groupKey in group.match_map.Keys) {
                 if (IsMatchingRegex(matchString, groupKey)) {
                     matchedGroup = group.match_map[groupKey];
+                    return true;
+                }
+            }
+
+            matchedGroup = null;
+            return false;
+        }
+        
+        public static bool TryFindMatchingSimpleGroup(LineGroup group, string matchString, out LineGroup matchedGroup) {
+            if (group.simple_match_map == null || group.simple_match_map.Count == 0) {
+                matchedGroup = null;
+                return false;
+            }
+            
+            foreach (var groupKey in group.simple_match_map.Keys) {
+                if (IsMatchingRegex(matchString, groupKey)) {
+                    matchedGroup = new LineGroup();
+                    matchedGroup.line = group.simple_match_map[groupKey];
                     return true;
                 }
             }

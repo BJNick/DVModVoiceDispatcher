@@ -32,9 +32,11 @@ namespace PiperSharp {
             CancellationToken token = default) {
             var process = CreatePiperProcess(configuration);
             process.Start();
-            await process.StandardInput.WriteLineAsync(text.ToUtf8());
-            await process.StandardInput.FlushAsync();
-            process.StandardInput.Close();
+            
+            using (var writer = new StreamWriter(process.StandardInput.BaseStream, Encoding.UTF8)) {
+                await writer.WriteLineAsync(text.ToUtf8());
+                await writer.FlushAsync();
+            }
             
             await process.WaitForExitAsync(token);
             
@@ -49,7 +51,7 @@ namespace PiperSharp {
             soxProcess.Start();
             
             using (var writer = new StreamWriter(piperProcess.StandardInput.BaseStream, Encoding.UTF8)) {
-                await writer.WriteLineAsync(text);
+                await writer.WriteLineAsync(text.ToUtf8());
                 await writer.FlushAsync();
             }
             

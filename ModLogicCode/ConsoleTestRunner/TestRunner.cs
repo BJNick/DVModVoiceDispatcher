@@ -14,6 +14,9 @@ namespace VoiceDispatcherMod {
         const string cwd = "D:\\SteamLibrary\\steamapps\\common\\Derail Valley\\Mods\\VoiceDispatcherMod\\Piper";
         
         const string lines = "D:\\Projects\\Mods\\DVVoiceAssistant\\ModLogicCode\\VoiceDispatcherMod\\lines.json";
+
+        // en_US-ljspeech-high | en_US-joe-medium | ru_RU-irina-medium
+        private const string modelName = "en_US-joe-medium"; 
         
         public static void Main(string[] args) {
             SetConsoleEncoding(Encoding.UTF8);
@@ -97,7 +100,6 @@ namespace VoiceDispatcherMod {
         }
 
         public static async Task Generate(string text) {
-            const string modelName = "en_US-ljspeech-high";
             var modelPath = Path.Combine(cwd, modelName);
             var piperPath = Path.Combine(cwd, "piper",
                 Environment.OSVersion.Platform == PlatformID.Win32NT ? "piper.exe" : "piper");
@@ -113,7 +115,6 @@ namespace VoiceDispatcherMod {
         }
 
         public static async Task GenerateWithSox(string text) {
-            const string modelName = "en_US-ljspeech-high";
             var modelPath = Path.Combine(cwd, modelName);
             var piperPath = Path.Combine(cwd, "piper",
                 Environment.OSVersion.Platform == PlatformID.Win32NT ? "piper.exe" : "piper");
@@ -157,6 +158,30 @@ namespace VoiceDispatcherMod {
                 new PiperSharpTests().TestDownloadModel().Wait();
             } catch (Exception ex) {
                 Console.WriteLine("Error downloading models: " + ex.Message);
+            }
+        }
+        
+        public static void DirectTest() {
+            // Read line from console and generate audio, then play (utf-8)
+            SetConsoleEncoding(Encoding.UTF8);
+            string lastLine = "This is a test line for the Piper Sharp audio generation.";
+            while (true) {
+                Console.WriteLine("Enter text to generate audio (or 'q' to quit):");
+                var input = Console.ReadLine();
+                if (input?.ToLower() == "q") {
+                    break;
+                }
+                
+                if (string.IsNullOrEmpty(input)) {
+                    input = lastLine;
+                }
+                lastLine = input;
+                
+                Console.WriteLine($"Generating audio for: {input}");
+                SetConsoleEncoding(Encoding.Default);
+                GenerateWithSox(input).GetAwaiter().GetResult();
+                SetConsoleEncoding(Encoding.UTF8);
+                Play();
             }
         }
         

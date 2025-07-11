@@ -12,18 +12,18 @@ namespace DvMod.HeadsUpDisplay {
         private const int MaxEventCount = 5;
         private const int MaxEventSpan = 500;
         
-        public static List<TrackEvent> QueryUpcomingEvents()
+        public static List<(double, string)> QueryUpcomingEventsInText(int maxEventCount = 10)
         {
-            if (FollowCurrentTrack(MaxEventSpan, out var currentGrade, out var events)) return new List<TrackEvent>();
+            if (FollowCurrentTrack(MaxEventSpan, out var currentGrade, out var events)) return new List<(double, string)>();
 
             var eventDescriptions = events
                 .ExceptUnnamedTracks()
                 .ResolveJunctionSpeedLimits()
                 .FilterRedundantSpeedLimits()
                 .FilterGradeEvents(currentGrade)
-                .Take(MaxEventCount)
+                .Take(maxEventCount)
                 .TakeWhile(ev => ev.span < MaxEventSpan)
-                /*.Select(ev => ev switch
+                .Select(ev => ev switch
                     {
                         TrackChangeEvent e => (e.span, e.ID.ToString()),
                         JunctionEvent e => (e.span, GetJunctionEventDescription(e)),
@@ -31,7 +31,7 @@ namespace DvMod.HeadsUpDisplay {
                         SpeedLimitEvent e => (e.span, GetSpeedLimitEventDescription(e)),
                         GradeEvent e => (e.span, $"{e.grade:F1} %"),
                         _ => (0.0, $"Unknown event: {ev}"),
-                    })*/
+                    })
                 .ToList();
 
             return eventDescriptions;
@@ -73,6 +73,23 @@ namespace DvMod.HeadsUpDisplay {
                 startSpan,
                 direction ? maxEventSpan : -maxEventSpan);
             return false;
+        }
+        
+        private static string GetJunctionEventDescription(JunctionEvent e)
+        {
+            var description = TrackFollower.DescribeJunctionBranches(e.junction);
+            return description;
+        }
+
+        private static string GetSpeedLimitEventDescription(SpeedLimitEvent e)
+        {
+            var currentSpeed = Mathf.Abs(PlayerManager.Car.GetForwardSpeed() * 3.6f);
+            var color = "white";
+            if (currentSpeed > e.limit + 5f)
+                color = e.span < 500f ? "red" : e.span < 1000f ? "orange" : "yellow";
+            else if (currentSpeed < e.limit - 10f)
+                color = "lime";
+            return $"<color={color}>{e.limit} km/h</color>";
         }
     }
 }

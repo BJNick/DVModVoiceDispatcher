@@ -24,9 +24,12 @@ namespace VoiceDispatcherMod {
                 return;
             }
 
+            var allSigns = FilterTrackEvents.QueryUpcomingEventsInText();
+            Main.Logger.Log("Events: " + string.Join("; ", allSigns.Select(it => (int)it.Item1 + " " + it.Item2)));
+
             var speedLimits = FilterTrackEvents.QueryUpcomingSpeedLimits();
             if (speedLimits.Count > 0 && GetCurrentSpeed() > MinimumSpeed && !IsPlayerDerailed()) {
-                Main.Logger.Log("Upcoming speed limits: " + string.Join(", ", speedLimits.Select(it => it.limit)));
+                //Main.Logger.Log("Upcoming speed limits: " + string.Join(", ", speedLimits.Select(it => it.limit)));
                 var nextSpeedLimit = speedLimits.First();
                 PlaySpeedLimitRead(nextSpeedLimit);
 

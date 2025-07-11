@@ -2,6 +2,7 @@ using DV.Logic.Job;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TrackID = DV.Logic.Job.TrackID;
 
 /*
  * This code is from DV Heads Up Display mod at https://github.com/mspielberg/dv-hud/tree/master
@@ -99,9 +100,9 @@ namespace DvMod.HeadsUpDisplay
             if (left == null || right == null)
                 return junction.selectedBranch == 0 ? "<<<" : ">>>";
 
-            var selector =
-                (left.yardId != right.yardId || left.subYardId != right.subYardId) ? SubYardSelector :
-                TrackSelector;
+            Func<TrackID, string> selector = id => id.FullID;
+                /*(left.yardId != right.yardId || left.subYardId != right.subYardId) ? SubYardSelector :
+                TrackSelector;*/
 
             return junction.selectedBranch == 0
                 ? $"<color=lime>{selector(left)}</color> <<< {selector(right)}"

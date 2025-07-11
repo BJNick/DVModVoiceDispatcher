@@ -62,7 +62,7 @@ namespace VoiceDispatcherMod {
                 return 0f;
             }
             var playerSpeed = PlayerManager.LastLoco.GetAbsSpeed() * 3.6f; // Convert m/s to km/h
-            Main.Logger.Log("Current speed: " + playerSpeed);
+            //Main.Logger.Log("Current speed: " + playerSpeed);
             return playerSpeed;
         }
 

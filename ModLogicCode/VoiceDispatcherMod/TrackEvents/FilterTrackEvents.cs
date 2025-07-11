@@ -63,7 +63,6 @@ namespace DvMod.HeadsUpDisplay {
                 return true;
             var startSpan = bogie.traveller.Span;
             // var locoDirection = PlayerManager.LastLoco == null || PlayerManager.LastLoco.GetComponent<LocoControllerBase>()?.reverser >= 0f;
-            Main.Logger.Log("Reverser: " + PlayerManager.LastLoco.GetComponent<SimController>()?.controlsOverrider?.Reverser?.Value);
             var locoDirection = PlayerManager.LastLoco == null || PlayerManager.LastLoco.GetComponent<SimController>()?.controlsOverrider?.Reverser?.Value >= 0.5f;
             var direction = !locoDirection ^ (bogie.trackDirection > 0);
             currentGrade = TrackIndexer.Grade(bogie.point1) * (direction ? 1 : -1);

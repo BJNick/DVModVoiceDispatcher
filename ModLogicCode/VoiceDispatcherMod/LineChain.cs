@@ -213,7 +213,7 @@ namespace VoiceDispatcherMod {
                     yield return null;
                 }
                 
-                Main.Logger.Log("Playing line: " + lineChain[index].SubtitleText);
+                //Main.Logger.Log("Playing line: " + lineChain[index].SubtitleText);
                 CommsRadioNarrator.PlayRadioClip(currentLine.AudioClip);
                 
                 while (CommsRadioNarrator.source.isPlaying) {
@@ -224,7 +224,7 @@ namespace VoiceDispatcherMod {
                             break;
                         }
                         if (!upcomingLine.IsClipReady && !upcomingLine.IsClipFailed) {
-                            Main.Logger.Log("Creating line: " + lineChain[i].SubtitleText);
+                            //Main.Logger.Log("Creating line: " + lineChain[i].SubtitleText);
                             upcomingLine.CreateClip(coroutineRunner);
                             break;
                         }

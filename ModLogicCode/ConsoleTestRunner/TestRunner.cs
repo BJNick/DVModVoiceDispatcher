@@ -16,8 +16,7 @@ namespace VoiceDispatcherMod {
         const string lines = "D:\\Projects\\Mods\\DVVoiceAssistant\\ModLogicCode\\VoiceDispatcherMod\\lines.json";
         
         public static void Main(string[] args) {
-            Console.InputEncoding = Encoding.UTF8;
-            Console.OutputEncoding = Encoding.UTF8;
+            SetConsoleEncoding(Encoding.UTF8);
             Randomizer.RandomRange = new Random().Next;
             JsonLinesLoader.Init(lines);
             string lastGroupName = "speed_report";
@@ -76,11 +75,19 @@ namespace VoiceDispatcherMod {
 
                 selectedLine = JsonLinesLoader.ReplaceAll(selectedLine, replacements);
                 Console.WriteLine($"Generating line: {selectedLine}");
+                
+                SetConsoleEncoding(Encoding.Default);
                 GenerateWithSox(selectedLine).GetAwaiter().GetResult();
+                SetConsoleEncoding(Encoding.UTF8);
+
                 Play();
                 Console.WriteLine();
-
             } while (true);
+        }
+        
+        public static void SetConsoleEncoding(Encoding encoding) {
+            Console.InputEncoding = encoding;
+            Console.OutputEncoding = encoding;
         }
         
         public static string GetRandomLine(List<string> lines) {

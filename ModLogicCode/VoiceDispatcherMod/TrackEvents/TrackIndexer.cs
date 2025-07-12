@@ -37,7 +37,12 @@ namespace DvMod.HeadsUpDisplay
 
         private static IEnumerable<TrackEvent> ParseSign(string colliderName, bool direction, double span)
         {
-            string[] parts = colliderName.Split('\n');
+            string[] parts = colliderName.Split(';');
+            if (parts.Length == 3) {
+                // Skip the first part, it is branch distance such as Y 0.3
+                parts = new[] {parts[1], parts[2]};
+            }
+            
             switch (parts.Length)
             {
                 case 1:
@@ -126,7 +131,7 @@ namespace DvMod.HeadsUpDisplay
                 {
                     signDebug.gameObject.layer = SIGN_COLLIDER_LAYER;
                     var collider = signDebug.gameObject.AddComponent<SphereCollider>();
-                    collider.name = signDebug.text;
+                    collider.name = signDebug.text.Replace("\n", ";");
                     collider.center = new Vector3(2f, 0f, 0f);
                     collider.radius = 3f;
                     collider.isTrigger = true;

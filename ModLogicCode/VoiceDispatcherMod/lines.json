@@ -23,7 +23,7 @@
           "{distance}",
           "{distance_rounded}"
         ],
-        "line": "Speed limit {speed_limit}. In {distance_rounded} meters."
+        "line": "Speed limit {speed_limit} in {distance_rounded} meters."
     },
     "speed_limit_warning": {
       "description": "Lines reporting a dangerous change in speed limit.",
@@ -43,7 +43,7 @@
         "{distance_rounded}",
         "{distance_rounded_2}"
       ],
-      "line": "Speed limit {speed_limit}. Then drop to {speed_limit_2} in {distance_rounded_2} meters."
+      "line": "Speed limit {speed_limit}, then drop to {speed_limit_2} in {distance_rounded_2} meters."
     },
     
     "direction_report": {

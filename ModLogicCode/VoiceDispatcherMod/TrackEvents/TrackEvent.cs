@@ -207,6 +207,25 @@ namespace DvMod.HeadsUpDisplay
                 }
             }
         }
+        
+        /// <summary>Filters out reversed speed limit events.</summary>
+        public static IEnumerable<TrackEvent> FilterReversedSpeedLimits(this IEnumerable<TrackEvent> events)
+        {
+            foreach (TrackEvent ev in events)
+            {
+                if (ev is SpeedLimitEvent sle)
+                {
+                    if (sle.Direction)
+                    {
+                        yield return sle;
+                    }
+                }
+                else
+                {
+                    yield return ev;
+                }
+            }
+        }
 
         public const double GradeChangeInterval = 100;
 

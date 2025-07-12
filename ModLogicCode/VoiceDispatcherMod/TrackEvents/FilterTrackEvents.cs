@@ -19,7 +19,7 @@ namespace DvMod.HeadsUpDisplay {
             var eventDescriptions = events
                 .ExceptUnnamedTracks()
                 .ResolveJunctionSpeedLimits()
-                .FilterRedundantSpeedLimits()
+                .FilterReversedSpeedLimits()
                 .FilterGradeEvents(currentGrade)
                 .Take(maxEventCount)
                 .TakeWhile(ev => ev.span < MaxEventSpan)
@@ -45,7 +45,7 @@ namespace DvMod.HeadsUpDisplay {
             return events
                 .ExceptUnnamedTracks()
                 .ResolveJunctionSpeedLimits()
-                .FilterRedundantSpeedLimits()
+                .FilterReversedSpeedLimits()
                 .OfType<SpeedLimitEvent>()
                 .Take(maxEventCount)
                 .ToList();

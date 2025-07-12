@@ -16,6 +16,36 @@
         "Speed: {speed} kilometers per hour"
       ]
     },
+    "speed_limit_change": {
+        "description": "Lines reporting a change in speed limit.",
+        "placeholders": [
+          "{speed_limit}",
+          "{distance}",
+          "{distance_rounded}"
+        ],
+        "line": "Speed limit {speed_limit}. In {distance_rounded} meters."
+    },
+    "speed_limit_warning": {
+      "description": "Lines reporting a dangerous change in speed limit.",
+      "placeholders": [
+        "{speed_limit}",
+        "{distance}",
+        "{distance_rounded}"
+      ],
+      "line": "Warning, speed limit drops to {speed_limit} in {distance_rounded} meters."
+    },
+    "speed_limit_change_2": {
+      "description": "Lines reporting a change in speed limit, followed shortly by another change.",
+      "placeholders": [
+        "{speed_limit}",
+        "{speed_limit_2}",
+        "{distance}",
+        "{distance_rounded}",
+        "{distance_rounded_2}"
+      ],
+      "line": "Speed limit {speed_limit}. Then drop to {speed_limit_2} in {distance_rounded_2} meters."
+    },
+    
     "direction_report": {
       "description": "Lines reporting the player's current direction. {direction} is replaced with a direction (e.g., north).",
       "placeholders": [

@@ -13,8 +13,11 @@ namespace VoiceDispatcherMod {
         private const float DeralmentDelay = 5f;
         private const float DeralmentReset = 15f;
         private const float DeralmentCooldown = RateLimiter.Minute * 10;
-        
+
         private const float MinimumSpeed = 10f; // Minimum speed to consider for speed limit checks
+
+        private const float DistanceBetweenCloseSpeedLimits = 200f; // Distance to consider them as double speed limit
+        private const float SkipDistanceBetweenSpeedLimits = 50; // Distance to skip a high speed limit if the next one is lower
 
         private static int _lastSpeedLimitRead = -1;
         private static float _lastDerailment = float.NegativeInfinity;
@@ -27,11 +30,25 @@ namespace VoiceDispatcherMod {
             var allSigns = FilterTrackEvents.QueryUpcomingEventsInText();
             Main.Logger.Log("Events: " + string.Join("; ", allSigns.Select(it => (int)it.Item1 + " " + it.Item2)));
 
-            var speedLimits = FilterTrackEvents.QueryUpcomingSpeedLimits();
+            var speedLimits = FilterTrackEvents.QueryUpcomingSpeedLimits(2);
             if (speedLimits.Count > 0 && GetCurrentSpeed() > MinimumSpeed && !IsPlayerDerailed()) {
                 //Main.Logger.Log("Upcoming speed limits: " + string.Join(", ", speedLimits.Select(it => it.limit)));
                 var nextSpeedLimit = speedLimits.First();
-                PlaySpeedLimitRead(nextSpeedLimit);
+                var secondSpeedLimit = speedLimits.Skip(1).FirstOrDefault();
+                var minimumLimit = nextSpeedLimit;
+
+                if (secondSpeedLimit != null && nextSpeedLimit.limit != secondSpeedLimit.limit &&
+                    secondSpeedLimit.span - nextSpeedLimit.span < DistanceBetweenCloseSpeedLimits &&
+                    secondSpeedLimit.limit < nextSpeedLimit.limit) {
+                    minimumLimit = secondSpeedLimit;
+                    if (secondSpeedLimit.span - nextSpeedLimit.span < SkipDistanceBetweenSpeedLimits) {
+                        PlaySpeedLimitRead(secondSpeedLimit);
+                    } else {
+                        PlayDoubleSpeedLimitRead(nextSpeedLimit, secondSpeedLimit);
+                    }
+                } else {
+                    PlaySpeedLimitRead(nextSpeedLimit);
+                }
 
                 if (GetCurrentSpeed() > nextSpeedLimit.limit + SpeedLimitMargin) {
                     if (TimeUntil(nextSpeedLimit.span) < WarningTime) {
@@ -61,6 +78,7 @@ namespace VoiceDispatcherMod {
             if (PlayerManager.LastLoco == null) {
                 return 0f;
             }
+
             var playerSpeed = PlayerManager.LastLoco.GetAbsSpeed() * 3.6f; // Convert m/s to km/h
             //Main.Logger.Log("Current speed: " + playerSpeed);
             return playerSpeed;
@@ -77,13 +95,31 @@ namespace VoiceDispatcherMod {
 
             _lastSpeedLimitRead = speedLimit.limit;
 
-            var lineBuilder = new List<string>();
-            lineBuilder.Add("SpeedLimit");
-            lineBuilder.AddRange(VoicingUtils.Exact(speedLimit.limit));
-            lineBuilder.Add("In");
-            lineBuilder.AddRange(VoicingUtils.RoundedDown((int)Math.Round(speedLimit.span)));
-            lineBuilder.Add("Meters");
-            CommsRadioNarrator.PlayWithClick(LineChain.FromAssetBundleLines(lineBuilder));
+            string line = JsonLinesLoader.GetRandomAndReplace("speed_limit_change", new() {
+                { "speed_limit", speedLimit.limit.ToString() },
+                { "distance", ((int)speedLimit.span).ToString() },
+                { "distance_rounded", VoicingUtils.RoundDown((int)speedLimit.span).ToString() }
+            });
+            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
+        }
+
+        private static void PlayDoubleSpeedLimitRead(SpeedLimitEvent speedLimit, SpeedLimitEvent speedLimit2) {
+            if (_lastSpeedLimitRead == speedLimit2.limit) {
+                return; // Avoid repeating the same speed limit
+            }
+
+            _lastSpeedLimitRead = speedLimit2.limit;
+
+            string line = JsonLinesLoader.GetRandomAndReplace("speed_limit_change_2", new() {
+                { "speed_limit", speedLimit.limit.ToString() },
+                { "distance", ((int)speedLimit.span).ToString() },
+                { "distance_rounded", VoicingUtils.RoundDown((int)speedLimit.span).ToString() },
+
+                { "speed_limit_2", speedLimit2.limit.ToString() },
+                { "distance_2", ((int)speedLimit2.span).ToString() },
+                { "distance_rounded_2", VoicingUtils.RoundDown((int)speedLimit2.span).ToString() }
+            });
+            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
         }
 
         private static void PlaySpeedingWarning() {

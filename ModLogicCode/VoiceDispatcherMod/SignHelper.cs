@@ -11,13 +11,15 @@ namespace VoiceDispatcherMod {
         private const float WarningTime = 20f; // seconds before the speed limit is reached to warn about speeding
 
         private const float DerailmentDelay = 5f;
-        private const float DerailmentReset = 15f;
+        private const float DerailmentReset = 20f;
         private const float DerailmentCooldown = RateLimiter.Minute * 10;
 
         private const float MinimumSpeed = 10f; // Minimum speed to consider for speed limit checks
 
         private const float DistanceBetweenCloseSpeedLimits = 200f; // Distance to consider them as double speed limit
-        private const float SkipDistanceBetweenSpeedLimits = 50; // Distance to skip a high speed limit if the next one is lower
+
+        private const float
+            SkipDistanceBetweenSpeedLimits = 50; // Distance to skip a high speed limit if the next one is lower
 
         private static string _lastSpeedLimitRead = "";
         private static float _lastDerailment = float.NegativeInfinity;
@@ -127,6 +129,7 @@ namespace VoiceDispatcherMod {
             if (CommsRadioNarrator.currentlyReading) {
                 return;
             }
+
             if (RateLimiter.CannotYetPlay("SpeedingWarning", 4)) {
                 return;
             }
@@ -149,13 +152,12 @@ namespace VoiceDispatcherMod {
                 return;
             }
 
-            if (RateLimiter.CannotYetPlay("Derailment", 6)) {
+            if (RateLimiter.CannotYetPlay("Derailment", 8)) {
                 return;
             }
 
-            var lineBuilder = new List<string>();
-            lineBuilder.Add(Randomizer.GetRandomLine("Derailment", 1, 5));
-            CommsRadioNarrator.PlayWithClick(LineChain.FromAssetBundleLines(lineBuilder));
+            string line = JsonLinesLoader.GetRandomAndReplace("derailment");
+            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
         }
     }
 }

@@ -108,6 +108,9 @@ namespace VoiceDispatcherMod {
         }
 
         private static bool TryLoadAssetBundle() {
+            if (voicedLines) {
+                return true;
+            }
             try {
                 Logger.Log("Loading voiced lines from: " + _assetBundlePath);
                 voicedLines = AssetBundle.LoadFromFile(_assetBundlePath);
@@ -181,7 +184,9 @@ namespace VoiceDispatcherMod {
             CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
         }
 
-        static void OnSessionStart(UnityModManager.ModEntry modEntry) { }
+        static void OnSessionStart(UnityModManager.ModEntry modEntry) {
+            TryLoadAssetBundle();
+        }
 
         static void OnUpdate(UnityModManager.ModEntry modEntry, float dt) {
             StationHelper.OnUpdate();

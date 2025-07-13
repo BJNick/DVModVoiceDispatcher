@@ -5,28 +5,17 @@
     "sentence_split_regex": "[.!?]\\s+"
   },
   "line_groups": {
-    "speed_report": {
-      "description": "Lines reporting the player's current speed in km/h. {speed} is replaced with the number.",
-      "placeholders": [
-        "{speed}"
-      ],
-      "lines": [
-        "Your speed is {speed} kilometers per hour",
-        "Currently going {speed} kilometers per hour",
-        "Speed: {speed} kilometers per hour"
-      ]
-    },
     "speed_limit_change": {
-        "description": "Lines reporting a change in speed limit.",
-        "placeholders": [
-          "{speed_limit}",
-          "{distance}",
-          "{distance_rounded}"
-        ],
-        "line": "Speed limit {speed_limit} in {distance_rounded} meters."
+      "description": "Lines reporting an upcoming change in speed limit.",
+      "placeholders": [
+        "{speed_limit}",
+        "{distance}",
+        "{distance_rounded}"
+      ],
+      "line": "Speed limit {speed_limit} in {distance_rounded} meters."
     },
     "speed_limit_change_2": {
-      "description": "Lines reporting a change in speed limit, followed shortly by another change.",
+      "description": "Lines reporting an upcoming change in speed limit, followed shortly by another change.",
       "placeholders": [
         "{speed_limit}",
         "{speed_limit_2}",
@@ -37,35 +26,46 @@
       "line": "Speed limit {speed_limit}, then drop to {speed_limit_2} in {distance_rounded_2} meters."
     },
     "speeding_warning": {
-        "description": "Lines warning the player about speeding. {speed_limit} is replaced with the speed limit.",
-        "placeholders": [
-            "{speed_limit}"
-            ],
-        "lines": [
-            "Slow down!",
-            "Watch your speed!",
-            "You're moving too fast!",
-            "Going over speed limit!",
-            "Reduce speed immediately!",
-            "Exceeding speed limit {speed_limit}!",
-            "Throttle back before you derail!",
-            "Stick to {speed_limit} or you'll regret it.",
-            "Your speeding is making the higher-ups nervous.",
-            "This isn't a race, slow it down.",
-            "You're about to set a new speed record, do not.",
-            "Remember you have brakes, use them!",
-            "Approaching a tight curve, good luck."
-        ]
-    },
-    "direction_report": {
-      "description": "Lines reporting the player's current direction. {direction} is replaced with a direction (e.g., north).",
+      "description": "Lines warning the player to slow down in anticipation. {speed_limit} is replaced with the upcoming speed limit.",
       "placeholders": [
-        "{direction}"
+        "{speed_limit}"
       ],
       "lines": [
-        "You are going {direction}",
-        "Heading {direction}",
-        "Moving towards {direction}"
+        "Slow down!",
+        "Watch your speed!",
+        "You're moving too fast!",
+        "Going over speed limit!",
+        "Reduce speed immediately!",
+        "Exceeding speed limit {speed_limit}!",
+        "Throttle back before you derail!",
+        "Stick to {speed_limit} or you'll regret it.",
+        "Your speeding is making the higher-ups nervous.",
+        "This isn't a race, slow it down.",
+        "You're about to set a new speed record, do not.",
+        "Remember you have brakes, use them!",
+        "Good luck with the tight curve ahead."
+      ]
+    },
+    "derailment": {
+      "description": "Lines that play when the player derails the train. These lines are meant to be funny. 2 random lines would play in consequence.",
+      "placeholders": [],
+      "lines": [
+        "Would you look at that, physics won this round again.",
+        "You've really outdone yourself this time. Hope you weren't too attached to that train.",
+        "I did say, slow down! But what do I know, I'm just the dispatcher.",
+        "I'll start the paperwork again. You better buy me a drink after this.",
+        "Congratulations! You've successfully demonstrated how NOT to drive a train.",
+        
+        "If locomotives could cry, yours would be sobbing right now.",
+        "I hope you have insurance left. Next time, try keeping the wheels on the track",
+        "You should add stunt driver to your portfolio.",
+        
+        "I'm starting to think you might need a refresher course on how to drive.",
+        "The maintenance crew are going to have some words for you when they see this mess.",
+        "That's going to require more than a bandage and some encouraging words to fix.",
+        "The scrap yard just called to thank you for the generous donation you're about to make.",
+        
+        "Are you okay?"
       ]
     },
     "highest_paying_job": {
@@ -101,17 +101,6 @@
           ]
         }
       }
-    },
-    "derailment": {
-      "description": "Lines that play when the player derails the train. These lines are meant to be humorous and sarcastic.",
-      "placeholders": [],
-      "lines": [
-        "Well, would you look at that, physics won this round again.",
-        "You've really outdone yourself this time. Hope you weren't too attached to that train.",
-        "I did say, slow down! But hey, what do I know, I'm just the dispatcher.",
-        "I'll start the paperwork again. You better buy me a drink after this.",
-        "Congratulations! You've successfully demonstrated how NOT to drive a train."
-      ]
     },
     "station_office_entry": {
       "description": "Lines that play when the player enters the station office.",

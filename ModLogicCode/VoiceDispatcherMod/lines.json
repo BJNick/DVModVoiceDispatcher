@@ -364,7 +364,6 @@
         "{car_id}",
         "{car_type_loc_key}",
         "{cargo_type_loc_key}",
-        "{empty}",
         "{destination_yard_id}",
         "{destination_track_name}",
         "{job_type_id}"
@@ -378,12 +377,27 @@
         "default": "{car_id}. Not part of any order."
       }
     },
+    "car_job_step": {
+      "description": "Reads out what the next step for this car is.",
+      "placeholders": [
+        "{step_type}",
+        "{destination_yard_id}",
+        "{destination_track_name}"
+      ],
+      "match_string": "{step_type}",
+      "simple_match_map": {
+        "Unload": "Unload this car at {destination_track_name}.",
+        "Load": "Load this car at {destination_track_name}.",
+        "Store": "Store this car at {destination_track_name}.",
+        "Deliver": "Deliver this car to {@yard_name(yard_id={destination_yard_id})} track {destination_track_name}."
+      }
+    },
     "car_in_job": {
       "description": "Reads out a note that this car is needed for a current ongoing job.",
       "lines": [
         "Take this car",
         "You need this car.",
-        "Yes, that one too.",
+        "Yes, need that one too.",
         "Part of your order.",
         "Don't forget this one."
       ]

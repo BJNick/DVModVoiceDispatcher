@@ -200,8 +200,8 @@ namespace VoiceDispatcherMod {
         public static TrackID ExtractSomeDestinationTrack(Job job) {
             var jobData = new Job_data(job);
             return job.jobType switch {
-                JobType.ShuntingLoad => JobDataExtractor.ExtractShuntingLoadJobData(jobData).destinationTrack,
-                JobType.ShuntingUnload => JobDataExtractor.ExtractShuntingUnloadJobData(jobData).destinationTracksData[0].track,
+                JobType.ShuntingLoad => JobDataExtractor.ExtractShuntingLoadJobData(jobData).loadMachineTrack,
+                JobType.ShuntingUnload => JobDataExtractor.ExtractShuntingUnloadJobData(jobData).unloadMachineTrack,
                 JobType.Transport => JobDataExtractor.ExtractTransportJobData(jobData).destinationTrack,
                 JobType.EmptyHaul => JobDataExtractor.ExtractEmptyHaulJobData(jobData).destinationTrack,
                 _ => new TrackID("Unknown", "Unknown Destination", "", "Unknown")

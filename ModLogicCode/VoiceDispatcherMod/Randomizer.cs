@@ -54,13 +54,14 @@ namespace VoiceDispatcherMod {
                 return lineGroup.lines[0];
             }
 
-            int lastIndex = LastSelectedIndexMap.TryGetValue(lineGroup.description, out var value) ? value : -1;
+            var repeatKey = lineGroup.description ?? lineGroup.lines[0];
+            int lastIndex = LastSelectedIndexMap.TryGetValue(repeatKey, out var value) ? value : -1;
             int generatedIndex = -1;
             while (generatedIndex == lastIndex || generatedIndex < 0) {
                 generatedIndex = RandomRange(0, lineGroup.lines.Count);
             }
 
-            LastSelectedIndexMap[lineGroup.description] = generatedIndex;
+            LastSelectedIndexMap[repeatKey] = generatedIndex;
             return lineGroup.lines[generatedIndex];
         }
     }

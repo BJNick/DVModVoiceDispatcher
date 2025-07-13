@@ -385,11 +385,36 @@
         "{destination_track_name}"
       ],
       "match_string": "{step_type}",
-      "simple_match_map": {
-        "Unload": "Unload this car at {destination_track_name}.",
-        "Load": "Load this car at {destination_track_name}.",
-        "Store": "Store this car at {destination_track_name}.",
-        "Deliver": "Deliver this car to {@yard_name(yard_id={destination_yard_id})} track {destination_track_name}."
+      "match_map": {
+        "Unload": {
+          "lines": [
+            "Unload at {destination_track_name}.",
+            "Empty at {destination_track_name}.",
+            "To be unloaded at {destination_track_name}."
+          ]
+        },
+        "Load": {
+          "lines": [
+            "Load at {destination_track_name}.",
+            "Fill with cargo at {destination_track_name}.",
+            "To be loaded at {destination_track_name}."
+          ]
+        },
+        "Store": {
+          "lines": [
+            "Store at {destination_track_name}.",
+            "Take to {destination_track_name}.",
+            "Move to {destination_track_name}.",
+            "Drop off at {destination_track_name}."
+          ]
+        },
+        "Deliver": {
+          "lines": [
+            "Deliver to {@yard_name(yard_id={destination_yard_id})} track {destination_track_name}.",
+            "Take to {@yard_name(yard_id={destination_yard_id})} track {destination_track_name}.",
+            "Bound for {@yard_name(yard_id={destination_yard_id})} track {destination_track_name}."
+          ]
+        }
       }
     },
     "car_in_job": {

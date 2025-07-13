@@ -185,6 +185,9 @@ namespace VoiceDispatcherMod {
                 }
                 var innerReplacements = new Dictionary<string, string>(replacements);
                 foreach (var param in parameters) {
+                    if (string.IsNullOrEmpty(param)) {
+                        continue;
+                    }
                     var paramParts = param.Split('=');
                     try {
                         if (paramParts.Length == 2) {

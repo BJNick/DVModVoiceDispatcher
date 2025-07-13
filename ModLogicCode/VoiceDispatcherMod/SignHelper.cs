@@ -50,9 +50,9 @@ namespace VoiceDispatcherMod {
                     PlaySpeedLimitRead(nextSpeedLimit);
                 }
 
-                if (GetCurrentSpeed() > nextSpeedLimit.limit + SpeedLimitMargin) {
-                    if (TimeUntil(nextSpeedLimit.span) < WarningTime) {
-                        PlaySpeedingWarning();
+                if (GetCurrentSpeed() > minimumLimit.limit + SpeedLimitMargin) {
+                    if (TimeUntil(minimumLimit.span) < WarningTime) {
+                        PlaySpeedingWarning(minimumLimit);
                     }
                 }
             }
@@ -122,14 +122,15 @@ namespace VoiceDispatcherMod {
             CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
         }
 
-        private static void PlaySpeedingWarning() {
+        private static void PlaySpeedingWarning(SpeedLimitEvent speedLimit) {
             if (RateLimiter.CannotYetPlay("SpeedingWarning", 5)) {
                 return;
             }
 
-            var lineBuilder = new List<string>();
-            lineBuilder.Add(Randomizer.GetRandomLine("SpeedingWarning", 1, 5));
-            CommsRadioNarrator.PlayWithClick(LineChain.FromAssetBundleLines(lineBuilder));
+            string line = JsonLinesLoader.GetRandomAndReplace("speeding_warning", new() {
+                { "speed_limit", speedLimit.limit.ToString() },
+            });
+            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
         }
 
         private static void PlayDerailmentMessage() {

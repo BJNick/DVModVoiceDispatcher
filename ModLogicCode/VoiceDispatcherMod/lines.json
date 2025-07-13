@@ -36,7 +36,27 @@
       ],
       "line": "Speed limit {speed_limit}, then drop to {speed_limit_2} in {distance_rounded_2} meters."
     },
-    
+    "speeding_warning": {
+        "description": "Lines warning the player about speeding. {speed_limit} is replaced with the speed limit.",
+        "placeholders": [
+            "{speed_limit}"
+            ],
+        "lines": [
+            "Slow down!",
+            "Watch your speed!",
+            "You're moving too fast!",
+            "Going over speed limit!",
+            "Reduce speed immediately!",
+            "Exceeding speed limit {speed_limit}!",
+            "Throttle back before you derail!",
+            "Stick to {speed_limit} or you'll regret it.",
+            "Your speeding is making the higher-ups nervous.",
+            "This isn't a race, slow it down.",
+            "You're about to set a new speed record, do not.",
+            "Remember you have brakes, use them!",
+            "Approaching a tight curve, good luck."
+        ]
+    },
     "direction_report": {
       "description": "Lines reporting the player's current direction. {direction} is replaced with a direction (e.g., north).",
       "placeholders": [

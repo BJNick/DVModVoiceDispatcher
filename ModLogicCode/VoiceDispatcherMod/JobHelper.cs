@@ -3,10 +3,25 @@ using System.Linq;
 using DV.Booklets;
 using DV.Logic.Job;
 using DV.ThingTypes;
+using UnityEngine;
 using static VoiceDispatcherMod.VoicingUtils;
 
 namespace VoiceDispatcherMod {
     public static class JobHelper {
+        
+        public static void PlayJobCompletedLine(Job job) {
+            var replacements = new Dictionary<string, string> {
+                { "job_type", job.jobType.MapToJobTypeName() },
+                { "job_type_id", job.jobType.ToString() },
+                { "exact_payout", Mathf.RoundToInt(job.GetWageForTheJob()).ToString() },
+                { "rounded_payout", RoundDown(Mathf.RoundToInt(job.GetWageForTheJob())).ToString() },
+                { "is_bonus_time", job.GetBonusPaymentForTheJob() > 0 ? "true" : "false" },
+                { "minutes_taken", Mathf.RoundToInt(job.GetJobCompletionTime() / 60).ToString() },
+            };
+            var line = JsonLinesLoader.GetRandomAndReplace("job_completed_payout", replacements);
+            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
+        }
+        
         public static void ReadFirstJobOverview() {
             if (JobsManager.Instance == null || JobsManager.Instance.currentJobs == null ||
                 JobsManager.Instance.currentJobs.Count == 0) {

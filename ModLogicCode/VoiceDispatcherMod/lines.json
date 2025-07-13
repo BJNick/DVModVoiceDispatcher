@@ -65,6 +65,36 @@
         "Are you okay?"
       ]
     },
+    "job_completed_payout": {
+      "description": "Lines reporting the outcome of a completed job.",
+      "placeholders": [
+        "{job_name}",
+        "{job_type_id}",
+        "{exact_payout}",
+        "{rounded_payout}",
+        "{is_bonus_time}",
+        "{minutes_taken}"
+      ],
+      "match_string": "{is_bonus_time}",
+      "match_map": {
+        "true": {
+          "description": "Lines for jobs completed within bonus time.",
+          "lines": [
+            "Well done! The job took {minutes_taken} minutes, and you earned a bonus payout of {rounded_payout} dollars.",
+            "Enjoy your bonus of {rounded_payout} dollars for completing the job in {minutes_taken} minutes.",
+            "Here are your {rounded_payout} dollars for finishing the job in {minutes_taken} minutes within bonus time."
+          ]
+        },
+        "false": {
+          "description": "Lines for jobs completed outside of bonus time.",
+          "lines": [
+            "Nice work! You were a bit slow, but you still completed the job in {minutes_taken} minutes, earning {rounded_payout} dollars.",
+            "Tough luck this time with the bonus, but you still earned {rounded_payout} dollars for completing the job in {minutes_taken} minutes.",
+            "{minutes_taken} minutes was too long for a bonus, but you still earned {rounded_payout} dollars for completing the job."
+          ]
+        }
+      }
+    },
     "highest_paying_job": {
       "description": "Lines reporting the highest paying job available. {job_type} is replaced with the type of job, {destination} with the destination, and {payout} with the payout amount.",
       "placeholders": [
@@ -419,7 +449,7 @@
           "lines": [
             "This car is in the right place.",
             "Keep it on this track for order completion.",
-            "Drop off this car here, its final destination."
+            "Drop off this car here for storage."
           ]
         }
       }

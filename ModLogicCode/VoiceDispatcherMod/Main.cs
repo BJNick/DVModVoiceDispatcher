@@ -173,13 +173,15 @@ namespace VoiceDispatcherMod {
                 return;
             }
 
-            // TODO: Increase interval back to 10 minutes after testing
-            if (RateLimiter.CannotYetPlay("StationWelcome" + station.stationInfo.YardID, 10)) {
+            if (RateLimiter.CannotYetPlay("StationWelcome" + station.stationInfo.YardID, RateLimiter.Minutes(2))) {
                 return;
             }
 
             var line = StationHelper.CreateWelcomeToStationOfficeLine(station);
-            line += " " + StationHelper.CreateHighestPayingJobLine(station);
+            if (RateLimiter.CannotYetPlay("AutoHighestJobRead" + station.stationInfo.YardID, RateLimiter.Minutes(10))) {
+                line += " " + StationHelper.CreateHighestPayingJobLine(station);
+            }
+            
             Logger.Log(line);
             CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
         }
@@ -224,6 +226,7 @@ namespace VoiceDispatcherMod {
                     if (!readJobs.Contains(job.ID) && !CommsRadioNarrator.currentlyReading) {
                         readJobs.Add(job.ID);
                         ReadJobOverview(job);
+                        job.JobCompleted += PlayJobCompletedLine;
                     }
                 }
             }

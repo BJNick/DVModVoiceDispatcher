@@ -105,13 +105,13 @@ namespace DvMod.HeadsUpDisplay
 
         private static IEnumerable<TrackEvent> GenerateTrackEvents(RailTrack track)
         {
-            Main.Logger.Log("Generating track events for " + track.name + " at " + track.transform.position);
+            //Main.Logger.Log("Generating track events for " + track.name + " at " + track.transform.position);
             var pointSet = track.GetKinkedPointSet();
             EquiPointSet simplified = EquiPointSet.ResampleEquidistant(
                 pointSet,
                 Mathf.Min(SIMPLIFIED_RESOLUTION, (float)pointSet.span / 15));
             
-            Main.Logger.Log("Simplified count: " + simplified.points.Length + " vs original " + pointSet.points.Length);
+            //Main.Logger.Log("Simplified count: " + simplified.points.Length + " vs original " + pointSet.points.Length);
             
             foreach (var point in simplified.points)
             {

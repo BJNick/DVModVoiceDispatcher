@@ -78,7 +78,7 @@ namespace VoiceDispatcherMod {
                     } else {
                         carStepType = CarStepType.Store;
                         destinationTrack = data.destinationTrack;
-                        if (destinationTrack == car.logicCar._currentTrack.ID) {
+                        if (destinationTrack == car.logicCar?._currentTrack?.ID) {
                             carStepType = CarStepType.Done;
                         }
                     }
@@ -93,7 +93,7 @@ namespace VoiceDispatcherMod {
                     } else {
                         carStepType = CarStepType.Store;
                         destinationTrack = FindStorageTrackForCar(car, data);
-                        if (destinationTrack == car.logicCar._currentTrack.ID) {
+                        if (destinationTrack == car.logicCar?._currentTrack?.ID) {
                             carStepType = CarStepType.Done;
                         }
                     }
@@ -104,7 +104,7 @@ namespace VoiceDispatcherMod {
                 case JobType.EmptyHaul: {
                     destinationTrack = JobHelper.ExtractSomeDestinationTrack(job);
                     carStepType = CarStepType.Deliver;
-                    if (destinationTrack == car.logicCar._currentTrack.ID) {
+                    if (destinationTrack == car.logicCar?._currentTrack?.ID) {
                         carStepType = CarStepType.Done;
                     }
 

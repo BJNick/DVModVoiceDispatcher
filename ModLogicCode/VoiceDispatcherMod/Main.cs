@@ -83,9 +83,6 @@ namespace VoiceDispatcherMod {
 
             PlayerManager.CarChanged += OnCarChanged;
             CommsRadioNarrator.OnCarClicked += OnCarClicked;
-            StationHelper.OnYardEntered += OnYardEntered;
-            StationHelper.OnYardExited += OnYardExited;
-            StationHelper.OnStationEntered += OnStationEntered;
             CommsRadioNarrator.OnEnableMod();
         }
 
@@ -136,54 +133,6 @@ namespace VoiceDispatcherMod {
 
         static void OnCarClicked(TrainCar car) {
             CarHelper.OnCarClicked(car);
-        }
-
-        static void OnYardEntered(StationController station) {
-            if (station == null) {
-                return;
-            }
-
-            if (RateLimiter.CannotYetPlay("YardEnterOrExit" + station.stationInfo.YardID,
-                    RateLimiter.Minutes(3))) {
-                return;
-            }
-
-            var line = StationHelper.CreateWelcomeToYardLine(station);
-            Logger.Log(line);
-            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
-        }
-
-        static void OnYardExited(StationController previousStation) {
-            if (previousStation == null) {
-                return;
-            }
-
-            if (RateLimiter.CannotYetPlay("YardEnterOrExit" + previousStation.stationInfo.YardID,
-                    RateLimiter.Minutes(3))) {
-                return;
-            }
-
-            var line = StationHelper.CreateExitingYardLine(previousStation);
-            Logger.Log(line);
-            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
-        }
-
-        static void OnStationEntered(StationController station) {
-            if (station == null || station.logicStation?.availableJobs?.Count == 0) {
-                return;
-            }
-
-            if (RateLimiter.CannotYetPlay("StationWelcome" + station.stationInfo.YardID, RateLimiter.Minutes(2))) {
-                return;
-            }
-
-            var line = StationHelper.CreateWelcomeToStationOfficeLine(station);
-            if (!RateLimiter.CannotYetPlay("AutoHighestJobRead" + station.stationInfo.YardID, RateLimiter.Minutes(10))) {
-                line += " " + StationHelper.CreateHighestPayingJobLine(station);
-            }
-            
-            Logger.Log(line);
-            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
         }
 
         static void OnSessionStart(UnityModManager.ModEntry modEntry) {

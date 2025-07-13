@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DV.ThingTypes;
 using UnityEngine;
 using static VoiceDispatcherMod.VoicingUtils;
 
@@ -16,10 +15,6 @@ namespace VoiceDispatcherMod {
         private const float YardRadiusRatio = 0.7f; // smaller than job spawn radius to avoid false positives
 
         private static StationController playerEnteredOffice;
-
-        public static event Action<StationController> OnYardEntered;
-        public static event Action<StationController> OnYardExited;
-        public static event Action<StationController> OnStationEntered;
 
         public static void OnUpdate() {
             if (StationController.allStations == null || !PlayerManager.PlayerTransform) {
@@ -36,51 +31,93 @@ namespace VoiceDispatcherMod {
             if (yard) {
                 if (!playerEnteredOffice && IsPlayerInOfficeRange(yard)) {
                     playerEnteredOffice = yard;
-                    OnStationEntered?.Invoke(yard);
+                    OnStationEntered(yard);
                 } else if (playerEnteredOffice == yard && !IsPlayerInOfficeRange(yard)) {
                     playerEnteredOffice = null;
                 }
             }
         }
-        
+
+
+        static void OnYardEntered(StationController station) {
+            if (RateLimiter.CannotYetPlay("YardEnterOrExit" + station.stationInfo.YardID,
+                    RateLimiter.Minutes(3))) {
+                return;
+            }
+
+            var line = CreateWelcomeToYardLine(station);
+            Main.Logger.Log(line);
+            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
+        }
+
+        static void OnYardExited(StationController previousStation) {
+            if (RateLimiter.CannotYetPlay("YardEnterOrExit" + previousStation.stationInfo.YardID,
+                    RateLimiter.Minutes(3))) {
+                return;
+            }
+
+            var line = CreateExitingYardLine(previousStation);
+            Main.Logger.Log(line);
+            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
+        }
+
+        static void OnStationEntered(StationController station) {
+            if (RateLimiter.CannotYetPlay("StationWelcome" + station.stationInfo.YardID, RateLimiter.Minutes(2))) {
+                return;
+            }
+
+            var line = CreateWelcomeToStationOfficeLine(station);
+            if (!RateLimiter.CannotYetPlay("AutoHighestJobRead" + station.stationInfo.YardID,
+                    RateLimiter.Minutes(10))) {
+                line += " " + CreateHighestPayingJobLine(station);
+            }
+
+            Main.Logger.Log(line);
+            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
+        }
+
         public static string CreateWelcomeToStationOfficeLine(StationController station) {
             if (station == null || station.stationInfo == null) {
                 Main.Logger.Error("Cannot create welcome line for station: station or stationInfo is null.");
                 return string.Empty;
             }
+
             return JsonLinesLoader.GetRandomAndReplace("station_office_entry", new() {
                 { "yard_name", station.stationInfo.MapToYardName() },
                 { "yard_id", station.stationInfo.YardID }
             });
         }
-        
+
         public static string CreateWelcomeToYardLine(StationController station) {
             if (station == null || station.stationInfo == null) {
                 Main.Logger.Error("Cannot create welcome line for yard: station or stationInfo is null.");
                 return string.Empty;
             }
+
             return JsonLinesLoader.GetRandomAndReplace("yard_entry", new() {
                 { "yard_name", station.stationInfo.MapToYardName() },
                 { "yard_id", station.stationInfo.YardID }
             });
         }
-        
+
         public static string CreateExitingYardLine(StationController station) {
             if (station == null || station.stationInfo == null) {
                 Main.Logger.Error("Cannot create exiting line for yard: station or stationInfo is null.");
                 return string.Empty;
             }
+
             return JsonLinesLoader.GetRandomAndReplace("yard_exit", new() {
                 { "yard_name", station.stationInfo.MapToYardName() },
                 { "yard_id", station.stationInfo.YardID }
             });
         }
-        
+
         public static string CreateHighestPayingJobLine(StationController station) {
             if (!station || station.logicStation?.availableJobs == null) {
                 Main.Logger.Error("Cannot create highest paying job line: station or its jobs are null.");
                 return string.Empty;
             }
+
             var allJobs = station.logicStation.availableJobs;
             var job = allJobs.OrderByDescending(it => it.initialWage).FirstOrDefault();
             if (job == null) {
@@ -123,9 +160,9 @@ namespace VoiceDispatcherMod {
                 subYard = FindSubYardInRange();
 
                 if (!newYard) {
-                    OnYardExited?.Invoke(playerYard);
+                    OnYardExited(playerYard);
                 } else {
-                    OnYardEntered?.Invoke(newYard);
+                    OnYardEntered(newYard);
                 }
 
                 playerYard = newYard;

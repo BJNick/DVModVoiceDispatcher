@@ -20,15 +20,15 @@ namespace VoiceDispatcherMod {
         private static string _assetBundlePath;
 
         private static AssetBundle voicedLines;
-        public static Settings settings;
+        public static Settings Settings;
         public static UnityModManager.ModEntry mod;
 
         private static List<string> readJobs = new();
 
         static bool Load(UnityModManager.ModEntry modEntry) {
             mod = modEntry;
-            settings = UnityModManager.ModSettings.Load<Settings>(modEntry);
-            
+            Settings = UnityModManager.ModSettings.Load<Settings>(modEntry);
+
             var harmony = new Harmony(modEntry.Info.Id);
             harmony.PatchAll(Assembly.GetExecutingAssembly());
 
@@ -39,9 +39,9 @@ namespace VoiceDispatcherMod {
             modEntry.OnUnload = Unload;
             modEntry.OnGUI = OnGUI;
             modEntry.OnSaveGUI = OnSaveGUI;
-            
+
             VoiceGenerator.Init();
-            JsonLinesLoader.Init( "D:\\Projects\\Mods\\DVVoiceAssistant\\ModLogicCode\\VoiceDispatcherMod\\lines.json");
+            JsonLinesLoader.Init("D:\\Projects\\Mods\\DVVoiceAssistant\\ModLogicCode\\VoiceDispatcherMod\\lines.json");
             JsonLinesLoader.LogError = Logger.Error;
 
             return true;
@@ -93,21 +93,23 @@ namespace VoiceDispatcherMod {
             if (voicedLines) {
                 voicedLines.Unload(true);
             }
+
             CommsRadioNarrator.OnDisableMod();
         }
 
         static void OnGUI(UnityModManager.ModEntry modEntry) {
-            settings.Draw(modEntry);
+            Settings.Draw(modEntry);
         }
 
         static void OnSaveGUI(UnityModManager.ModEntry modEntry) {
-            settings.Save(modEntry);
+            Settings.Save(modEntry);
         }
 
         private static bool TryLoadAssetBundle() {
             if (voicedLines) {
                 return true;
             }
+
             try {
                 Logger.Log("Loading voiced lines from: " + _assetBundlePath);
                 voicedLines = AssetBundle.LoadFromFile(_assetBundlePath);
@@ -140,8 +142,31 @@ namespace VoiceDispatcherMod {
         }
 
         static void OnUpdate(UnityModManager.ModEntry modEntry, float dt) {
-            StationHelper.OnUpdate();
+            if (Settings.EnableStationHelper) {
+                StationHelper.OnUpdate();
+            }
 
+            if (JobsManager.Instance != null && Settings.EnableJobHelper) {
+                foreach (var job in JobsManager.Instance.currentJobs) {
+                    if (!readJobs.Contains(job.ID) && !CommsRadioNarrator.currentlyReading) {
+                        readJobs.Add(job.ID);
+                        ReadJobOverview(job);
+                        job.JobCompleted += PlayJobCompletedLine;
+                    }
+                }
+            }
+
+            if (Settings.EnableSignHelper) {
+                SignHelper.CheckSpeedLimits();
+            }
+            
+
+            if (Settings.EnableDebugKeys) {
+                ProcessDebugKeystrokes();
+            }
+        }
+
+        private static void ProcessDebugKeystrokes() {
             if (Input.GetKeyDown(KeyCode.L)) {
                 CommsRadioNarrator.PlayWithClick(LineChain.FromAssetBundleLines(testVoiceLines));
             }
@@ -155,7 +180,7 @@ namespace VoiceDispatcherMod {
             if (Input.GetKeyDown(KeyCode.O)) {
                 ReadJobOverview(JobsManager.Instance.currentJobs.First());
             }
-            
+
             if (Input.GetKeyDown(KeyCode.Semicolon)) {
                 List<Line> lines = new List<Line>();
                 lines.Add(new PromptLine("This is"));
@@ -169,18 +194,6 @@ namespace VoiceDispatcherMod {
                 coroutineRunner.StartCoroutine(
                     LineChain.PlayLinesInCoroutine(lines, coroutineRunner));
             }
-
-            if (JobsManager.Instance != null) {
-                foreach (var job in JobsManager.Instance.currentJobs) {
-                    if (!readJobs.Contains(job.ID) && !CommsRadioNarrator.currentlyReading) {
-                        readJobs.Add(job.ID);
-                        ReadJobOverview(job);
-                        job.JobCompleted += PlayJobCompletedLine;
-                    }
-                }
-            }
-
-            SignHelper.CheckSpeedLimits();
         }
     }
 }

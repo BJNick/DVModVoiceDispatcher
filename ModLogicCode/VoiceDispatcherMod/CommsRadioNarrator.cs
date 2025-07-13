@@ -186,11 +186,11 @@ namespace VoiceDispatcherMod {
             void SetVolume(int newVolume) {
                 CutCoroutineShort(false);
                 CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform);
-                Main.settings.Volume = Mathf.Clamp(newVolume, 1, 10);
-                Main.settings.Save(Main.mod);
+                Main.Settings.Volume = Mathf.Clamp(newVolume, 1, 10);
+                Main.Settings.Save(Main.mod);
                 var line = JsonLinesLoader.GetRandomAndReplace("volume_check", new() {
-                    { "volume", Main.settings.Volume.ToString() },
-                    { "volume_spelled", Main.settings.Volume.MapToNumberName() }
+                    { "volume", Main.Settings.Volume.ToString() },
+                    { "volume_spelled", Main.Settings.Volume.MapToNumberName() }
                 });
                 Play(LineChain.SplitIntoChain(line));
                 menuList.RenderActions();
@@ -200,10 +200,10 @@ namespace VoiceDispatcherMod {
                     CommsRadioController.PlayAudioFromRadio(CancelSound, transform);
                     SetState(State.SelectActions);
                 }),
-                new ActionItem("Increase volume", () => { SetVolume(Main.settings.Volume + 1); },
-                    () => $"Increase vol {Main.settings.Volume}"),
-                new ActionItem("Decrease volume", () => { SetVolume(Main.settings.Volume - 1); },
-                    () => $"Decrease vol {Main.settings.Volume}"),
+                new ActionItem("Increase volume", () => { SetVolume(Main.Settings.Volume + 1); },
+                    () => $"Increase vol {Main.Settings.Volume}"),
+                new ActionItem("Decrease volume", () => { SetVolume(Main.Settings.Volume - 1); },
+                    () => $"Decrease vol {Main.Settings.Volume}"),
             };
         }
 
@@ -245,7 +245,7 @@ namespace VoiceDispatcherMod {
         }
 
         private void PointToCar(TrainCar car) {
-            if (car != null) {
+            if (car != null && Main.Settings.EnableCarHelper) {
                 if (PointedCar != car) {
                     HighlightCar(car, selectionMaterial);
                     CommsRadioController.PlayAudioFromRadio(HoverCarSound, transform);
@@ -518,12 +518,12 @@ namespace VoiceDispatcherMod {
                 playAt = radio.transform;
                 var distanceFromListener = Vector3.Distance(playAt.position, Camera.main.transform.transform.position);
                 // Decrease spacial blend to 0 at distance 0.4 and lower, increase to 1 at distance 0.8 and beyond
-                source.volume = 1 * (Main.settings.Volume / 10f);
+                source.volume = 1 * (Main.Settings.Volume / 10f);
                 source.spatialBlend = Mathf.Clamp01((distanceFromListener - 0.4f) / 0.4f);
             } else {
                 if (!playAt) playAt = Camera.main.transform;
                 // in inventory
-                source.volume = 0.75f * (Main.settings.Volume / 10f);
+                source.volume = 0.75f * (Main.Settings.Volume / 10f);
                 source.spatialBlend = 0;
             }
 

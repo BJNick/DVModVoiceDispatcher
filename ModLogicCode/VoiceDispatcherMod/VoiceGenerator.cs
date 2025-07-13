@@ -16,7 +16,7 @@ namespace VoiceDispatcherMod {
         private static string _outputDirectory;
         
         public static void Init() {
-            _modelName = Main.settings.Model;
+            _modelName = Main.Settings.Model;
             _workingDirectory = Path.Combine(Main.mod.Path, "Piper");
             _outputDirectory = Path.Combine(_workingDirectory, "output");
             if (!Directory.Exists(_workingDirectory)) {

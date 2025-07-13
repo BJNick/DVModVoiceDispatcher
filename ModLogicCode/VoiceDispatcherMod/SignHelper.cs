@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using DvMod.HeadsUpDisplay;
 using UnityEngine;
 
@@ -64,7 +62,9 @@ namespace VoiceDispatcherMod {
                 _lastSpeedLimitRead = "";
             }
 
-            PlayDerailmentMessage();
+            if (IsPlayerDerailed()) {
+                PlayDerailmentMessage();
+            }
         }
 
         private static float TimeUntil(double span) {
@@ -87,7 +87,7 @@ namespace VoiceDispatcherMod {
         }
 
         private static bool IsPlayerDerailed() {
-            return PlayerManager.LastLoco?.derailed ?? false;
+            return PlayerManager.LastLoco && PlayerManager.LastLoco.derailed;
         }
 
         private static void PlaySpeedLimitRead(SpeedLimitEvent speedLimit) {

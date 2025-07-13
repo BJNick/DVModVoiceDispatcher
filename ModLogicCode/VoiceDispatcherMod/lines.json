@@ -55,16 +55,13 @@
         "I did say, slow down! But what do I know, I'm just the dispatcher.",
         "I'll start the paperwork again. You better buy me a drink after this.",
         "Congratulations! You've successfully demonstrated how NOT to drive a train.",
-        
         "If locomotives could cry, yours would be sobbing right now.",
         "I hope you have insurance left. Next time, try keeping the wheels on the track",
         "You should add stunt driver to your portfolio.",
-        
         "I'm starting to think you might need a refresher course on how to drive.",
         "The maintenance crew are going to have some words for you when they see this mess.",
         "That's going to require more than a bandage and some encouraging words to fix.",
         "The scrap yard just called to thank you for the generous donation you're about to make.",
-        
         "Are you okay?"
       ]
     },
@@ -360,6 +357,45 @@
         "{car_type_id}"
       ],
       "line": "{letter_part} {first_digit} {second_digit} {third_digit}"
+    },
+    "car_description": {
+      "description": "Reads out a full description when a car is selected.",
+      "placeholders": [
+        "{car_id}",
+        "{car_type_loc_key}",
+        "{cargo_type_loc_key}",
+        "{empty}",
+        "{destination_yard_id}",
+        "{destination_track_name}",
+        "{job_type_id}"
+      ],
+      "match_string": "{job_type_id}",
+      "simple_match_map": {
+        "ShuntingLoad": "{car_id}. For loading at {destination_track_name}",
+        "ShuntingUnload": "{car_id}. {@L(key={cargo_type_loc_key})} for unloading at {destination_track_name}.",
+        "Transport": "{car_id}. {@L(key={cargo_type_loc_key})} bound for {@yard_name(yard_id={destination_yard_id})}.",
+        "EmptyHaul": "{car_id}. Logistical order bound for {@yard_name(yard_id={destination_yard_id})}.",
+        "default": "{car_id}. Not part of any order."
+      }
+    },
+    "car_in_job": {
+      "description": "Reads out a note that this car is needed for a current ongoing job.",
+      "lines": [
+        "Take this car",
+        "You need this car.",
+        "Yes, that one too.",
+        "Part of your order.",
+        "Don't forget this one."
+      ]
+    },
+    "car_not_in_job": {
+      "description": "Reads out a note that this car is not needed for any current ongoing jobs.",
+      "lines": [
+        "Unrelated car.",
+        "Leave it alone.",
+        "Not part of your order.",
+        "Don't move this car."
+      ]
     },
     "volume_check": {
       "description": "Lines that play when the player checks the volume of the mod.",

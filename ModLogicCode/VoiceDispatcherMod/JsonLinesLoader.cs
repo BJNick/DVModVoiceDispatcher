@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using DV.Localization;
 using Newtonsoft.Json;
 
 namespace VoiceDispatcherMod {
@@ -14,10 +17,10 @@ namespace VoiceDispatcherMod {
     public class LineGroup {
         public string description;
         public List<string> placeholders;
-        
+
         public string line;
         public List<string> lines;
-        
+
         public string match_string;
         public Dictionary<string, LineGroup> match_map;
         public Dictionary<string, string> simple_match_map;
@@ -55,7 +58,7 @@ namespace VoiceDispatcherMod {
 
         public static DialogueData LoadDialogueData() {
             try {
-                string json = System.IO.File.ReadAllText(Path);
+                string json = File.ReadAllText(Path);
                 return JsonConvert.DeserializeObject<DialogueData>(json);
             } catch (Exception e) {
                 LogError($"Error loading dialogue data: {e.Message}");
@@ -81,7 +84,7 @@ namespace VoiceDispatcherMod {
             if (TryFindMatchingSimpleGroup(baseLineGroup, replacedMatchString, out var simpleGroup)) {
                 return simpleGroup;
             }
-            
+
             if (TryFindMatchingSimpleGroup(baseLineGroup, "default", out var matchedGroup)) {
                 return GetMatchedLineGroup(matchedGroup, replacements);
             }
@@ -112,7 +115,7 @@ namespace VoiceDispatcherMod {
                 matchedGroup = null;
                 return false;
             }
-            
+
             foreach (var groupKey in group.match_map.Keys) {
                 if (IsMatchingRegex(matchString, groupKey)) {
                     matchedGroup = group.match_map[groupKey];
@@ -123,13 +126,13 @@ namespace VoiceDispatcherMod {
             matchedGroup = null;
             return false;
         }
-        
+
         public static bool TryFindMatchingSimpleGroup(LineGroup group, string matchString, out LineGroup matchedGroup) {
             if (group.simple_match_map == null || group.simple_match_map.Count == 0) {
                 matchedGroup = null;
                 return false;
             }
-            
+
             foreach (var groupKey in group.simple_match_map.Keys) {
                 if (IsMatchingRegex(matchString, groupKey)) {
                     matchedGroup = new LineGroup();
@@ -150,8 +153,8 @@ namespace VoiceDispatcherMod {
             try {
                 // Apply caseString as regex to matchString
                 var pattern = "^" + caseString + "$"; // Ensure full match
-                var regex = new System.Text.RegularExpressions.Regex(pattern,
-                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                var regex = new Regex(pattern,
+                    RegexOptions.IgnoreCase);
                 return regex.IsMatch(matchString);
             } catch (Exception e) {
                 LogError($"Error matching '{matchString}' with case string '{caseString}': {e.Message}");
@@ -171,23 +174,21 @@ namespace VoiceDispatcherMod {
 
             return text;
         }
-        
+
         /* Must be called after ReplacePlaceholders to ensure all placeholders are replaced before processing calls */
         public static string ReplaceCalls(string text, Dictionary<string, string> replacements) {
             var callPattern = @"\{@(\w+)\(([^)]*)\)\}";
-            var matches = System.Text.RegularExpressions.Regex.Matches(text, callPattern);
-            foreach (System.Text.RegularExpressions.Match match in matches) {
+            var matches = Regex.Matches(text, callPattern);
+            foreach (Match match in matches) {
                 var key = match.Groups[1].Value;
                 var parameters = match.Groups[2].Value.Split(',');
-                if (GetBaseLineGroup(key) == null) {
-                    LogError($"Line group '{key}' not found in text: {text}");
-                    continue;
-                }
+
                 var innerReplacements = new Dictionary<string, string>(replacements);
                 foreach (var param in parameters) {
                     if (string.IsNullOrEmpty(param)) {
                         continue;
                     }
+
                     var paramParts = param.Split('=');
                     try {
                         if (paramParts.Length == 2) {
@@ -199,8 +200,18 @@ namespace VoiceDispatcherMod {
                         LogError($"Parameter '{paramParts[1].Trim()}' not found in replacements: {e.Message}");
                     }
                 }
-                
-                var value = GetRandomAndReplace(key, innerReplacements);
+
+                var value = ProcessBuiltInCalls(key, innerReplacements);
+                if (value == null) {
+                    if (GetBaseLineGroup(key) == null) {
+                        LogError($"Line group '{key}' not found in text: {text}");
+                        continue;
+                    }
+
+                    // If no built-in call was processed, try to get a random line from the group
+                    value = GetRandomAndReplace(key, innerReplacements);
+                }
+
                 if (value != null) {
                     text = text.Replace(match.Value, value);
                 } else {
@@ -210,7 +221,18 @@ namespace VoiceDispatcherMod {
 
             return text;
         }
-        
+
+        public static string ProcessBuiltInCalls(string key, Dictionary<string, string> replacements) {
+            switch (key) {
+                case "L":
+                    return LocalizationAPI.L(replacements["key"]);
+                case "Lo":
+                    return LocalizationAPI.Lo(replacements["key"], replacements["language"]);
+            }
+
+            return null;
+        }
+
         public static string ReplaceAll(string text, Dictionary<string, string> replacements) {
             text = ReplacePlaceholders(text, replacements);
             text = ReplaceCalls(text, replacements);
@@ -229,18 +251,19 @@ namespace VoiceDispatcherMod {
                 LogError($"Proper type mapping for '{type}' not found.");
                 return value; // Return the original key if no mapping is found
             }
+
             var replacements = new Dictionary<string, string> { { group.placeholders[0], value } };
             return GetRandomAndReplace(type, replacements);
         }
-        
+
         public static string SentenceDelimiter() {
             return DialogueData?.language_settings?.sentence_delimiter ?? ".";
         }
-        
+
         public static string ClauseDelimiter() {
             return DialogueData?.language_settings?.clause_delimiter ?? ",";
         }
-        
+
         public static string SentenceSplitRegex() {
             return DialogueData?.language_settings?.sentence_split_regex ?? "[.!?]\\s+";
         }

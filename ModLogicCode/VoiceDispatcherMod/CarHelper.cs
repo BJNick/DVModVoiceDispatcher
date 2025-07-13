@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using DV.Booklets;
-using DV.Logic.Job;
-using DV.ThingTypes;
-using static VoiceDispatcherMod.VoicingUtils;
+﻿using DV.Logic.Job;
+using DV.ThingTypes.TransitionHelpers;
 
 namespace VoiceDispatcherMod {
     public class CarHelper {
@@ -10,12 +7,9 @@ namespace VoiceDispatcherMod {
 
         public static void OnCarClicked(TrainCar car) {
             var job = JobsManager.Instance.GetJobOfCar(car.logicCar);
+
             if (job != null && lastClickedCarId != car.ID && JobsManager.Instance.currentJobs.Count > 0) {
-                //TerseCommentOnCarJob(job);
-                var line = CreateCarIdLine(car);
-                Main.Logger.Log(line);
-                CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
-                
+                TerseCommentOnCarJob(job);
                 lastClickedCarId = car.ID;
             } else {
                 DetailedCommentOnCar(car, job);
@@ -24,51 +18,35 @@ namespace VoiceDispatcherMod {
         }
 
         public static void TerseCommentOnCarJob(Job job) {
-            var lineBuilder = new List<string>();
             var isPartOfYourJob = JobsManager.Instance.currentJobs.Contains(job);
-            if (isPartOfYourJob) {
-                lineBuilder.Add(Randomizer.GetRandomLine("CarInJob", 1, 3));
-            } else {
-                lineBuilder.Add(Randomizer.GetRandomLine("CarNotInJob", 1, 3));
-            }
-
-            CommsRadioNarrator.PlayWithClick(LineChain.FromAssetBundleLines(lineBuilder));
+            string line = JsonLinesLoader.GetRandomAndReplace(isPartOfYourJob ? "car_in_job" : "car_not_in_job");
+            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
         }
-        
+
         public static string CreateCarIdLine(TrainCar car) {
             if (car == null || string.IsNullOrEmpty(car.ID)) {
                 Main.Logger.Error("Cannot create car ID line: car is null or ID is empty.");
                 return "UnknownCar";
             }
+
             return car.MapToCarID();
         }
 
         public static void DetailedCommentOnCar(TrainCar car, Job job) {
-            var lineBuilder = new List<string>();
-            lineBuilder.AddRange(VoicedCarNumber(car.ID));
+            var cargoLocKey = car.logicCar.CurrentCargoTypeInCar.ToV2()?.localizationKeyShort ?? "Empty";
 
-            switch (job?.jobType) {
-                case null:
-                    lineBuilder.Add("NotPartOfAnyOrder");
-                    break;
-                case JobType.ShuntingLoad:
-                    lineBuilder.Add("WaitingForLoading");
-                    break;
-                case JobType.ShuntingUnload:
-                    lineBuilder.Add("WaitingForUnloading");
-                    break;
-                case JobType.Transport:
-                case JobType.EmptyHaul:
-                    lineBuilder.Add("BoundFor");
-                    lineBuilder.Add(GetYardName(JobHelper.ExtractSomeDestinationTrack(job)));
-                    break;
-                default:
-                    lineBuilder.Add("PartOf");
-                    lineBuilder.Add("JobType" + job.jobType);
-                    break;
-            }
-
-            CommsRadioNarrator.PlayWithClick(LineChain.FromAssetBundleLines(lineBuilder));
+            string line = JsonLinesLoader.GetRandomAndReplace("car_description", new() {
+                { "car_id", car.MapToCarID() },
+                { "car_type_loc_key", car.logicCar.carType.localizationKey },
+                { "cargo_type_loc_key", cargoLocKey },
+                { "destination_yard_id", job != null ? JobHelper.ExtractSomeDestinationTrack(job).yardId : "Unknown" }, {
+                    "destination_track_name",
+                    job != null ? JobHelper.ExtractSomeDestinationTrack(job).MapToTrackName() : "Unknown"
+                },
+                { "job_type_id", job != null ? job.jobType.ToString() : "No Job" }
+            });
+            Main.Logger.Log(line);
+            CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
         }
     }
 }

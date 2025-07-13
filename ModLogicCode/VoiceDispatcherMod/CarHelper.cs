@@ -12,7 +12,8 @@ namespace VoiceDispatcherMod {
             Load,
             Unload,
             Deliver,
-            Store
+            Store,
+            Done
         }
 
         public static void OnCarClicked(TrainCar car) {
@@ -33,6 +34,7 @@ namespace VoiceDispatcherMod {
                 CurrentCarStepComment(car, job);
                 return;
             }
+
             string line = JsonLinesLoader.GetRandomAndReplace("car_not_in_job");
             CommsRadioNarrator.PlayWithClick(LineChain.SplitIntoChain(line));
         }
@@ -76,6 +78,9 @@ namespace VoiceDispatcherMod {
                     } else {
                         carStepType = CarStepType.Store;
                         destinationTrack = data.destinationTrack;
+                        if (destinationTrack == car.logicCar._currentTrack.ID) {
+                            carStepType = CarStepType.Done;
+                        }
                     }
 
                     break;
@@ -88,13 +93,21 @@ namespace VoiceDispatcherMod {
                     } else {
                         carStepType = CarStepType.Store;
                         destinationTrack = FindStorageTrackForCar(car, data);
+                        if (destinationTrack == car.logicCar._currentTrack.ID) {
+                            carStepType = CarStepType.Done;
+                        }
                     }
+
                     break;
                 }
                 case JobType.Transport:
                 case JobType.EmptyHaul: {
                     destinationTrack = JobHelper.ExtractSomeDestinationTrack(job);
                     carStepType = CarStepType.Deliver;
+                    if (destinationTrack == car.logicCar._currentTrack.ID) {
+                        carStepType = CarStepType.Done;
+                    }
+
                     break;
                 }
                 default: {
@@ -103,7 +116,7 @@ namespace VoiceDispatcherMod {
                     return;
                 }
             }
-            
+
             var line = JsonLinesLoader.GetRandomAndReplace("car_job_step", new() {
                 { "car_id", car.MapToCarID() },
                 { "car_type_loc_key", car.logicCar.carType.localizationKey },

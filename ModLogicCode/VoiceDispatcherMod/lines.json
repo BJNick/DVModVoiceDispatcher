@@ -414,6 +414,13 @@
             "Take to {@yard_name(yard_id={destination_yard_id})} track {destination_track_name}.",
             "Bound for {@yard_name(yard_id={destination_yard_id})} track {destination_track_name}."
           ]
+        },
+        "Done": {
+          "lines": [
+            "This car is in the right place.",
+            "Keep it on this track for order completion.",
+            "Drop off this car here, its final destination."
+          ]
         }
       }
     },

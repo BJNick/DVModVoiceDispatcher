@@ -178,7 +178,7 @@ namespace VoiceDispatcherMod {
             }
 
             var line = StationHelper.CreateWelcomeToStationOfficeLine(station);
-            if (RateLimiter.CannotYetPlay("AutoHighestJobRead" + station.stationInfo.YardID, RateLimiter.Minutes(10))) {
+            if (!RateLimiter.CannotYetPlay("AutoHighestJobRead" + station.stationInfo.YardID, RateLimiter.Minutes(10))) {
                 line += " " + StationHelper.CreateHighestPayingJobLine(station);
             }
             

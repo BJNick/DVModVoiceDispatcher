@@ -40,11 +40,39 @@ namespace VoiceDispatcherMod {
             modEntry.OnGUI = OnGUI;
             modEntry.OnSaveGUI = OnSaveGUI;
 
-            VoiceGenerator.Init();
-            JsonLinesLoader.Init("D:\\Projects\\Mods\\DVVoiceAssistant\\ModLogicCode\\VoiceDispatcherMod\\lines.json");
-            JsonLinesLoader.LogError = Logger.Error;
+            ReloadVoiceModel(modEntry);
+            ReloadJsonLines(modEntry);
 
             return true;
+        }
+        
+        public static void ReloadVoiceModel(UnityModManager.ModEntry modEntry) {
+            var path = Settings.VoiceModelPath;
+            if (!Path.IsPathRooted(path)) {
+                path = Path.Combine(modEntry.Path, path);
+            }
+            // Check if the file exists
+            if (!Directory.Exists(path)) {
+                Logger.Error($"Voice model directory not found at: {path}");
+                return;
+            }
+            Logger.Log($"Voice model json from: {path}");
+            VoiceGenerator.Init(path);
+        }
+
+        public static void ReloadJsonLines(UnityModManager.ModEntry modEntry) {
+            var path = Settings.LinesJsonPath;
+            if (!Path.IsPathRooted(path)) {
+                path = Path.Combine(modEntry.Path, path);
+            }
+            // Check if the file exists
+            if (!File.Exists(path)) {
+                Logger.Error($"Lines JSON file not found at: {path}");
+                return;
+            }
+            Logger.Log($"Reloading lines json from: {path}");
+            JsonLinesLoader.Init(path);
+            JsonLinesLoader.LogError = Logger.Error;
         }
 
         static bool Unload(UnityModManager.ModEntry modEntry) {
@@ -98,7 +126,16 @@ namespace VoiceDispatcherMod {
         }
 
         static void OnGUI(UnityModManager.ModEntry modEntry) {
+            if (GUILayout.Button("Reload voice model", GUILayout.Width(250))) {
+                ReloadVoiceModel(modEntry);
+            }
+            if (GUILayout.Button("Reload lines.json", GUILayout.Width(250))) {
+                ReloadJsonLines(modEntry);
+            }
             Settings.Draw(modEntry);
+            if (GUILayout.Button("Delete Cached Audio", GUILayout.Width(250))) {
+                VoiceGenerator.ClearCache();
+            }
         }
 
         static void OnSaveGUI(UnityModManager.ModEntry modEntry) {

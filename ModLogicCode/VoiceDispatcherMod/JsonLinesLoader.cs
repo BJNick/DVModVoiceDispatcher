@@ -51,8 +51,6 @@ namespace VoiceDispatcherMod {
             DialogueData = LoadDialogueData();
             if (DialogueData == null) {
                 LogError("Failed to load dialogue data.");
-            } else {
-                LogError("Dialogue data loaded successfully.");
             }
         }
 

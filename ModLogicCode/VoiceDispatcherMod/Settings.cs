@@ -2,13 +2,18 @@
 using UnityModManagerNet;
 
 namespace VoiceDispatcherMod {
-    public class Settings : UnityModManager.ModSettings, IDrawable
-    {
-        [Draw("Radio Volume", DrawType.Slider, Min = 1, Max = 10)]
-        public int Volume = 10;
+    public class Settings : UnityModManager.ModSettings, IDrawable {
 
-        [Draw("TTS Model Name")]
-        public string Model = "en_US-joe-medium";
+        [Draw("TTS Model Directory Path")]
+        public string VoiceModelPath = "Piper\\en_US-joe-medium";
+        
+        [Draw("Lines JSON File Path")]
+        public string LinesJsonPath = "lines.json";
+        
+        [Draw("Voice Volume", DrawType.Slider, Min = 1, Max = 10)]
+        public int Volume = 10;
+        
+        [Header("Features")]
         
         [Draw("Job Helper (current order read, completion)")]
         public bool EnableJobHelper = true;
@@ -30,8 +35,6 @@ namespace VoiceDispatcherMod {
             Save(this, modEntry);
         }
 
-        public void OnChange()
-        {
-        }
+        public void OnChange() {}
     }
 }

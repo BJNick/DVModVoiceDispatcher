@@ -310,12 +310,16 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>start XCOPY /Y "$(TargetPath)" "D:\SteamLibrary\steamapps\common\Derail Valley\Mods\$(ProjectName)\$(ProjectName).dll*"</PostBuildEvent>
+    <PostBuildEvent>
+      start XCOPY /Y "$(TargetPath)" "D:\SteamLibrary\steamapps\common\Derail Valley\Mods\$(ProjectName)\$(ProjectName).dll*"
+      COPY /Y "$(ProjectDir)lines.json" "D:\SteamLibrary\steamapps\common\Derail Valley\Mods\$(ProjectName)\lines.json"
+    </PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

@@ -10,13 +10,13 @@ using VoiceDispatcherMod.PiperSharp;
 
 namespace VoiceDispatcherMod {
     public static class VoiceGenerator {
-        private static string _modelName;
+        private static string _modelPath;
         
         private static string _workingDirectory;
         private static string _outputDirectory;
         
-        public static void Init() {
-            _modelName = Main.Settings.Model;
+        public static void Init(string modelPath) {
+            _modelPath = modelPath;
             _workingDirectory = Path.Combine(Main.mod.Path, "Piper");
             _outputDirectory = Path.Combine(_workingDirectory, "output");
             if (!Directory.Exists(_workingDirectory)) {
@@ -50,11 +50,10 @@ namespace VoiceDispatcherMod {
             if (!string.IsNullOrEmpty(existingFile)) {
                 return existingFile;
             }
-            
-            var modelPath = Path.Combine(_workingDirectory, _modelName);
+
             var piperPath = Path.Combine(_workingDirectory, "piper",
                 Environment.OSVersion.Platform == PlatformID.Win32NT ? "piper.exe" : "piper");
-            var model = await VoiceModel.LoadModel(modelPath);
+            var model = await VoiceModel.LoadModel(_modelPath);
             var piperModelConfig = new PiperConfiguration()
             {
                 ExecutableLocation = piperPath,
@@ -70,11 +69,10 @@ namespace VoiceDispatcherMod {
             if (!string.IsNullOrEmpty(existingFile)) {
                 return existingFile;
             }
-            
-            var modelPath = Path.Combine(_workingDirectory, _modelName);
+
             var piperPath = Path.Combine(_workingDirectory, "piper",
                 Environment.OSVersion.Platform == PlatformID.Win32NT ? "piper.exe" : "piper");
-            var model = await VoiceModel.LoadModel(modelPath);
+            var model = await VoiceModel.LoadModel(_modelPath);
             var piperModelConfig = new PiperConfiguration()
             {
                 ExecutableLocation = piperPath,
@@ -130,6 +128,20 @@ namespace VoiceDispatcherMod {
                 throw new InvalidOperationException("Failed to generate audio clip.");
             }
             return await LoadAudioClipFromFileAsync(filePath);
+        }
+        
+        public static void ClearCache() {
+            if (Directory.Exists(_outputDirectory)) {
+                foreach (var file in Directory.GetFiles(_outputDirectory)) {
+                    try {
+                        File.Delete(file);
+                    } catch (Exception ex) {
+                        Main.Logger.Error($"Failed to delete file {file}: {ex.Message}");
+                    }
+                }
+            } else {
+                Main.Logger.Warning("Output directory does not exist, nothing to clear.");
+            }
         }
 
     }

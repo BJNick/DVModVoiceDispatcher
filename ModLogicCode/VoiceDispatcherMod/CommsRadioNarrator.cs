@@ -214,7 +214,7 @@ namespace VoiceDispatcherMod {
         }
 
         public void SetStartingDisplay() {
-            display.SetDisplay("Narrator", "Ongoing order available", "Check");
+            display.SetDisplay("Dispatcher", "Ongoing order available", "Check");
         }
 
         #endregion
@@ -260,7 +260,7 @@ namespace VoiceDispatcherMod {
                 if (currentlyReading) {
                     // Split camelcase with spaces
                     string subtitle = Regex.Replace(source.clip.name, "(?<=[a-z])([A-Z])", " $1").Trim();
-                    display.SetContentAndAction("Speaking...\n" + subtitle, "Interrupt");
+                    display.SetContentAndAction( subtitle, "Interrupt");
                     return;
                 }
 

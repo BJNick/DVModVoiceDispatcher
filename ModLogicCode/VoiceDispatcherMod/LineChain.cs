@@ -219,6 +219,7 @@ namespace VoiceDispatcherMod {
                 }
                 
                 // Main.Logger.Log("Playing line: " + currentLine.SubtitleText);
+                currentLine.AudioClip.name = currentLine.SubtitleText;
                 CommsRadioNarrator.PlayRadioClip(currentLine.AudioClip);
                 
                 while (CommsRadioNarrator.source.isPlaying) {

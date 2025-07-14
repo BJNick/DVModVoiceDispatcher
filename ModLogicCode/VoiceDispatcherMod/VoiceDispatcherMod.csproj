@@ -319,6 +319,7 @@
     <PostBuildEvent>
       start XCOPY /Y "$(TargetPath)" "D:\SteamLibrary\steamapps\common\Derail Valley\Mods\$(ProjectName)\$(ProjectName).dll*"
       COPY /Y "$(ProjectDir)lines.json" "D:\SteamLibrary\steamapps\common\Derail Valley\Mods\$(ProjectName)\lines.json"
+      COPY /Y "$(ProjectDir)..\..\info.json" "D:\SteamLibrary\steamapps\common\Derail Valley\Mods\$(ProjectName)\info.json"
     </PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

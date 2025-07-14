@@ -208,12 +208,17 @@ namespace VoiceDispatcherMod {
             while (index < lineChain.Count) {
                 var currentLine = lineChain[index];
                 currentLine.CreateClip(coroutineRunner);
+                
+                // Wait for the game to resume
+                while (Time.timeScale == 0f) {
+                    yield return null;
+                }
             
                 while (!currentLine.IsClipReady && !currentLine.IsClipFailed) {
                     yield return null;
                 }
                 
-                //Main.Logger.Log("Playing line: " + lineChain[index].SubtitleText);
+                // Main.Logger.Log("Playing line: " + currentLine.SubtitleText);
                 CommsRadioNarrator.PlayRadioClip(currentLine.AudioClip);
                 
                 while (CommsRadioNarrator.source.isPlaying) {

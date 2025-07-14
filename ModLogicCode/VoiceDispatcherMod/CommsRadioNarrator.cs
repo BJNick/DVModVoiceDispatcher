@@ -416,58 +416,6 @@ namespace VoiceDispatcherMod {
             }
         }
 
-        private static IEnumerator PlayVoiceLinesCoroutine(string[] lines) {
-            var clips = lines.Select(GetVoicedClip).Where(clip => clip != null).ToArray();
-            return PlayClipsInCoroutine(clips);
-        }
-        
-        public static async Task GenerateAndPlay(string line, bool withClick = true) {
-            Main.Logger.Log("Ignoring voice line: " + line);
-            return;
-            
-            var clip = await VoiceGenerator.CreateClip(line);
-            
-            var clipList = new List<AudioClip> { clip };
-            if (withClick) {
-                clipList.Insert(0, GetVoicedClip("NoiseClick"));
-                clipList.Add(GetVoicedClip("NoiseClick"));
-            }
-            
-            /*if (currentlyReading) {
-                // TODO
-                Main.Logger.Warning("Already reading a voice line, CANNOT QUEUE this one.");
-                return;
-            }*/
-
-            currentlyReading = true;
-            SetupCoroutineRunner();
-            currentCoroutine = coroutineRunner.StartCoroutine(PlayClipsInCoroutine(clipList.ToArray()));
-        }
-
-        private static IEnumerator PlayClipsInCoroutine(AudioClip[] clips) {
-            if (clips.Length == 0) {
-                Main.Logger.Error("No valid voice lines found.");
-                yield break;
-            }
-
-            clips[0].LoadAudioData();
-            foreach (var clip in clips) {
-                PlayRadioClip(clip);
-                // Sleep until the next clip is ready to play
-                var waitTime = clip.length - 0.05f;
-                yield return new WaitForSeconds(waitTime);
-            }
-
-            if (!NarratorQueue.HasLines()) {
-                currentlyReading = false;
-            } else {
-                Main.Logger.Log("Waiting to play next queued voice line.");
-                yield return new WaitForSeconds(delayBetweenLinesInQueue);
-                currentlyReading = false;
-                PlayWithClick(NarratorQueue.Dequeue());
-            }
-        }
-
         private static void CutCoroutineShort(bool playClick = true) {
             if (currentCoroutine != null && currentlyReading) {
                 if (coroutineRunner != null) coroutineRunner.StopCoroutine(currentCoroutine);

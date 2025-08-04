@@ -11,11 +11,26 @@ namespace VoiceDispatcherMod {
         // Patch: Adding lines, no logic changes
         private const string InitialVersion = "0.0.1";
 
-        private const string CodeVersion = "0.0.2";
-
         private const string VersionKey = "formatVersion";
 
         public static Action<string> LogError = Console.WriteLine;
+        
+        public static bool IsUpToDate(string path) {
+            return GetVersionStr(path) == GetBuiltInVersionStr();
+        }
+
+        public static void CreateBackup(string path) {
+            try {
+                var version = GetVersionStr(path);
+                var backupPath = path.Replace(".json", "") + "." + version + ".json";
+                if (File.Exists(backupPath)) {
+                    return;
+                }
+                File.Copy(path, backupPath);
+            } catch (Exception ex) {
+                LogError($"Error creating backup for {path}: {ex.Message}");
+            }
+        }
 
         public static void FixFile(string path) {
             string json;
@@ -97,6 +112,25 @@ namespace VoiceDispatcherMod {
                     // Recurse for nested objects
                     MergeJson((JObject)prop.Value, (JObject)translated[prop.Name], prop.Name);
                 }
+            }
+        }
+
+        public static string GetVersionStr(string path) {
+            try {
+                var json = File.ReadAllText(path);
+                var root = JObject.Parse(json);
+                return root["metadata"]?[VersionKey]?.ToString() ?? InitialVersion;
+            } catch (Exception) {
+                return InitialVersion;
+            }
+        }
+        
+        public static string GetBuiltInVersionStr() {
+            try {
+                var builtInJson = ReadBuiltIn();
+                return builtInJson["metadata"]?[VersionKey]?.ToString() ?? InitialVersion;
+            } catch (Exception) {
+                return InitialVersion;
             }
         }
     }

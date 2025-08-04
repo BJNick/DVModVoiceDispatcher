@@ -78,7 +78,11 @@ namespace VoiceDispatcherMod {
             Logger.Log($"Reloading lines json from: {path}");
             JsonLinesLoader.LogError = Logger.Error;
             try {
-                JsonVersionConverter.FixFile(path);
+                if (!JsonVersionConverter.IsUpToDate(path)) {
+                    Logger.Warning("Lines JSON file is not up to date. Attempting to fix it.");
+                    JsonVersionConverter.CreateBackup(path);
+                    JsonVersionConverter.FixFile(path);
+                }
                 JsonLinesLoader.Init(path);
             } catch (Exception) {
                 Logger.Error("Failed to load lines from JSON");
@@ -139,15 +143,15 @@ namespace VoiceDispatcherMod {
             if (GUILayout.Button("Reload voice model", GUILayout.Width(250))) {
                 ReloadVoiceModel(modEntry);
             }
-            if (GUILayout.Button("Reload lines.json", GUILayout.Width(250))) {
-                ReloadJsonLines(modEntry);
-            }
             if (JsonLinesLoader.DialogueData != null && JsonLinesLoader.DialogueData.metadata != null) {
                 GUILayout.Label($"Loaded JSON: {JsonLinesLoader.DialogueData.metadata.name} " +
                                 $"({JsonLinesLoader.DialogueData.metadata.language}) " +
                                 $"by {JsonLinesLoader.DialogueData.metadata.author} " +
                                 $"v{JsonLinesLoader.DialogueData.metadata.lineVersion} " +
                                 $"- {JsonLinesLoader.DialogueData.metadata.description}");
+            }
+            if (GUILayout.Button("Reload lines.json", GUILayout.Width(250))) {
+                ReloadJsonLines(modEntry);
             }
             Settings.Draw(modEntry);
             if (GUILayout.Button("Delete Cached Audio", GUILayout.Width(250))) {

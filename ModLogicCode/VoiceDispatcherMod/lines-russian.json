@@ -1,4 +1,12 @@
-﻿{
+{
+  "metadata": {
+    "formatVersion": "0.0.2",
+    "lineVersion": "0.1.0",
+    "name": "Default Russian",
+    "language": "Russian",
+    "description": "Default russian lines for the Voice Dispatcher Mod.",
+    "author": "BJNick"
+  },
   "language_settings": {
     "sentence_delimiter": ".",
     "clause_delimiter": ",",
@@ -417,6 +425,189 @@
         "10": "десять",
         "default": "{number}"
       }
+    },
+    "speed_limit_change": {
+      "description": "Lines reporting an upcoming change in speed limit.",
+      "placeholders": [
+        "{speed_limit}",
+        "{distance}",
+        "{distance_rounded}"
+      ],
+      "line": "Speed limit {speed_limit} in {distance_rounded} meters."
+    },
+    "speed_limit_change_2": {
+      "description": "Lines reporting an upcoming change in speed limit, followed shortly by another change.",
+      "placeholders": [
+        "{speed_limit}",
+        "{speed_limit_2}",
+        "{distance}",
+        "{distance_rounded}",
+        "{distance_rounded_2}"
+      ],
+      "line": "Speed limit {speed_limit}, then drop to {speed_limit_2} in {distance_rounded_2} meters."
+    },
+    "speeding_warning": {
+      "description": "Lines warning the player to slow down in anticipation. {speed_limit} is replaced with the upcoming speed limit.",
+      "placeholders": [
+        "{speed_limit}"
+      ],
+      "lines": [
+        "Slow down!",
+        "Watch your speed!",
+        "You're moving too fast!",
+        "Going over speed limit!",
+        "Reduce speed immediately!",
+        "Exceeding speed limit {speed_limit}!",
+        "Throttle back before you derail!",
+        "Stick to {speed_limit} or you'll regret it.",
+        "Your speeding is making the higher-ups nervous.",
+        "This isn't a race, slow it down.",
+        "You're about to set a new speed record, do not.",
+        "Remember you have brakes, use them!",
+        "Good luck with the tight curve ahead."
+      ]
+    },
+    "job_completed_payout": {
+      "description": "Lines reporting the outcome of a completed job.",
+      "placeholders": [
+        "{job_name}",
+        "{job_type_id}",
+        "{exact_payout}",
+        "{rounded_payout}",
+        "{is_bonus_time}",
+        "{minutes_taken}"
+      ],
+      "match_string": "{is_bonus_time}",
+      "match_map": {
+        "true": {
+          "description": "Lines for jobs completed within bonus time.",
+          "lines": [
+            "Well done! The job took {minutes_taken} minutes, and you earned a bonus payout of {rounded_payout} dollars.",
+            "Enjoy your bonus of {rounded_payout} dollars for completing the job in {minutes_taken} minutes.",
+            "Here are your {rounded_payout} dollars for finishing the job in {minutes_taken} minutes within bonus time."
+          ]
+        },
+        "false": {
+          "description": "Lines for jobs completed outside of bonus time.",
+          "lines": [
+            "Nice work! You were a bit slow, but you still completed the job in {minutes_taken} minutes, earning {rounded_payout} dollars.",
+            "Tough luck this time with the bonus, but you still earned {rounded_payout} dollars for completing the job in {minutes_taken} minutes.",
+            "{minutes_taken} minutes was too long for a bonus, but you still earned {rounded_payout} dollars for completing the job."
+          ]
+        }
+      }
+    },
+    "car_count_russian_example": {
+      "description": "Number followed by 'cars' in the proper plural form in Russian.",
+      "placeholders": [
+        "{count}"
+      ],
+      "match_string": "{count}",
+      "match_map": {
+        ".*(?<!1)1": {
+          "line": "{count} vagon"
+        },
+        ".*(?<!1)[234]": {
+          "line": "{count} vagona"
+        },
+        "default": {
+          "line": "{count} vagonov"
+        }
+      }
+    },
+    "car_description": {
+      "description": "Reads out a full description when a car is selected.",
+      "placeholders": [
+        "{car_id}",
+        "{car_type_loc_key}",
+        "{cargo_type_loc_key}",
+        "{destination_yard_id}",
+        "{destination_track_name}",
+        "{job_type_id}"
+      ],
+      "match_string": "{job_type_id}",
+      "simple_match_map": {
+        "ShuntingLoad": "{car_id}. For loading at {destination_track_name}",
+        "ShuntingUnload": "{car_id}. {@L(key={cargo_type_loc_key})} for unloading at {destination_track_name}.",
+        "Transport": "{car_id}. {@L(key={cargo_type_loc_key})} bound for {@yard_name(yard_id={destination_yard_id})}.",
+        "EmptyHaul": "{car_id}. Logistical order bound for {@yard_name(yard_id={destination_yard_id})}.",
+        "default": "{car_id}. Not part of any order."
+      }
+    },
+    "car_job_step": {
+      "description": "Reads out what the next step for this car is.",
+      "placeholders": [
+        "{step_type}",
+        "{destination_yard_id}",
+        "{destination_track_name}"
+      ],
+      "match_string": "{step_type}",
+      "match_map": {
+        "Unload": {
+          "lines": [
+            "Unload at {destination_track_name}.",
+            "Empty at {destination_track_name}.",
+            "To be unloaded at {destination_track_name}."
+          ]
+        },
+        "Load": {
+          "lines": [
+            "Load at {destination_track_name}.",
+            "Fill with cargo at {destination_track_name}.",
+            "To be loaded at {destination_track_name}."
+          ]
+        },
+        "Store": {
+          "lines": [
+            "Store at {destination_track_name}.",
+            "Take to {destination_track_name}.",
+            "Move to {destination_track_name}.",
+            "Drop off at {destination_track_name}."
+          ]
+        },
+        "Deliver": {
+          "lines": [
+            "Deliver to {@yard_name(yard_id={destination_yard_id})} track {destination_track_name}.",
+            "Take to {@yard_name(yard_id={destination_yard_id})} track {destination_track_name}.",
+            "Bound for {@yard_name(yard_id={destination_yard_id})} track {destination_track_name}."
+          ]
+        },
+        "Done": {
+          "lines": [
+            "This car is in the right place.",
+            "Keep it on this track for order completion.",
+            "Drop off this car here for storage."
+          ]
+        }
+      }
+    },
+    "car_in_job": {
+      "description": "Reads out a note that this car is needed for a current ongoing job.",
+      "lines": [
+        "Take this car",
+        "You need this car.",
+        "Yes, need that one too.",
+        "Part of your order.",
+        "Don't forget this one."
+      ]
+    },
+    "car_not_in_job": {
+      "description": "Reads out a note that this car is not needed for any current ongoing jobs.",
+      "lines": [
+        "Unrelated car.",
+        "Leave it alone.",
+        "Not part of your order.",
+        "Don't move this car."
+      ]
+    },
+    "call_test": {
+      "description": "Lines used for testing the call replacements of the mod. These lines are not meant to be used in the game.",
+      "placeholders": [
+        "{destination_count}",
+        "{destination_sub_yard_id}",
+        "{destination_order_number}"
+      ],
+      "line": "Make sure to go to track {@track_name(sub_yard_id={destination_sub_yard_id},order_number={destination_order_number})}. Pick up {@car_count(count={destination_count})} from there. Also check out {@track_name(sub_yard_id=E, order_number=1)} for more cars.}"
     }
   }
 }

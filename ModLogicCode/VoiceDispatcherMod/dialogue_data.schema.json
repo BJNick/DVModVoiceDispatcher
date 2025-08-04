@@ -4,6 +4,7 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
+    "metadata": { "$ref": "#/definitions/Metadata" },
     "line_groups": {
       "type": "object",
       "additionalProperties": {
@@ -13,8 +14,21 @@
     "language_settings": { "$ref":"#/definitions/LanguageSettings" },
     "additionalProperties": false
   },
-  "required": ["line_groups", "language_settings"],
+  "required": ["line_groups", "language_settings", "metadata"],
   "definitions": {
+    "Metadata": {
+      "type": "object",
+      "properties": {
+        "lineVersion": { "type": "string" },
+        "formatVersion": { "type": "string" },
+        "name": { "type": "string" },
+        "language": { "type": "string" },
+        "description": { "type": "string" },
+        "author": { "type": "string" }
+      },
+      "required": ["lineVersion", "formatVersion", "name", "language", "description", "author"],
+      "additionalProperties": false
+    },
     "LineGroup": {
       "type": "object",
       "properties": {

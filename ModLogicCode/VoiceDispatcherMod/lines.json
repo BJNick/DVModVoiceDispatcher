@@ -1,4 +1,12 @@
 ﻿{
+  "metadata": {
+    "formatVersion": "0.0.2",
+    "lineVersion": "0.1.0",
+    "name": "Default Lines",
+    "language": "English",
+    "description": "Default lines for the Voice Dispatcher Mod.",
+    "author": "BJNick"
+  },
   "language_settings": {
     "sentence_delimiter": ".",
     "clause_delimiter": ",",

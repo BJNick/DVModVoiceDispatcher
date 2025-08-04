@@ -273,6 +273,7 @@
     <Compile Include="CommsRadioNarrator.cs" />
     <Compile Include="JobHelper.cs" />
     <Compile Include="JsonLinesLoader.cs" />
+    <Compile Include="JsonVersionConverter.cs" />
     <Compile Include="LineChain.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="NarratorLineQueue.cs" />
@@ -336,6 +337,6 @@
   <ItemGroup>
     <Content Include="dialogue_data.schema.json" />
     <Content Include="lines-russian.json" />
-    <Content Include="lines.json" />
+    <EmbeddedResource Include="lines.json" />
   </ItemGroup>
 </Project>

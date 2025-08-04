@@ -184,7 +184,10 @@ namespace VoiceDispatcherMod {
                 Play();
             }
         }
-        
+
+        public static void FixFileTest() {
+            JsonVersionConverter.FixFile("D:\\Projects\\Mods\\DVVoiceAssistant\\ModLogicCode\\VoiceDispatcherMod\\lines-russian.json");
+        }
         
     }
 }

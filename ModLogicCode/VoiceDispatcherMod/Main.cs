@@ -61,9 +61,14 @@ namespace VoiceDispatcherMod {
         }
 
         public static void ReloadJsonLines(UnityModManager.ModEntry modEntry) {
+            var isDefault = Settings.LinesJsonPath == "lines.json";
             var path = Settings.LinesJsonPath;
             if (!Path.IsPathRooted(path)) {
                 path = Path.Combine(modEntry.Path, path);
+            }
+            JsonVersionConverter.LogError = Logger.Error;
+            if (isDefault) {
+                JsonVersionConverter.CreateFileIfMissing(path);
             }
             // Check if the file exists
             if (!File.Exists(path)) {
@@ -71,8 +76,13 @@ namespace VoiceDispatcherMod {
                 return;
             }
             Logger.Log($"Reloading lines json from: {path}");
-            JsonLinesLoader.Init(path);
             JsonLinesLoader.LogError = Logger.Error;
+            try {
+                JsonVersionConverter.FixFile(path);
+                JsonLinesLoader.Init(path);
+            } catch (Exception) {
+                Logger.Error("Failed to load lines from JSON");
+            }
         }
 
         static bool Unload(UnityModManager.ModEntry modEntry) {
@@ -131,6 +141,13 @@ namespace VoiceDispatcherMod {
             }
             if (GUILayout.Button("Reload lines.json", GUILayout.Width(250))) {
                 ReloadJsonLines(modEntry);
+            }
+            if (JsonLinesLoader.DialogueData != null && JsonLinesLoader.DialogueData.metadata != null) {
+                GUILayout.Label($"Loaded JSON: {JsonLinesLoader.DialogueData.metadata.name} " +
+                                $"({JsonLinesLoader.DialogueData.metadata.language}) " +
+                                $"by {JsonLinesLoader.DialogueData.metadata.author} " +
+                                $"v{JsonLinesLoader.DialogueData.metadata.lineVersion} " +
+                                $"- {JsonLinesLoader.DialogueData.metadata.description}");
             }
             Settings.Draw(modEntry);
             if (GUILayout.Button("Delete Cached Audio", GUILayout.Width(250))) {

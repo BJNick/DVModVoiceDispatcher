@@ -7,8 +7,21 @@ using DV.Localization;
 using Newtonsoft.Json;
 
 namespace VoiceDispatcherMod {
+    
+    [Serializable]
+    public class Metadata {
+        public string lineVersion;
+        public string formatVersion;
+
+        public string name;
+        public string language;
+        public string description;
+        public string author;
+    }
+    
     [Serializable]
     public class DialogueData {
+        public Metadata metadata;
         public Dictionary<string, LineGroup> line_groups;
         public LanguageSettings language_settings;
     }

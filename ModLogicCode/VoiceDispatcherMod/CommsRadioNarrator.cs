@@ -157,16 +157,16 @@ namespace VoiceDispatcherMod {
             menuList = new RadioMenuList(display);
             
             mainMenuActions = new() {
-                new ActionItem("Cancel", () => {
+                new ActionItem("menu_cancel", () => {
                     CommsRadioController.PlayAudioFromRadio(CancelSound, transform);
                     SetState(State.MainView);
                 }),
-                new ActionItem("What's my order?", () => {
+                new ActionItem("menu_whats_my_order", () => {
                     CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform); 
                     JobHelper.ReadAllJobsOverview();
                     SetState(State.MainView);
                 }),
-                new ActionItem("Highest job here?", () => {
+                new ActionItem("menu_highest_job_here", () => {
                     if (StationHelper.playerYard == null) {
                         CommsRadioController.PlayAudioFromRadio(CancelSound, transform);
                         return;
@@ -177,7 +177,7 @@ namespace VoiceDispatcherMod {
                     PlayWithClick(LineChain.SplitIntoChain(line));
                     SetState(State.MainView);
                 }),
-                new ActionItem("Edit Settings", () => {
+                new ActionItem("menu_edit_settings", () => {
                     CommsRadioController.PlayAudioFromRadio(ConfirmSound, transform);
                     SetState(State.ChangeSettings);
                 }),
@@ -196,14 +196,14 @@ namespace VoiceDispatcherMod {
                 menuList.RenderActions();
             }
             settingsActions = new() {
-                new ActionItem("Back", () => {
+                new ActionItem("menu_back", () => {
                     CommsRadioController.PlayAudioFromRadio(CancelSound, transform);
                     SetState(State.SelectActions);
                 }),
-                new ActionItem("Increase volume", () => { SetVolume(Main.Settings.Volume + 1); },
-                    () => $"Increase vol {Main.Settings.Volume}"),
-                new ActionItem("Decrease volume", () => { SetVolume(Main.Settings.Volume - 1); },
-                    () => $"Decrease vol {Main.Settings.Volume}"),
+                new ActionItem("menu_increase_volume", () => { SetVolume(Main.Settings.Volume + 1); },
+                    ActionItem.FromKey("menu_increase_vol_current", "current_volume",  () => Main.Settings.Volume.ToString())),
+                new ActionItem("menu_decrease_volume", () => { SetVolume(Main.Settings.Volume - 1); },
+                    ActionItem.FromKey("menu_decrease_vol_current", "current_volume", () => Main.Settings.Volume.ToString())),
             };
         }
 
@@ -214,7 +214,7 @@ namespace VoiceDispatcherMod {
         }
 
         public void SetStartingDisplay() {
-            display.SetDisplay("Dispatcher", "Ongoing order available", "Check");
+            display.SetDisplay(ActionItem.FromKey("menu_title")());
         }
 
         #endregion
@@ -252,7 +252,7 @@ namespace VoiceDispatcherMod {
                 }
 
                 PointedCar = car;
-                display.SetContentAndAction("What's this car?", "Ask");
+                display.SetContentAndAction(ActionItem.FromKey("menu_whats_this_car")(), ActionItem.FromKey("menu_ask")());
             } else {
                 PointedCar = null;
                 ClearHighlightedCar();
@@ -260,11 +260,11 @@ namespace VoiceDispatcherMod {
                 if (currentlyReading) {
                     // Split camelcase with spaces
                     string subtitle = Regex.Replace(source.clip.name, "(?<=[a-z])([A-Z])", " $1").Trim();
-                    display.SetContentAndAction( subtitle, "Interrupt");
+                    display.SetContentAndAction( subtitle, ActionItem.FromKey("menu_interrupt")());
                     return;
                 }
 
-                display.SetContentAndAction("Open menu?");
+                display.SetContentAndAction(ActionItem.FromKey("menu_open_menu")());
             }
         }
 

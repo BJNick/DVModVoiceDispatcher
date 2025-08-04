@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "formatVersion": "0.0.2",
+    "formatVersion": "0.0.3",
     "lineVersion": "0.1.0",
     "name": "Default Russian",
     "language": "Russian",
@@ -608,6 +608,57 @@
         "{destination_order_number}"
       ],
       "line": "Make sure to go to track {@track_name(sub_yard_id={destination_sub_yard_id},order_number={destination_order_number})}. Pick up {@car_count(count={destination_count})} from there. Also check out {@track_name(sub_yard_id=E, order_number=1)} for more cars.}"
+    },
+    "menu_title": {
+      "line": "Диспетчер"
+    },
+    "menu_cancel": {
+      "line": "Отменить"
+    },
+    "menu_back": {
+      "line": "Назад"
+    },
+    "menu_interrupt": {
+      "line": "Прервать"
+    },
+    "menu_ask": {
+      "line": "Спросить"
+    },
+    "menu_whats_my_order": {
+      "line": "Какой у меня заказ?"
+    },
+    "menu_highest_job_here": {
+      "line": "Прибыльная работа?"
+    },
+    "menu_whats_this_car": {
+      "line": "Что это за вагон?"
+    },
+    "menu_open_menu": {
+      "line": "Открыть меню?"
+    },
+    "menu_settings_title": {
+      "line": "Настройки"
+    },
+    "menu_edit_settings": {
+      "line": "Изменить настройки"
+    },
+    "menu_increase_volume": {
+      "line": "Увеличить громк."
+    },
+    "menu_decrease_volume": {
+      "line": "Уменьшить громк."
+    },
+    "menu_increase_vol_current": {
+      "placeholders": [
+        "{current_volume}"
+      ],
+      "line": "Увеличить {current_volume}"
+    },
+    "menu_decrease_vol_current": {
+      "placeholders": [
+        "{current_volume}"
+      ],
+      "line": "Уменьшить {current_volume}"
     }
   }
 }

@@ -4,14 +4,20 @@ using DV;
 
 namespace VoiceDispatcherMod {
     public class ActionItem {
-        public string Name;
+        public Func<string> Name;
         private Action Run;
         public Func<string> ActionName;
         
-        public ActionItem(string name, Action run, Func<string> actionName = null) {
+        public ActionItem(string key, Action run, Func<string> actionName = null) {
+            Name = FromKey(key);
+            Run = run;
+            ActionName = actionName ?? Name;
+        }
+        
+        public ActionItem(Func<string> name, Action run, Func<string> actionName = null) {
             Name = name;
             Run = run;
-            ActionName = actionName ?? (() => name);
+            ActionName = actionName ?? (() => name());
         }
         
         public void OnUse() {
@@ -19,7 +25,17 @@ namespace VoiceDispatcherMod {
         }
 
         public override string ToString() {
-            return Name;
+            return Name();
+        }
+
+        public static Func<string> FromKey(string key) {
+            return () => JsonLinesLoader.GetRandomAndReplace(key);
+        }
+        
+        public static Func<string> FromKey(string key, string blankKey, Func<string> replacement) {
+            return () => JsonLinesLoader.GetRandomAndReplace(key, new Dictionary<string, string> {
+                { blankKey, replacement() }
+            });
         }
     }
     

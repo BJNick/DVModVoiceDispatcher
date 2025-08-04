@@ -81,13 +81,15 @@ namespace VoiceDispatcherMod {
 
         public static void Transition(JObject original, JObject translated) {
             var versionFrom = new Version(translated["metadata"]?[VersionKey]?.ToString() ?? InitialVersion);
-            switch (versionFrom.ToString()) {
+            var finalVersion = GetBuiltInVersionStr();
+            /*switch (versionFrom.ToString()) {
                 case "0.0.1": {
-                    // No changes needed, just update version
-                    translated["metadata"][VersionKey] = "0.0.2";
+                    
                     break;
                 }
-            }
+            }*/
+            // No changes needed, just update version
+            translated["metadata"][VersionKey] = finalVersion;
         }
 
         public static JObject ReadBuiltIn() {

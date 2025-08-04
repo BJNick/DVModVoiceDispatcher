@@ -1,6 +1,6 @@
 ﻿{
   "metadata": {
-    "formatVersion": "0.0.2",
+    "formatVersion": "0.0.3",
     "lineVersion": "0.1.0",
     "name": "Default Lines",
     "language": "English",
@@ -606,6 +606,57 @@
         "10": "ten",
         "default": "{number}"
       }
+    },
+    "menu_title": {
+      "line": "Dispatcher"
+    },
+    "menu_cancel": {
+      "line": "Cancel"
+    },
+    "menu_back": {
+      "line": "Back"
+    },
+    "menu_interrupt": {
+      "line": "Interrupt"
+    },
+    "menu_ask": {
+      "line": "Ask"
+    },
+    "menu_whats_my_order": {
+      "line": "What's my order?"
+    },
+    "menu_highest_job_here": {
+      "line": "Highest job here?"
+    },
+    "menu_whats_this_car": {
+      "line": "What's this car?"
+    },
+    "menu_open_menu": {
+      "line": "Open menu?"
+    },
+    "menu_settings_title": {
+      "line": "Settings"
+    },
+    "menu_edit_settings": {
+      "line": "Edit Settings"
+    },
+    "menu_increase_volume": {
+      "line": "Increase volume"
+    },
+    "menu_decrease_volume": {
+      "line": "Decrease volume"
+    },
+    "menu_increase_vol_current": {
+      "placeholders": [
+        "{current_volume}"
+      ],
+      "line": "Increase vol {current_volume}"
+    },
+    "menu_decrease_vol_current": {
+      "placeholders": [
+        "{current_volume}"
+      ],
+      "line": "Decrease vol {current_volume}"
     }
   }
 }

@@ -2,7 +2,7 @@
   "Id": "VoiceDispatcherMod",
   "DisplayName": "Voice Dispatcher Mod",
   "Author": "BJNick",
-  "Version": "0.0.2",
+  "Version": "0.0.3",
   "AssemblyName": "VoiceDispatcherMod.dll",
   "EntryMethod": "VoiceDispatcherMod.Main.Load"
 }
